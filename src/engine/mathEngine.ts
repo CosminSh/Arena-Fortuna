@@ -149,7 +149,7 @@ export const ENEMY_GLADIATORS: Gladiator[] = [
     archetypeId: 'murmillo',
     maxHp: 100,
     currentHp: 100,
-    shieldCharges: 25, // Decimus starts with 25 shield protection!
+    shieldCharges: 12, // Decimus starts with 12 shield armor
     houseName: 'House of the Golden Falcon',
     isPlayer: false,
     avatarUrl: './assets/murmillo.png',
@@ -179,7 +179,7 @@ export const ENEMY_GLADIATORS: Gladiator[] = [
     archetypeId: 'retiarius',
     maxHp: 90,
     currentHp: 90,
-    shieldCharges: 10,
+    shieldCharges: 5, // Batiatus starts with 5 shield armor
     houseName: 'House of the Golden Falcon',
     isPlayer: false,
     avatarUrl: './assets/retiarius.png',
@@ -194,7 +194,7 @@ export const ENEMY_GLADIATORS: Gladiator[] = [
     archetypeId: 'thraex',
     maxHp: 110,
     currentHp: 110,
-    shieldCharges: 30, // Flamma starts with 30 shield protection!
+    shieldCharges: 15, // Flamma starts with 15 shield armor
     houseName: 'House of the Golden Falcon',
     isPlayer: false,
     avatarUrl: './assets/thraex.png',
@@ -323,9 +323,9 @@ export function resolveTurn(
     else if (matchCount === 2) rawDamage = Math.round((25 + gearDamageBonus) * triangleMultiplier);
     else rawDamage = Math.round((10 + gearDamageBonus) * triangleMultiplier);
   } else if (primarySymbol === 'shield') {
-    if (matchCount === 3) shieldGranted = 35 + gearShieldBonus;
-    else if (matchCount === 2) shieldGranted = 20 + gearShieldBonus;
-    else shieldGranted = 10;
+    if (matchCount === 3) shieldGranted = 22 + gearShieldBonus;
+    else if (matchCount === 2) shieldGranted = 14 + gearShieldBonus;
+    else shieldGranted = 4;
 
     if (attacker.archetypeId === 'murmillo') {
       shieldGranted = Math.round(shieldGranted * 1.25);
@@ -336,13 +336,13 @@ export function resolveTurn(
 
     if (attacker.archetypeId === 'murmillo') {
       if (matchCount === 3) {
-        shieldGranted = 45 + gearShieldBonus;
+        shieldGranted = 25 + gearShieldBonus;
         rawDamage = 15 + gearDamageBonus;
       } else if (matchCount === 2) {
-        shieldGranted = 25 + gearShieldBonus;
+        shieldGranted = 15 + gearShieldBonus;
         rawDamage = 10 + gearDamageBonus;
       } else {
-        shieldGranted = 10;
+        shieldGranted = 4;
       }
     } else if (attacker.archetypeId === 'thraex') {
       if (matchCount === 3) {
@@ -395,7 +395,8 @@ export function resolveTurn(
   netDamage = Math.max(0, Math.round(remainingDamage));
   const updatedDefenderHp = Math.max(0, defender.currentHp - netDamage);
 
-  const updatedAttackerShields = attacker.shieldCharges + shieldGranted;
+  const maxShieldCap = attacker.archetypeId === 'murmillo' ? 30 : 22;
+  const updatedAttackerShields = Math.min(maxShieldCap, attacker.shieldCharges + shieldGranted);
   const updatedDefenderShields = Math.max(0, defender.shieldCharges - shieldBlocked);
 
   let logMessage = `${attacker.name} rolled [${reels.map((r) => r.toUpperCase()).join(' | ')}].`;
