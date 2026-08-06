@@ -70,7 +70,7 @@ export const App: React.FC = () => {
         onResetToHome={handleReturnHome}
       />
 
-      <main style={{ flex: 1 }}>
+      <main className="main-content">
         {viewMode === 'home' && (
           <HomeView
             onStartWar={handleStartWar}
@@ -115,10 +115,6 @@ export const App: React.FC = () => {
       {showProbabilityModal && (
         <ProbabilityModal onClose={() => setShowProbabilityModal(false)} />
       )}
-
-      <footer style={{ textAlign: 'center', margin: '2rem 0 1rem', color: 'var(--color-text-muted)', fontSize: '0.8rem' }}>
-        Arena Reels — Vertical Slice Prototype | Designed for GitHub Pages | Job Assignment Demo
-      </footer>
     </div>
   );
 };
