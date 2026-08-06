@@ -10,11 +10,42 @@
 **Arena Reels** is a static, self-contained vertical slice prototype demonstrating a **slot-machine combat mechanic** set inside an asynchronous PvP gladiator guild war context.
 
 This prototype represents **Part A** of the attached [Game Design Document (GDD)](./Arena_Reels_GDD.md). It delivers a complete, playable slice of battle:
-- **No Backend / No Firebase / No Login**: Pure client-side React + TypeScript application engineered for static deployment on GitHub Pages.
+- **No Backend / No Firebase / No Login**: Client-side React + TypeScript application engineered for static deployment on GitHub Pages.
 - **Gladiator Archetypes**: Choose between the defensive **Murmillo**, the shield-bypassing **Thraex**, or the disruptive **Retiarius**.
-- **Armory Build Preview**: Equip Weapons, Armor, and Crests to customize your combat stats. *(All prototype gear is 100% free and unlocked to demonstrate build strategy without introducing pay-to-win mechanics).*
+- **Armory Build System**: Equip Weapons, Armor, and Crests to customize combat stats. *(All prototype gear is 100% free and unlocked to demonstrate build depth without pay-to-win mechanics).*
 - **Analytical Scouting & Monte Carlo Win Rates**: Inspect rival gladiators with real **1,000-battle Monte Carlo win rate simulations** computed dynamically against your exact player build.
-- **Interactive 3-Reel Slot Combat**: Spin the reels each turn to execute attacks, shields, and unique class abilities, backed by a soft matchup triangle, auto-battle spectator mode, and Web Audio procedural sound effects.
+- **Player Agency on Wild Rolls**: When a Wild symbol is rolled, players actively choose tactical resolution (**Sword Damage**, **Shield Armor**, or **Class Ability**).
+- **Interactive 3-Reel Slot Combat**: Spin reels each turn to execute attacks, shields, and unique class abilities, backed by a soft matchup triangle, auto-battle spectator mode, and Web Audio procedural sound effects.
+
+---
+
+## 🗺️ Application Architecture & Core User Flow
+
+```text
+┌─────────────────────────┐
+│     1. HOME BRIEFING    │  Daily Guild War Roster & House Standing
+└────────────┬────────────┘
+             │
+             ▼
+┌─────────────────────────┐
+│    2. GLADIATOR HUB     │  Select Archetype & Customize Free Armory Loadout
+└────────────┬────────────┘
+             │
+             ▼
+┌─────────────────────────┐
+│   3. TARGET SCOUTING    │  Inspect 4 Rivals with 1,000-Battle Monte Carlo Win Rates
+└────────────┬────────────┘
+             │
+             ▼
+┌─────────────────────────┐
+│    4. SLOT COMBAT       │  3-Reel Spins, Wild Tactical Choice, Auto-Battle Toggle
+└────────────┬────────────┘
+             │
+             ▼
+┌─────────────────────────┐
+│   5. MATCH RESULT RECAP │  Damage & Shield Absorption Breakdown + War Points
+└─────────────────────────┘
+```
 
 ---
 
@@ -26,7 +57,7 @@ This prototype represents **Part A** of the attached [Game Design Document (GDD)
    - **Thraex (The Hooked Blade)**: Precision offense; Hooked Blade bypasses 25%–40% of enemy shields and strips enemy shield charges.
    - **Retiarius (The Net)**: Disruption & control; Entangling Net applies -30% damage reduction onto the enemy, and 3 Net symbols grant a **Free Reroll**.
 3. **Scout Target via Monte Carlo Simulation**: Inspect rival gladiators in the scouting grid. See real simulated win odds calculated from 1,000 turn-by-turn combat simulations.
-4. **Spin the Reels (Manual or Auto-Battle)**: Alternate turns against the enemy over up to **8 turns**. Use `Spacebar`, click **SPIN REELS**, or check **AUTO BATTLE** to spectate automated turns.
+4. **Spin the Reels & Choose Wild Resolution**: Alternate turns against the enemy over up to **8 turns**. Use `Spacebar`, click **SPIN REELS**, or toggle **AUTO BATTLE**. When a Wild appears, choose whether it becomes **Sword**, **Shield**, or **Class**.
 5. **Review Match Outcome**: Analyze side-by-side damage, shield block attribution, and tactical recaps to claim House War points.
 
 ---
@@ -40,7 +71,7 @@ The combat slot machine features 3 reels with 4 symbol types:
 | 🗡️ | **Sword** | Deals direct combat damage to the target. |
 | 🛡️ | **Shield** | Gains protective block charges that absorb incoming damage. |
 | ⭐ | **Class Symbol** | Triggers your selected gladiator's unique archetype ability. |
-| 🃏 | **Wild** | Substitutes into the highest available matching combination. |
+| 🃏 | **Wild** | Substitutes into player-selected matching combination. |
 
 ---
 
@@ -53,7 +84,7 @@ Each reel independently samples symbols using the following weighted distributio
 | 🗡️ **Sword** | 35 | **35.0%** | **3-of-a-Kind (Jackpot)**: **19.60%** *(Exact 3 Swords: 4.29%)* |
 | 🛡️ **Shield** | 30 | **30.0%** | **2-of-a-Kind (Standard)**: **64.65%** |
 | ⭐ **Class Symbol** | 25 | **25.0%** | **No Match (Fumble)**: **15.75%** |
-| 🃏 **Wild** | 10 | **10.0%** | *Wilds substitute into best tier* |
+| 🃏 **Wild** | 10 | **10.0%** | *Wilds substitute into player-chosen tier* |
 
 > 💡 **Empirical Verification**: Run `npm run simulate` in the terminal to execute a 100,000-spin Monte Carlo simulation verifying these theoretical values.
 
@@ -61,6 +92,14 @@ Each reel independently samples symbols using the following weighted distributio
 - **Murmillo beats Retiarius**: Scutum shield reduces trident damage and cuts first Net disruption by 50%.
 - **Retiarius beats Thraex**: Entangling Net (-30% debuff) locks down Thraex's high-tempo damage.
 - **Thraex beats Murmillo**: Hooked Sica blade ignores 25%–40% of Murmillo's shield block.
+
+---
+
+## ⚡ Performance & Mobile Optimization
+
+- **Asset Optimization**: Compressed all artwork assets down from ~9.8 MB to **~1.3 MB** (87% bundle size reduction).
+- **Dynamic Mobile Layout**: Engineered with `100dvh` viewport scaling and a compact 50px Versus Header strip for small mobile screens (iPhone 13 Mini).
+- **Procedural Web Audio Engine**: Real-time synthesized sound cues with zero external audio assets.
 
 ---
 
@@ -73,8 +112,9 @@ To ensure full transparency regarding human game design judgment vs AI execution
 - **Gladiator Archetypes & Math Model**: Designed Murmillo, Thraex, and Retiarius stats, abilities, and the 15% soft matchup triangle.
 - **Exact Probability Math**: Calculated the 19.60% / 64.65% / 15.75% exact combination matrix with Wild substitution rules.
 - **Analytical Monte Carlo Scouting**: Formulated the 1,000-battle Monte Carlo simulation engine to display real win rates on target selection.
+- **Player Agency & Tactical Choice**: Added player-controlled Wild resolution and shield capacity caps to eliminate stalemates.
 - **Fair Monetization Vision**: Designed the Armory as a free strategy preview, keeping competitive battle fair.
-- **UX & Balance Tuning**: Directed mobile responsiveness (iPhone 13 Mini layouts), Auto Battle mode, and combat log feedback.
+- **UX & Balance Tuning**: Directed mobile responsiveness (iPhone 13 Mini layouts), typography (Cinzel Decorative / Marcellus), and Auto Battle spectator mode.
 
 ### 🤖 AI-Assisted Work (Antigravity AI / Gemini 3.6 Flash)
 - **Code Generation & Scaffolding**: Generated TypeScript component structures, React hooks, and CSS styling.

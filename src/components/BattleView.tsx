@@ -117,14 +117,25 @@ export const BattleView: React.FC<BattleViewProps> = ({
     }, 1600);
   };
 
+  const [pendingWildReels, setPendingWildReels] = useState<SymbolType[] | null>(null);
+
   const executePlayerOutcome = (finalReels: SymbolType[]) => {
+    if (finalReels.includes('wild') && !isAutoBattle) {
+      setPendingWildReels(finalReels);
+      return;
+    }
+    finishExecutePlayerOutcome(finalReels);
+  };
+
+  const finishExecutePlayerOutcome = (finalReels: SymbolType[], chosenWildSymbol?: SymbolType) => {
     const playerTurnResult = resolveTurn(
       turn,
       player,
       enemy,
       finalReels,
       activeEntangledPlayer,
-      firstNetUsedEnemy
+      firstNetUsedEnemy,
+      chosenWildSymbol
     );
 
     const { outcome: pOutcome, updatedAttackerShields, updatedDefenderShields } = playerTurnResult;
@@ -170,6 +181,13 @@ export const BattleView: React.FC<BattleViewProps> = ({
     setTimeout(() => {
       startEnemySpinSequence(nextEnemyHp, updatedAttackerShields, updatedDefenderShields);
     }, 1000);
+  };
+
+  const handleChooseWild = (chosenSymbol: SymbolType) => {
+    if (!pendingWildReels) return;
+    const finalReels = pendingWildReels;
+    setPendingWildReels(null);
+    finishExecutePlayerOutcome(finalReels, chosenSymbol);
   };
 
   const startEnemySpinSequence = (currentEnemyHp: number, playerShields: number, enemyShields: number) => {
@@ -559,6 +577,55 @@ export const BattleView: React.FC<BattleViewProps> = ({
           </div>
         )}
       </div>
+
+      {/* WILD CHOICE RESOLUTION OVERLAY MODAL */}
+      {pendingWildReels && (
+        <div className="modal-overlay" style={{ zIndex: 9999 }}>
+          <div className="modal-content" style={{ borderColor: 'var(--color-gold)', textAlign: 'center', maxWidth: '380px', padding: '1.4rem' }}>
+            <h2 style={{ fontSize: '1.2rem', color: '#facc15', marginBottom: '0.4rem', fontFamily: 'var(--font-serif)' }}>
+              🃏 WILD SYMBOL ROLLED!
+            </h2>
+            <p style={{ fontSize: '0.82rem', color: '#fff', marginBottom: '1.2rem' }}>
+              Choose your tactical Wild resolution for this turn:
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
+              <button
+                className="btn btn-primary"
+                onClick={() => {
+                  soundFx.playClick();
+                  handleChooseWild('sword');
+                }}
+                onMouseEnter={() => soundFx.playHover()}
+                style={{ padding: '0.75rem', justifyContent: 'center', fontSize: '0.88rem' }}
+              >
+                🗡️ SWORD — Maximize Attack Damage
+              </button>
+              <button
+                className="btn btn-secondary"
+                onClick={() => {
+                  soundFx.playClick();
+                  handleChooseWild('shield');
+                }}
+                onMouseEnter={() => soundFx.playHover()}
+                style={{ padding: '0.75rem', justifyContent: 'center', fontSize: '0.88rem', borderColor: '#3b82f6', color: '#60a5fa' }}
+              >
+                🛡️ SHIELD — Raise Defense Armor
+              </button>
+              <button
+                className="btn btn-secondary"
+                onClick={() => {
+                  soundFx.playClick();
+                  handleChooseWild('class');
+                }}
+                onMouseEnter={() => soundFx.playHover()}
+                style={{ padding: '0.75rem', justifyContent: 'center', fontSize: '0.88rem', borderColor: '#a855f7', color: '#c084fc' }}
+              >
+                ⭐ CLASS — Trigger Archetype Perk
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

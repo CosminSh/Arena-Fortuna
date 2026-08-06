@@ -46,7 +46,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onStartWar, onOpenGladiatorH
         style={{
           width: '100%',
           maxWidth: '460px',
-          backgroundImage: 'linear-gradient(180deg, rgba(8, 10, 15, 0.5) 0%, rgba(8, 10, 15, 0.95) 100%), url("./assets/arena_banner.png")',
+          backgroundImage: 'linear-gradient(180deg, rgba(8, 10, 15, 0.5) 0%, rgba(8, 10, 15, 0.95) 100%), url("./assets/arena_banner.jpg")',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           padding: '1.8rem 1.2rem',

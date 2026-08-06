@@ -216,17 +216,21 @@ export function spinReels(): SymbolType[] {
   return [getRandomSymbol(), getRandomSymbol(), getRandomSymbol()];
 }
 
-export function evaluateCombination(reels: SymbolType[]): CombinationResult {
+export function evaluateCombination(
+  reels: SymbolType[],
+  chosenWildSymbol?: SymbolType
+): CombinationResult {
   const nonWilds = reels.filter((s) => s !== 'wild');
   const wildCount = reels.length - nonWilds.length;
 
   if (wildCount === 3) {
+    const symbolToUse = chosenWildSymbol || 'sword';
     return {
       matchCount: 3,
-      primarySymbol: 'sword',
+      primarySymbol: symbolToUse,
       hasWild: true,
       rawSymbols: reels,
-      description: 'TRIPLE WILD JACKPOT! Critical Strike.',
+      description: `TRIPLE WILD JACKPOT (${symbolToUse.toUpperCase()})! Critical Strike.`,
       tier: 'jackpot',
     };
   }
@@ -245,7 +249,11 @@ export function evaluateCombination(reels: SymbolType[]): CombinationResult {
     }
   }
 
-  const effectiveMatch = maxFreq + wildCount;
+  if (chosenWildSymbol && wildCount > 0) {
+    bestSymbol = chosenWildSymbol;
+  }
+
+  const effectiveMatch = (counts[bestSymbol] || 0) + wildCount;
 
   if (effectiveMatch >= 3) {
     return {
@@ -283,14 +291,15 @@ export function resolveTurn(
   defender: Gladiator,
   reels: SymbolType[],
   activeEntangled: boolean,
-  firstNetUsed: boolean
+  firstNetUsed: boolean,
+  chosenWildSymbol?: SymbolType
 ): {
   outcome: TurnOutcome;
   updatedFirstNetUsed: boolean;
   updatedAttackerShields: number;
   updatedDefenderShields: number;
 } {
-  const combination = evaluateCombination(reels);
+  const combination = evaluateCombination(reels, chosenWildSymbol);
   const attackerArchetype = ARCHETYPES[attacker.archetypeId];
 
   let gearDamageBonus = 0;
