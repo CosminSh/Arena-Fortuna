@@ -368,6 +368,39 @@ export const BattleView: React.FC<BattleViewProps> = ({
         </label>
       </div>
 
+      {/* MOBILE COMPACT VERSUS HEADER STRIP (< 820px) */}
+      <div className="mobile-versus-strip">
+        <div className="mobile-fighter-col player">
+          <img src={playerArch.portrait} alt={player.name} className="mobile-avatar" />
+          <div className="mobile-fighter-info">
+            <div className="mobile-fighter-name">{player.name}</div>
+            <div className="stage-hp-track" style={{ height: '12px', marginTop: '0.15rem' }}>
+              <div className="stage-hp-fill" style={{ width: `${(player.currentHp / player.maxHp) * 100}%` }} />
+              <span className="stage-hp-val" style={{ fontSize: '0.65rem' }}>{player.currentHp}/{player.maxHp} HP</span>
+            </div>
+            {player.shieldCharges > 0 && (
+              <span className="mobile-shield-badge">🛡️ {player.shieldCharges}</span>
+            )}
+          </div>
+        </div>
+
+        <div className="mobile-vs-badge">VS</div>
+
+        <div className="mobile-fighter-col enemy">
+          <div className="mobile-fighter-info" style={{ textAlign: 'right' }}>
+            <div className="mobile-fighter-name">{enemy.name}</div>
+            <div className="stage-hp-track" style={{ height: '12px', marginTop: '0.15rem' }}>
+              <div className="stage-hp-fill enemy" style={{ width: `${(enemy.currentHp / enemy.maxHp) * 100}%` }} />
+              <span className="stage-hp-val" style={{ fontSize: '0.65rem' }}>{enemy.currentHp}/{enemy.maxHp} HP</span>
+            </div>
+            {enemy.shieldCharges > 0 && (
+              <span className="mobile-shield-badge">🛡️ {enemy.shieldCharges}</span>
+            )}
+          </div>
+          <img src={enemy.avatarUrl} alt={enemy.name} className="mobile-avatar" style={{ borderColor: '#ef4444' }} />
+        </div>
+      </div>
+
       {/* RESPONSIVE ARENA STAGE: Flanks on Desktop, Stacks on Mobile */}
       <div className="battle-arena-stage">
         {/* Player Gladiator Card */}
