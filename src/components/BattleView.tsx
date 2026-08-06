@@ -3,7 +3,7 @@ import { Gladiator, SymbolType, BattleState, TurnOutcome } from '../types/game';
 import { ARCHETYPES, spinReels, resolveTurn } from '../engine/mathEngine';
 import { soundFx } from '../engine/audioEngine';
 import { triggerGladiatorArenaSparks } from '../engine/arenaParticles';
-import { Swords, Shield, RefreshCw, Zap, ChevronDown, ChevronUp, AlertTriangle } from 'lucide-react';
+import { Swords, Shield, RefreshCw, Zap, ChevronDown, ChevronUp, AlertTriangle, Sparkles } from 'lucide-react';
 
 interface BattleViewProps {
   playerGladiator: Gladiator;
@@ -30,7 +30,6 @@ export const BattleView: React.FC<BattleViewProps> = ({
   const [turn, setTurn] = useState<number>(1);
   const [turnPhase, setTurnPhase] = useState<TurnPhase>('player_ready');
 
-  // Reels state
   const [reels, setReels] = useState<SymbolType[]>(['sword', 'shield', 'class']);
   const [spinningReelIndex, setSpinningReelIndex] = useState<[boolean, boolean, boolean]>([false, false, false]);
 
@@ -43,19 +42,22 @@ export const BattleView: React.FC<BattleViewProps> = ({
 
   // FX States
   const [floatingDamage, setFloatingDamage] = useState<{ text: string; isEnemy: boolean } | null>(null);
+  const [screenFlash, setScreenFlash] = useState<'gold' | 'red' | null>(null);
+  const [abilityBanner, setAbilityBanner] = useState<string | null>(null);
   const [isShaking, setIsShaking] = useState<boolean>(false);
   const [showLogDrawer, setShowLogDrawer] = useState<boolean>(false);
 
   const playerArch = ARCHETYPES[player.archetypeId];
   const enemyArch = ARCHETYPES[enemy.archetypeId];
 
-  // 1. PLAYER SPIN SEQUENCE
   const handlePlayerSpin = () => {
     if (turnPhase !== 'player_ready' || player.currentHp <= 0 || enemy.currentHp <= 0 || turn > 8) return;
 
     setTurnPhase('player_spinning');
     setSpinningReelIndex([true, true, true]);
     setFloatingDamage(null);
+    setScreenFlash(null);
+    setAbilityBanner(null);
 
     const finalPlayerReels = spinReels();
 
@@ -80,7 +82,6 @@ export const BattleView: React.FC<BattleViewProps> = ({
       setSpinningReelIndex([false, false, false]);
       soundFx.playReelStop();
 
-      // Resolve Player Action
       executePlayerOutcome(finalPlayerReels);
     }, 1600);
   };
@@ -105,8 +106,13 @@ export const BattleView: React.FC<BattleViewProps> = ({
       soundFx.playHit();
       setFloatingDamage({ text: `-${pOutcome.netDamage}`, isEnemy: true });
       triggerScreenShake();
+      triggerScreenFlash('gold');
     } else if (pOutcome.shieldBlocked > 0) {
       soundFx.playShieldBlock();
+    }
+
+    if (pOutcome.abilityTriggered) {
+      setAbilityBanner(`⚡ ${pOutcome.abilityTriggered}`);
     }
 
     if (pOutcome.combination.tier === 'jackpot') {
@@ -128,17 +134,16 @@ export const BattleView: React.FC<BattleViewProps> = ({
       return;
     }
 
-    // Trigger Enemy Counter-Turn Spin Sequence after brief pause
     setTimeout(() => {
       startEnemySpinSequence(nextEnemyHp, pOutcome);
     }, 1000);
   };
 
-  // 2. ENEMY SPIN SEQUENCE (Player watches enemy roll!)
   const startEnemySpinSequence = (currentEnemyHp: number, pOutcome: TurnOutcome) => {
     setTurnPhase('enemy_spinning');
     setSpinningReelIndex([true, true, true]);
     setFloatingDamage(null);
+    setAbilityBanner(null);
 
     const finalEnemyReels = spinReels();
 
@@ -163,7 +168,6 @@ export const BattleView: React.FC<BattleViewProps> = ({
       setSpinningReelIndex([false, false, false]);
       soundFx.playReelStop();
 
-      // Resolve Enemy Action
       executeEnemyOutcome(finalEnemyReels, currentEnemyHp);
     }, 1600);
   };
@@ -188,8 +192,13 @@ export const BattleView: React.FC<BattleViewProps> = ({
       soundFx.playHit();
       setFloatingDamage({ text: `-${eOutcome.netDamage}`, isEnemy: false });
       triggerScreenShake();
+      triggerScreenFlash('red');
     } else if (eOutcome.shieldBlocked > 0) {
       soundFx.playShieldBlock();
+    }
+
+    if (eOutcome.abilityTriggered) {
+      setAbilityBanner(`⚠️ ENEMY: ${eOutcome.abilityTriggered}`);
     }
 
     if (eOutcome.debuffApplied) setActiveEntangledPlayer(true);
@@ -206,6 +215,11 @@ export const BattleView: React.FC<BattleViewProps> = ({
   const triggerScreenShake = () => {
     setIsShaking(true);
     setTimeout(() => setIsShaking(false), 450);
+  };
+
+  const triggerScreenFlash = (type: 'gold' | 'red') => {
+    setScreenFlash(type);
+    setTimeout(() => setScreenFlash(null), 600);
   };
 
   const finishMatch = (finalP: Gladiator, finalE: Gladiator, finalTurn: number, lastOutcome: TurnOutcome) => {
@@ -245,6 +259,13 @@ export const BattleView: React.FC<BattleViewProps> = ({
         position: 'relative',
       }}
     >
+      {/* Screen Flashes */}
+      {screenFlash === 'gold' && <div className="screen-flash-gold" />}
+      {screenFlash === 'red' && <div className="screen-flash-red" />}
+
+      {/* Ability Callout Banner */}
+      {abilityBanner && <div className="ability-banner">{abilityBanner}</div>}
+
       {/* Floating Damage Text */}
       {floatingDamage && (
         <div className="floating-dmg" style={{ color: floatingDamage.isEnemy ? '#ef4444' : '#60a5fa' }}>
@@ -302,14 +323,23 @@ export const BattleView: React.FC<BattleViewProps> = ({
         </div>
       </div>
 
-      {/* Centerpiece 3D Casino Slot Machine Frame (Dynamically themes based on player/enemy turn!) */}
+      {/* Centerpiece 3D Casino Slot Machine Frame */}
       <div
         className="slot-frame"
         style={{
           borderColor: isEnemyTurn ? '#ef4444' : 'var(--color-gold)',
-          boxShadow: isEnemyTurn ? '0 0 40px rgba(239, 68, 68, 0.4), inset 0 0 25px rgba(0,0,0,0.9)' : '0 0 35px rgba(245, 158, 11, 0.35), inset 0 0 25px rgba(0,0,0,0.9)',
+          boxShadow: isEnemyTurn ? '0 0 45px rgba(239, 68, 68, 0.45), inset 0 0 30px rgba(0,0,0,0.95)' : '0 0 45px rgba(245, 158, 11, 0.4), inset 0 0 30px rgba(0,0,0,0.95)',
         }}
       >
+        {/* LED Lights Strip */}
+        <div className="slot-led-strip">
+          <div className="slot-led" />
+          <div className="slot-led" />
+          <div className="slot-led" />
+          <div className="slot-led" />
+          <div className="slot-led" />
+        </div>
+
         <div style={{ fontSize: '0.78rem', fontWeight: 900, color: isEnemyTurn ? '#f87171' : 'var(--color-gold)', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
           {isEnemyTurn ? `⚠️ ${enemy.name.toUpperCase()}'S ATTACK REELS` : 'YOUR COMBAT REELS'}
         </div>
@@ -324,7 +354,7 @@ export const BattleView: React.FC<BattleViewProps> = ({
                 key={idx}
                 className={`slot-reel ${isReelSpinning ? 'active-spin' : ''}`}
                 style={{
-                  borderColor: isEnemyTurn ? 'rgba(239, 68, 68, 0.6)' : 'rgba(245, 158, 11, 0.6)',
+                  borderColor: isEnemyTurn ? 'rgba(239, 68, 68, 0.7)' : 'rgba(245, 158, 11, 0.7)',
                 }}
               >
                 <div className="slot-symbol-content">
@@ -343,7 +373,7 @@ export const BattleView: React.FC<BattleViewProps> = ({
             style={{
               background: isEnemyTurn
                 ? 'linear-gradient(135deg, #7f1d1d 0%, #450a0a 100%)'
-                : 'linear-gradient(135deg, #ef4444 0%, #b91c1c 100%)',
+                : 'linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #991b1b 100%)',
             }}
             onClick={handlePlayerSpin}
             disabled={turnPhase !== 'player_ready' || player.currentHp <= 0 || enemy.currentHp <= 0}
@@ -369,7 +399,7 @@ export const BattleView: React.FC<BattleViewProps> = ({
       </div>
 
       {/* Expandable Log Strip */}
-      <div style={{ width: '100%', maxWidth: '580px', background: 'rgba(12, 16, 24, 0.9)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '10px', padding: '0.4rem 0.8rem' }}>
+      <div style={{ width: '100%', maxWidth: '600px', background: 'rgba(10, 14, 22, 0.9)', border: '1px solid rgba(255, 255, 255, 0.12)', borderRadius: '12px', padding: '0.4rem 0.8rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }} onClick={() => setShowLogDrawer(!showLogDrawer)}>
           <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--color-gold)' }}>
             {combatLogs[0] ? `LAST ROLL: ${combatLogs[0].logMessage}` : 'Tap Spin to start battle action...'}
