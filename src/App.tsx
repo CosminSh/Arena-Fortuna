@@ -76,68 +76,86 @@ export const App: React.FC = () => {
     };
   };
 
+  // Determine dynamic full-bleed background image for each scene
+  let sceneBg = './assets/arena_bg.png';
+  if (viewMode === 'gladiator') sceneBg = './assets/armory_bg.png';
+  else if (viewMode === 'target') sceneBg = './assets/scouting_bg.png';
+  else if (viewMode === 'battle') sceneBg = './assets/arena_bg.png';
+
   return (
-    <div className="app-container">
-      <HeaderNav
-        onOpenProbabilityModal={() => setShowProbabilityModal(true)}
-        onResetToHome={handleReturnHome}
-      />
-
-      <main className="main-content">
-        {viewMode === 'home' && (
-          <HomeView
-            onStartWar={handleStartWar}
-            onOpenGladiatorHub={() => setViewMode('gladiator')}
-            onOpenMath={() => setShowProbabilityModal(true)}
-          />
-        )}
-
-        {viewMode === 'gladiator' && (
-          <GladiatorHubView
-            currentArchetypeId={selectedArchetypeId}
-            equippedGear={equippedGear}
-            onUpdateGladiator={handleUpdateGladiator}
-            onBack={() => setViewMode('home')}
-          />
-        )}
-
-        {viewMode === 'archetype' && (
-          <ArchetypeSelectView
-            onSelectArchetype={handleSelectArchetype}
-            onBack={() => setViewMode('home')}
-          />
-        )}
-
-        {viewMode === 'target' && (
-          <TargetSelectView
-            playerArchetypeId={selectedArchetypeId}
-            onSelectTarget={handleSelectTarget}
-            onBack={() => setViewMode('home')}
-          />
-        )}
-
-        {viewMode === 'battle' && selectedEnemy && (
-          <BattleView
-            playerGladiator={createPlayerGladiator()}
-            enemyGladiator={selectedEnemy}
-            onFinishBattle={handleFinishBattle}
-          />
-        )}
-      </main>
-
-      {/* Result Modal Overlay */}
-      {battleState && (
-        <ResultModal
-          battleState={battleState}
-          onReturnHome={handleReturnHome}
-          onRematch={handleRematch}
+    <div
+      style={{
+        width: '100vw',
+        height: '100vh',
+        backgroundImage: `linear-gradient(180deg, rgba(6, 8, 13, 0.45) 0%, rgba(6, 8, 13, 0.88) 100%), url(${sceneBg})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        transition: 'background-image 0.4s ease-in-out',
+      }}
+    >
+      <div className="app-container">
+        <HeaderNav
+          onOpenProbabilityModal={() => setShowProbabilityModal(true)}
+          onResetToHome={handleReturnHome}
         />
-      )}
 
-      {/* Probability Modal Overlay */}
-      {showProbabilityModal && (
-        <ProbabilityModal onClose={() => setShowProbabilityModal(false)} />
-      )}
+        <main className="main-content">
+          {viewMode === 'home' && (
+            <HomeView
+              onStartWar={handleStartWar}
+              onOpenGladiatorHub={() => setViewMode('gladiator')}
+              onOpenMath={() => setShowProbabilityModal(true)}
+            />
+          )}
+
+          {viewMode === 'gladiator' && (
+            <GladiatorHubView
+              currentArchetypeId={selectedArchetypeId}
+              equippedGear={equippedGear}
+              onUpdateGladiator={handleUpdateGladiator}
+              onBack={() => setViewMode('home')}
+            />
+          )}
+
+          {viewMode === 'archetype' && (
+            <ArchetypeSelectView
+              onSelectArchetype={handleSelectArchetype}
+              onBack={() => setViewMode('home')}
+            />
+          )}
+
+          {viewMode === 'target' && (
+            <TargetSelectView
+              playerArchetypeId={selectedArchetypeId}
+              onSelectTarget={handleSelectTarget}
+              onBack={() => setViewMode('home')}
+            />
+          )}
+
+          {viewMode === 'battle' && selectedEnemy && (
+            <BattleView
+              playerGladiator={createPlayerGladiator()}
+              enemyGladiator={selectedEnemy}
+              onFinishBattle={handleFinishBattle}
+            />
+          )}
+        </main>
+
+        {/* Result Modal Overlay */}
+        {battleState && (
+          <ResultModal
+            battleState={battleState}
+            onReturnHome={handleReturnHome}
+            onRematch={handleRematch}
+          />
+        )}
+
+        {/* Probability Modal Overlay */}
+        {showProbabilityModal && (
+          <ProbabilityModal onClose={() => setShowProbabilityModal(false)} />
+        )}
+      </div>
     </div>
   );
 };
