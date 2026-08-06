@@ -580,15 +580,46 @@ export const BattleView: React.FC<BattleViewProps> = ({
 
       {/* WILD CHOICE RESOLUTION OVERLAY MODAL */}
       {pendingWildReels && (
-        <div className="modal-overlay" style={{ zIndex: 9999 }}>
-          <div className="modal-content" style={{ borderColor: 'var(--color-gold)', textAlign: 'center', maxWidth: '380px', padding: '1.4rem' }}>
-            <h2 style={{ fontSize: '1.2rem', color: '#facc15', marginBottom: '0.4rem', fontFamily: 'var(--font-serif)' }}>
+        <div className="modal-overlay" style={{ zIndex: 9999, background: 'rgba(4, 6, 12, 0.75)', backdropFilter: 'blur(4px)' }}>
+          <div className="modal-content" style={{ borderColor: 'var(--color-gold)', textAlign: 'center', maxWidth: '420px', padding: '1.4rem' }}>
+            <h2 style={{ fontSize: '1.25rem', color: '#facc15', marginBottom: '0.2rem', fontFamily: 'var(--font-serif)' }}>
               🃏 WILD SYMBOL ROLLED!
             </h2>
-            <p style={{ fontSize: '0.82rem', color: '#fff', marginBottom: '1.2rem' }}>
-              Choose your tactical Wild resolution for this turn:
+            <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.85)', marginBottom: '0.6rem' }}>
+              Inspect your 3 reels below and choose how to resolve your Wild symbol:
             </p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
+
+            {/* ROLLED REELS VISUAL PREVIEW */}
+            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center', marginBottom: '1.1rem', background: 'rgba(0,0,0,0.4)', padding: '0.6rem', borderRadius: '14px', border: '1px solid rgba(245, 158, 11, 0.3)' }}>
+              {pendingWildReels.map((sym, idx) => {
+                const isWild = sym === 'wild';
+                const display = SYMBOL_DISPLAY[sym];
+                return (
+                  <div
+                    key={idx}
+                    style={{
+                      flex: 1,
+                      background: isWild ? 'rgba(168, 85, 247, 0.25)' : 'rgba(255, 255, 255, 0.05)',
+                      border: isWild ? '2px solid #c084fc' : '1px solid rgba(255, 255, 255, 0.15)',
+                      borderRadius: '10px',
+                      padding: '0.4rem 0.3rem',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: '0.2rem',
+                    }}
+                  >
+                    <span style={{ fontSize: '0.62rem', color: isWild ? '#c084fc' : '#9ca3af', fontWeight: 800 }}>
+                      REEL {idx + 1}
+                    </span>
+                    <img src={display.image} alt={display.label} style={{ width: '42px', height: '42px', objectFit: 'contain' }} />
+                    <span style={{ fontSize: '0.7rem', fontWeight: 900, color: display.color }}>{display.label}</span>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
               <button
                 className="btn btn-primary"
                 onClick={() => {
@@ -596,7 +627,7 @@ export const BattleView: React.FC<BattleViewProps> = ({
                   handleChooseWild('sword');
                 }}
                 onMouseEnter={() => soundFx.playHover()}
-                style={{ padding: '0.75rem', justifyContent: 'center', fontSize: '0.88rem' }}
+                style={{ padding: '0.7rem', justifyContent: 'center', fontSize: '0.85rem' }}
               >
                 🗡️ SWORD — Maximize Attack Damage
               </button>
@@ -607,7 +638,7 @@ export const BattleView: React.FC<BattleViewProps> = ({
                   handleChooseWild('shield');
                 }}
                 onMouseEnter={() => soundFx.playHover()}
-                style={{ padding: '0.75rem', justifyContent: 'center', fontSize: '0.88rem', borderColor: '#3b82f6', color: '#60a5fa' }}
+                style={{ padding: '0.7rem', justifyContent: 'center', fontSize: '0.85rem', borderColor: '#3b82f6', color: '#60a5fa' }}
               >
                 🛡️ SHIELD — Raise Defense Armor
               </button>
@@ -618,7 +649,7 @@ export const BattleView: React.FC<BattleViewProps> = ({
                   handleChooseWild('class');
                 }}
                 onMouseEnter={() => soundFx.playHover()}
-                style={{ padding: '0.75rem', justifyContent: 'center', fontSize: '0.88rem', borderColor: '#a855f7', color: '#c084fc' }}
+                style={{ padding: '0.7rem', justifyContent: 'center', fontSize: '0.85rem', borderColor: '#a855f7', color: '#c084fc' }}
               >
                 ⭐ CLASS — Trigger Archetype Perk
               </button>
