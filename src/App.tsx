@@ -143,7 +143,7 @@ export const App: React.FC = () => {
 
           {viewMode === 'target' && (
             <TargetSelectView
-              playerArchetypeId={selectedArchetypeId}
+              playerGladiator={createPlayerGladiator()}
               onSelectTarget={handleSelectTarget}
               onBack={() => setViewMode('home')}
             />

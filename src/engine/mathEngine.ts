@@ -436,3 +436,78 @@ export function resolveTurn(
     updatedDefenderShields,
   };
 }
+
+export function simulateMatchup(
+  player: Gladiator,
+  enemy: Gladiator,
+  simulations: number = 1000
+): { playerWinRate: number; enemyWinRate: number; averageTurns: number } {
+  let playerWins = 0;
+  let totalTurns = 0;
+
+  for (let i = 0; i < simulations; i++) {
+    const simPlayer: Gladiator = { ...player, currentHp: player.maxHp, shieldCharges: player.shieldCharges || 0 };
+    const simEnemy: Gladiator = { ...enemy, currentHp: enemy.maxHp, shieldCharges: enemy.shieldCharges || 0 };
+
+    let turn = 1;
+    let activeEntangledPlayer = false;
+    let activeEntangledEnemy = false;
+    let firstNetUsedPlayer = false;
+    let firstNetUsedEnemy = false;
+
+    while (turn <= 8 && simPlayer.currentHp > 0 && simEnemy.currentHp > 0) {
+      // 1. Player Turn
+      const playerTurn = resolveTurn(
+        turn,
+        simPlayer,
+        simEnemy,
+        spinReels(),
+        activeEntangledPlayer,
+        firstNetUsedEnemy
+      );
+
+      firstNetUsedEnemy = playerTurn.updatedFirstNetUsed;
+      simEnemy.currentHp = Math.max(0, simEnemy.currentHp - playerTurn.outcome.netDamage);
+      simEnemy.shieldCharges = playerTurn.updatedDefenderShields;
+      simPlayer.shieldCharges = playerTurn.updatedAttackerShields;
+
+      if (playerTurn.outcome.debuffApplied) activeEntangledEnemy = true;
+      else activeEntangledEnemy = false;
+      activeEntangledPlayer = false;
+
+      if (simEnemy.currentHp <= 0) break;
+
+      // 2. Enemy Turn
+      const enemyTurn = resolveTurn(
+        turn,
+        simEnemy,
+        simPlayer,
+        spinReels(),
+        activeEntangledEnemy,
+        firstNetUsedPlayer
+      );
+
+      firstNetUsedPlayer = enemyTurn.updatedFirstNetUsed;
+      simPlayer.currentHp = Math.max(0, simPlayer.currentHp - enemyTurn.outcome.netDamage);
+      simPlayer.shieldCharges = enemyTurn.updatedDefenderShields;
+      simEnemy.shieldCharges = enemyTurn.updatedAttackerShields;
+
+      if (enemyTurn.outcome.debuffApplied) activeEntangledPlayer = true;
+
+      if (simPlayer.currentHp <= 0) break;
+
+      turn++;
+    }
+
+    if (simPlayer.currentHp > simEnemy.currentHp) {
+      playerWins++;
+    }
+    totalTurns += Math.min(turn, 8);
+  }
+
+  const playerWinRate = Math.round((playerWins / simulations) * 100);
+  const enemyWinRate = 100 - playerWinRate;
+  const averageTurns = Number((totalTurns / simulations).toFixed(1));
+
+  return { playerWinRate, enemyWinRate, averageTurns };
+}

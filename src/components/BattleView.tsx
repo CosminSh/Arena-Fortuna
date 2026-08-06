@@ -259,6 +259,10 @@ export const BattleView: React.FC<BattleViewProps> = ({
 
   const finishMatch = (finalP: Gladiator, finalE: Gladiator, finalTurn: number, lastOutcome: TurnOutcome) => {
     const isWinner = finalP.currentHp > finalE.currentHp;
+    const fullHistory = combatLogs.some((h) => h === lastOutcome)
+      ? combatLogs
+      : [lastOutcome, ...combatLogs];
+
     onFinishBattle({
       playerGladiator: finalP,
       enemyGladiator: finalE,
@@ -266,7 +270,7 @@ export const BattleView: React.FC<BattleViewProps> = ({
       isPlayerTurn: false,
       isSpinning: false,
       lockedReelIndexes: [false, false, false],
-      history: combatLogs,
+      history: fullHistory,
       winnerId: isWinner ? finalP.id : finalE.id,
       isOver: true,
       canReroll: false,

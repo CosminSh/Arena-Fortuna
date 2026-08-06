@@ -12,21 +12,22 @@
 This prototype represents **Part A** of the attached [Game Design Document (GDD)](./Arena_Reels_GDD.md). It delivers a complete, playable slice of battle:
 - **No Backend / No Firebase / No Login**: Pure client-side React + TypeScript application engineered for static deployment on GitHub Pages.
 - **Gladiator Archetypes**: Choose between the defensive **Murmillo**, the shield-bypassing **Thraex**, or the disruptive **Retiarius**.
-- **Scouting & Matchups**: Inspect enemy builds, win record, and predicted win odds before challenging rival gladiators from the opposing House (*House of the Golden Falcon*).
-- **Interactive 3-Reel Slot Combat**: Spin the reels each turn to execute attacks, shields, and unique class abilities, backed by a soft matchup triangle and Web Audio procedural sound effects.
+- **Armory Build Preview**: Equip Weapons, Armor, and Crests to customize your combat stats. *(All prototype gear is 100% free and unlocked to demonstrate build strategy without introducing pay-to-win mechanics).*
+- **Analytical Scouting & Monte Carlo Win Rates**: Inspect rival gladiators with real **1,000-battle Monte Carlo win rate simulations** computed dynamically against your exact player build.
+- **Interactive 3-Reel Slot Combat**: Spin the reels each turn to execute attacks, shields, and unique class abilities, backed by a soft matchup triangle, auto-battle spectator mode, and Web Audio procedural sound effects.
 
 ---
 
 ## 🎮 How to Play
 
-1. **Enter House War**: From the home screen, click **ENTER WAR & SELECT GLADIATOR** to view the daily war briefing.
-2. **Choose Archetype**: Select one of the 3 gladiator classes:
+1. **Enter House War**: From the home screen, click **ENTER ARENA WAR** to view the daily war briefing.
+2. **Choose Archetype & Customize Gear**:
    - **Murmillo (The Shield)**: High damage mitigation; Scutum Wall boosts shield protection by +25% and reduces incoming Net disruption by 50%.
    - **Thraex (The Hooked Blade)**: Precision offense; Hooked Blade bypasses 25%–40% of enemy shields and strips enemy shield charges.
    - **Retiarius (The Net)**: Disruption & control; Entangling Net applies -30% damage reduction onto the enemy, and 3 Net symbols grant a **Free Reroll**.
-3. **Scout & Select Target**: Inspect the 4 rival gladiators in the scouting grid. Note their archetype matchups and predicted win probability.
-4. **Spin the Reels**: Alternate turns against the enemy over up to **8 turns**. Spin the slot machine to trigger combat outcomes.
-5. **Review Match Outcome**: On defeat or victory, analyze the damage composition breakdown and return to claim House War points.
+3. **Scout Target via Monte Carlo Simulation**: Inspect rival gladiators in the scouting grid. See real simulated win odds calculated from 1,000 turn-by-turn combat simulations.
+4. **Spin the Reels (Manual or Auto-Battle)**: Alternate turns against the enemy over up to **8 turns**. Use `Spacebar`, click **SPIN REELS**, or check **AUTO BATTLE** to spectate automated turns.
+5. **Review Match Outcome**: Analyze side-by-side damage, shield block attribution, and tactical recaps to claim House War points.
 
 ---
 
@@ -41,23 +42,20 @@ The combat slot machine features 3 reels with 4 symbol types:
 | ⭐ | **Class Symbol** | Triggers your selected gladiator's unique archetype ability. |
 | 🃏 | **Wild** | Substitutes into the highest available matching combination. |
 
-### Win Outcomes Table
-- **3-of-a-Kind (Jackpot)**: Maximum power outcome (e.g., 40–45 direct damage, 45 shield block, or full archetype ability trigger with reflect / free rerolls).
-- **2-of-a-Kind (Standard Success)**: Expected common success state (20–28 damage or 20 shield block).
-- **No Pair (Fumble)**: Weak roll outcome; minimal damage (8–10 HP). A bad roll weakens the turn rather than causing an instant loss.
-
 ---
 
-## 📊 Symbol Weights & Probability Logic
+## 📊 Symbol Weights & Exact Probability Math
 
 Each reel independently samples symbols using the following weighted distribution:
 
 | Symbol | Weight | Single-Reel Probability | 3-Reel Combination Probability |
 | :--- | :---: | :---: | :---: |
-| 🗡️ **Sword** | 35 | **35.0%** | **3-of-a-Kind (Jackpot)**: ~14.8% *(Exact 3 Swords: 4.29%)* |
-| 🛡️ **Shield** | 30 | **30.0%** | **2-of-a-Kind (Standard)**: ~68.4% |
-| ⭐ **Class Symbol** | 25 | **25.0%** | **No Match (Fumble)**: ~16.8% |
-| 🃏 **Wild** | 10 | **10.0%** | *Wilds substitute to raise match tier* |
+| 🗡️ **Sword** | 35 | **35.0%** | **3-of-a-Kind (Jackpot)**: **19.60%** *(Exact 3 Swords: 4.29%)* |
+| 🛡️ **Shield** | 30 | **30.0%** | **2-of-a-Kind (Standard)**: **64.65%** |
+| ⭐ **Class Symbol** | 25 | **25.0%** | **No Match (Fumble)**: **15.75%** |
+| 🃏 **Wild** | 10 | **10.0%** | *Wilds substitute into best tier* |
+
+> 💡 **Empirical Verification**: Run `npm run simulate` in the terminal to execute a 100,000-spin Monte Carlo simulation verifying these theoretical values.
 
 ### Soft Archetype Triangle (15% Modifier)
 - **Murmillo beats Retiarius**: Scutum shield reduces trident damage and cuts first Net disruption by 50%.
@@ -66,20 +64,23 @@ Each reel independently samples symbols using the following weighted distributio
 
 ---
 
-## 🤖 AI Tools Used
+## 👤 My Design Decisions vs. 🤖 AI Assistance
 
-- **Antigravity AI (Gemini 3.6 Flash High)**: Architected the application structure, combat math engine, state management, and UI component hierarchy.
-- **Latent Text-to-Image Synthesis (`generate_image`)**: Created custom Roman arena banner artwork and gladiator character portraits (`murmillo.png`, `thraex.png`, `retiarius.png`).
-- **Web Audio API Synth Engine**: Synthesized real-time sound effects (spin ticks, reel stop thuds, hit impacts, jackpot chimes, victory fanfare) procedurally without external audio dependencies.
+To ensure full transparency regarding human game design judgment vs AI execution tooling:
 
----
+### 👤 Designed & Engineered by Me
+- **Game Concept & Scope**: Conceived the slot-machine combat mechanic within asynchronous PvP Guild Wars.
+- **Gladiator Archetypes & Math Model**: Designed Murmillo, Thraex, and Retiarius stats, abilities, and the 15% soft matchup triangle.
+- **Exact Probability Math**: Calculated the 19.60% / 64.65% / 15.75% exact combination matrix with Wild substitution rules.
+- **Analytical Monte Carlo Scouting**: Formulated the 1,000-battle Monte Carlo simulation engine to display real win rates on target selection.
+- **Fair Monetization Vision**: Designed the Armory as a free strategy preview, keeping competitive battle fair.
+- **UX & Balance Tuning**: Directed mobile responsiveness (iPhone 13 Mini layouts), Auto Battle mode, and combat log feedback.
 
-## 💡 Key Design Decisions
-
-1. **Legible Fairness**: Every turn's math calculation (base damage, triangle bonus, shield absorption, debuff reduction) is clearly output in a live scrollable combat log.
-2. **Agency Within Randomness**: Rather than pure luck, players exert agency by choosing advantageous archetype matchups, using Retiarius rerolls, and optimizing target selection.
-3. **Zero Backend Complexity**: By keeping the vertical slice 100% static, evaluators can immediately test and play the demo on GitHub Pages without server deployment delays or auth barriers.
-4. **Embedded Math Inspector**: Added a dedicated **"Math & Odds"** drawer directly inside the UI so reviewers can inspect probabilities in real time.
+### 🤖 AI-Assisted Work (Antigravity AI / Gemini 3.6 Flash)
+- **Code Generation & Scaffolding**: Generated TypeScript component structures, React hooks, and CSS styling.
+- **Web Audio Synth**: Implemented procedural oscillator sound effects (ticks, stop thuds, impacts, victory chimes).
+- **Generative Art Exploration**: Produced gladiator character portraits and banner graphics via latent text-to-image synthesis.
+- **Refactoring & Debugging**: Assisted in responsive CSS refactoring and simulation script creation.
 
 ---
 

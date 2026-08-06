@@ -161,7 +161,7 @@ export const GladiatorHubView: React.FC<GladiatorHubViewProps> = ({
                     <span style={{ fontSize: '0.82rem', fontWeight: 800, color: '#fff' }}>{item.name}</span>
                     {item.isPremium && (
                       <span style={{ fontSize: '0.6rem', background: '#d97706', color: '#000', padding: '0.1rem 0.35rem', borderRadius: '4px', fontWeight: 900 }}>
-                        PASS
+                        UNLOCKED
                       </span>
                     )}
                   </div>

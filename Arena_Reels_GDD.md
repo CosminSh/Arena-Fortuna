@@ -85,10 +85,10 @@ For the prototype, the class symbols can be represented by simple icons:
 - Net for Retiarius.
 
 ## A7. Win Conditions
-- **Three matching symbols**: powerful outcome such as high damage, a strong block, or a major class ability. This is the exciting jackpot moment.
-- **Two matching symbols**: standard successful outcome such as normal damage, partial defense, or a weaker ability. This is the expected common success state.
-- **No pair**: weak outcome, such as minimal damage or no useful effect. A bad roll should weaken the turn rather than automatically lose the battle.
-- **Wild symbol**: substitutes for another symbol and reduces the frustration of an unlucky roll.
+- **Three matching symbols (19.60%)**: powerful outcome such as high damage, a strong block, or a major class ability. This is the exciting jackpot moment.
+- **Two matching symbols (64.65%)**: standard successful outcome such as normal damage, partial defense, or a weaker ability. This is the expected common success state.
+- **No pair (15.75%)**: weak outcome, such as minimal damage or no useful effect. A bad roll should weaken the turn rather than automatically lose the battle.
+- **Wild symbol**: substitutes into the highest available matching combination to mitigate unlucky rolls.
 
 The player wins the battle by reducing the enemy's health to zero before their own health reaches zero. The slot result determines the immediate action, while archetype abilities and matchup bonuses influence the effectiveness of that action.
 
@@ -102,6 +102,7 @@ The player wins the battle by reducing the enemy's health to zero before their o
 - A Wild substitutes into the best available match.
 - Battle ends when one gladiator reaches 0 HP or after a maximum of 8 turns.
 - If the turn limit is reached, the gladiator with more HP wins.
+- **Armory Preview**: Players can experiment with free, fully unlocked gear loadouts (Weapons, Armor, Crests) to test stat variations without introducing pay-to-win mechanics.
 
 ## A9. Screens
 1. **Home** — player House, enemy House, and “Enter War” button.

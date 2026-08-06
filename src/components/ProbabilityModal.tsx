@@ -89,21 +89,24 @@ export const ProbabilityModal: React.FC<ProbabilityModalProps> = ({ onClose }) =
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem' }}>
               <div style={{ background: 'rgba(16, 185, 129, 0.1)', border: '1px solid #10b981', padding: '0.8rem', borderRadius: '8px' }}>
                 <span style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: '#10b981', fontWeight: 700 }}>3-OF-A-KIND (JACKPOT)</span>
-                <div style={{ fontSize: '1.4rem', fontWeight: 900, color: '#fff', margin: '0.2rem 0' }}>~14.8%</div>
+                <div style={{ fontSize: '1.4rem', fontWeight: 900, color: '#fff', margin: '0.2rem 0' }}>19.60%</div>
                 <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>High damage, shield reflect, or maximum ability output.</span>
               </div>
 
               <div style={{ background: 'rgba(59, 130, 246, 0.1)', border: '1px solid #3b82f6', padding: '0.8rem', borderRadius: '8px' }}>
                 <span style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: '#60a5fa', fontWeight: 700 }}>2-OF-A-KIND (STANDARD)</span>
-                <div style={{ fontSize: '1.4rem', fontWeight: 900, color: '#fff', margin: '0.2rem 0' }}>~68.4%</div>
+                <div style={{ fontSize: '1.4rem', fontWeight: 900, color: '#fff', margin: '0.2rem 0' }}>64.65%</div>
                 <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>Common successful outcome; standard damage or shield.</span>
               </div>
 
               <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef4444', padding: '0.8rem', borderRadius: '8px' }}>
                 <span style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: '#f87171', fontWeight: 700 }}>NO MATCH (FUMBLE)</span>
-                <div style={{ fontSize: '1.4rem', fontWeight: 900, color: '#fff', margin: '0.2rem 0' }}>~16.8%</div>
+                <div style={{ fontSize: '1.4rem', fontWeight: 900, color: '#fff', margin: '0.2rem 0' }}>15.75%</div>
                 <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>Weak roll; low minimal damage output (8–10 HP).</span>
               </div>
+            </div>
+            <div style={{ marginTop: '0.8rem', fontSize: '0.78rem', color: 'var(--color-gold)', fontStyle: 'italic' }}>
+              💡 Verify these probabilities empirically by running <code>npm run simulate</code> in the terminal.
             </div>
           </div>
 

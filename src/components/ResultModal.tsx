@@ -17,19 +17,21 @@ export const ResultModal: React.FC<ResultModalProps> = ({ battleState, onReturnH
   const playerArch = ARCHETYPES[playerGladiator.archetypeId];
   const enemyArch = ARCHETYPES[enemyGladiator.archetypeId];
 
-  // Player Stats
+  // Player Stats (player is attacker)
   const playerLogs = history.filter((h) => h.attackerId === playerGladiator.id);
   const playerDmgDealt = playerLogs.reduce((acc, h) => acc + h.netDamage, 0);
-  const playerShieldBlocked = playerLogs.reduce((acc, h) => acc + h.shieldBlocked, 0);
   const playerPierced = playerLogs.reduce((acc, h) => acc + h.piercedDamage, 0);
   const playerJackpots = playerLogs.filter((h) => h.combination.tier === 'jackpot').length;
 
-  // Enemy Stats
+  // Enemy Stats (enemy is attacker)
   const enemyLogs = history.filter((h) => h.attackerId === enemyGladiator.id);
   const enemyDmgDealt = enemyLogs.reduce((acc, h) => acc + h.netDamage, 0);
-  const enemyShieldBlocked = enemyLogs.reduce((acc, h) => acc + h.shieldBlocked, 0);
   const enemyPierced = enemyLogs.reduce((acc, h) => acc + h.piercedDamage, 0);
   const enemyJackpots = enemyLogs.filter((h) => h.combination.tier === 'jackpot').length;
+
+  // Shield absorption: damage blocked by defender during opponent's attacks
+  const playerShieldBlocked = enemyLogs.reduce((acc, h) => acc + h.shieldBlocked, 0);
+  const enemyShieldBlocked = playerLogs.reduce((acc, h) => acc + h.shieldBlocked, 0);
 
   const pointsEarned = isVictory ? 150 : 50;
 
