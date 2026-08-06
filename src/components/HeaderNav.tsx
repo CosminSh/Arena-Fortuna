@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Shield, Volume2, VolumeX, Music, BarChart2 } from 'lucide-react';
+import { Volume2, VolumeX, Music, BarChart2 } from 'lucide-react';
 import { soundFx } from '../engine/audioEngine';
 
 interface HeaderNavProps {
@@ -33,18 +33,14 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({ onOpenProbabilityModal, on
           onResetToHome();
         }}
         onMouseEnter={() => soundFx.playHover()}
-        style={{ cursor: 'pointer' }}
       >
-        <Shield size={32} className="text-amber-500" style={{ color: '#f59e0b' }} />
-        <div>
-          <h1 className="brand-title">ARENA REELS</h1>
-          <span className="brand-badge">PVP WAR CONCEPT DEMO</span>
-        </div>
+        <h1 className="brand-title">ARENA REELS</h1>
+        <span className="brand-badge">PVP WAR CONCEPT DEMO</span>
       </div>
 
       <div className="header-actions">
         <button
-          className="btn btn-secondary"
+          className="header-btn"
           onClick={() => {
             soundFx.playClick();
             onOpenProbabilityModal();
@@ -52,32 +48,29 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({ onOpenProbabilityModal, on
           onMouseEnter={() => soundFx.playHover()}
           title="Inspect Math & Symbol Probabilities"
         >
-          <BarChart2 size={18} />
+          <BarChart2 size={16} color="#f59e0b" />
           <span>Math & Odds</span>
         </button>
 
         <button
-          className="btn btn-secondary"
+          className="header-btn header-btn-icon"
           onClick={handleToggleMusic}
           onMouseEnter={() => soundFx.playHover()}
           title={musicPlaying ? 'Pause Background Music' : 'Play Background Music'}
-          style={{ padding: '0.4rem 0.7rem', fontSize: '0.78rem', borderColor: musicPlaying ? '#facc15' : 'rgba(255,255,255,0.2)' }}
         >
-          <Music size={16} color={musicPlaying ? '#facc15' : '#9ca3af'} />
-          <span style={{ color: musicPlaying ? '#facc15' : '#9ca3af' }}>
-            {musicPlaying ? 'MUSIC ON' : 'MUSIC OFF'}
-          </span>
+          <Music size={18} color={musicPlaying ? '#facc15' : '#6b7280'} />
         </button>
 
         <button
-          className="btn btn-secondary btn-icon"
+          className="header-btn header-btn-icon"
           onClick={handleToggleSound}
           onMouseEnter={() => soundFx.playHover()}
           title={muted ? 'Unmute Master Sound' : 'Mute Master Sound'}
         >
-          {muted ? <VolumeX size={20} color="#ef4444" /> : <Volume2 size={20} color="#10b981" />}
+          {muted ? <VolumeX size={18} color="#ef4444" /> : <Volume2 size={18} color="#10b981" />}
         </button>
       </div>
     </header>
   );
 };
+

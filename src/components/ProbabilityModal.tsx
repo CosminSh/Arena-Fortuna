@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, BarChart2, Zap, Layers, Cpu } from 'lucide-react';
+import { X, BarChart2, Zap, Layers } from 'lucide-react';
 import { soundFx } from '../engine/audioEngine';
 
 interface ProbabilityModalProps {
@@ -125,19 +125,9 @@ export const ProbabilityModal: React.FC<ProbabilityModalProps> = ({ onClose }) =
               <li><strong>Thraex beats Murmillo</strong>: Hooked blade (Sica) bypasses 25%–40% of Murmillo's shield block.</li>
             </ul>
           </div>
-
-          {/* Section 4: AI Workflow & Design Rationale */}
-          <div style={{ background: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(245, 158, 11, 0.2)', borderRadius: '12px', padding: '1.2rem' }}>
-            <h3 style={{ fontSize: '1.1rem', color: 'var(--color-gold)', marginBottom: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Cpu size={18} />
-              <span>4. AI Workflow & Design Decisions</span>
-            </h3>
-            <p style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
-              Built using <strong>Antigravity AI (Gemini 3.6 Flash High)</strong> for rapid end-to-end prototyping. Visual art assets were procedurally generated with latent text-to-image synthesis, and audio feedback was engineered using the native browser Web Audio API oscillator synthesizer.
-            </p>
-          </div>
         </div>
       </div>
     </div>
   );
 };
+

@@ -128,3 +128,21 @@ To ensure full transparency regarding human game design judgment vs AI execution
 
 Read the full design document detailing both Part A (Prototype) and Part B (Full PvP Guild War Vision):  
 👉 [Arena_Reels_GDD.md](./Arena_Reels_GDD.md)
+
+---
+
+## 🚀 Deployment & CI/CD Notes
+
+### Automated GitHub Pages Workflow
+Deployments are automatically handled on every push to `main` via [.github/workflows/deploy.yml](.github/workflows/deploy.yml).
+
+### Troubleshooting Deployment Failures
+1. **Transient GitHub Actions Outages (`Failed to resolve action download info` / `500 Internal Server Error` / `503 Service Unavailable`)**:
+   - **Cause**: GitHub Actions infrastructure transient API/download endpoint outage during the runner initialization phase (`Prepare all required actions`). This occurs *before* any repository code or build step executes.
+   - **Resolution**: No code changes required. Navigate to **Actions** in GitHub → Select the failed workflow run → Click **Re-run all jobs** (or trigger `workflow_dispatch`).
+2. **Local Build Pre-Flight Check**:
+   - Always run local compilation check before pushing to ensure zero TypeScript or Vite bundle errors:
+     ```bash
+     npm run build
+     ```
+
