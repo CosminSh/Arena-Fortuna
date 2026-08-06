@@ -3,9 +3,16 @@ class AudioEngine {
   private isMuted: boolean = false;
   private musicAudio: HTMLAudioElement | null = null;
   private currentTrackIndex: number = 0;
-  private musicTracks: string[] = ['./music/nocturnal.mp3', './music/nocturnal-2.mp3'];
+  private musicTrackNames: string[] = ['nocturnal.mp3', 'nocturnal-2.mp3'];
   private isMusicPlaying: boolean = false;
   private gestureListenerAttached: boolean = false;
+
+  private getTrackUrl(filename: string): string {
+    const meta = import.meta as unknown as { env?: { BASE_URL?: string } };
+    const base = meta.env?.BASE_URL || './';
+    const cleanBase = base.endsWith('/') ? base : base + '/';
+    return `${cleanBase}music/${filename}`;
+  }
 
   private initCtx() {
     if (!this.ctx) {
@@ -13,9 +20,6 @@ class AudioEngine {
       if (AudioCtx) {
         this.ctx = new AudioCtx();
       }
-    }
-    if (this.ctx && this.ctx.state === 'suspended') {
-      this.ctx.resume().catch(() => {});
     }
   }
 
@@ -32,13 +36,14 @@ class AudioEngine {
   public startMusic() {
     if (this.isMuted) return;
     if (!this.musicAudio) {
-      this.musicAudio = new Audio(this.musicTracks[this.currentTrackIndex]);
+      const initialSrc = this.getTrackUrl(this.musicTrackNames[this.currentTrackIndex]);
+      this.musicAudio = new Audio(initialSrc);
       this.musicAudio.loop = false;
       this.musicAudio.volume = 0.35;
       this.musicAudio.addEventListener('ended', () => {
-        this.currentTrackIndex = (this.currentTrackIndex + 1) % this.musicTracks.length;
+        this.currentTrackIndex = (this.currentTrackIndex + 1) % this.musicTrackNames.length;
         if (this.musicAudio) {
-          this.musicAudio.src = this.musicTracks[this.currentTrackIndex];
+          this.musicAudio.src = this.getTrackUrl(this.musicTrackNames[this.currentTrackIndex]);
           this.musicAudio.play().catch(() => {});
         }
       });
@@ -92,7 +97,7 @@ class AudioEngine {
   public playHover() {
     if (this.isMuted) return;
     this.initCtx();
-    if (!this.ctx) return;
+    if (!this.ctx || this.ctx.state === 'suspended') return;
 
     const osc = this.ctx.createOscillator();
     const gain = this.ctx.createGain();
