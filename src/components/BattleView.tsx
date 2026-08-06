@@ -96,19 +96,21 @@ export const BattleView: React.FC<BattleViewProps> = ({
       firstNetUsedEnemy
     );
 
-    const pOutcome = playerTurnResult.outcome;
+    const { outcome: pOutcome, updatedAttackerShields, updatedDefenderShields } = playerTurnResult;
     setFirstNetUsedEnemy(playerTurnResult.updatedFirstNetUsed);
 
     const nextEnemyHp = Math.max(0, enemy.currentHp - pOutcome.netDamage);
-    setEnemy((prev) => ({ ...prev, currentHp: nextEnemyHp }));
+    setEnemy((prev) => ({ ...prev, currentHp: nextEnemyHp, shieldCharges: updatedDefenderShields }));
+    setPlayer((prev) => ({ ...prev, shieldCharges: updatedAttackerShields }));
 
-    if (pOutcome.netDamage > 0) {
+    if (pOutcome.shieldBlocked > 0) {
+      soundFx.playShieldBlock();
+      setFloatingDamage({ text: `🛡️ ${pOutcome.shieldBlocked} BLOCKED`, isEnemy: true });
+    } else if (pOutcome.netDamage > 0) {
       soundFx.playHit();
       setFloatingDamage({ text: `-${pOutcome.netDamage}`, isEnemy: true });
       triggerScreenShake();
       triggerScreenFlash('gold');
-    } else if (pOutcome.shieldBlocked > 0) {
-      soundFx.playShieldBlock();
     }
 
     if (pOutcome.abilityTriggered) {
@@ -135,11 +137,11 @@ export const BattleView: React.FC<BattleViewProps> = ({
     }
 
     setTimeout(() => {
-      startEnemySpinSequence(nextEnemyHp, pOutcome);
+      startEnemySpinSequence(nextEnemyHp, updatedAttackerShields, updatedDefenderShields);
     }, 1000);
   };
 
-  const startEnemySpinSequence = (currentEnemyHp: number, pOutcome: TurnOutcome) => {
+  const startEnemySpinSequence = (currentEnemyHp: number, playerShields: number, enemyShields: number) => {
     setTurnPhase('enemy_spinning');
     setSpinningReelIndex([true, true, true]);
     setFloatingDamage(null);
@@ -168,33 +170,35 @@ export const BattleView: React.FC<BattleViewProps> = ({
       setSpinningReelIndex([false, false, false]);
       soundFx.playReelStop();
 
-      executeEnemyOutcome(finalEnemyReels, currentEnemyHp);
+      executeEnemyOutcome(finalEnemyReels, currentEnemyHp, playerShields, enemyShields);
     }, 1600);
   };
 
-  const executeEnemyOutcome = (finalEnemyReels: SymbolType[], currentEnemyHp: number) => {
+  const executeEnemyOutcome = (finalEnemyReels: SymbolType[], currentEnemyHp: number, playerShields: number, enemyShields: number) => {
     const enemyTurnResult = resolveTurn(
       turn,
-      enemy,
-      player,
+      { ...enemy, currentHp: currentEnemyHp, shieldCharges: enemyShields },
+      { ...player, shieldCharges: playerShields },
       finalEnemyReels,
       activeEntangledDefender,
       firstNetUsedPlayer
     );
 
-    const eOutcome = enemyTurnResult.outcome;
+    const { outcome: eOutcome, updatedAttackerShields, updatedDefenderShields } = enemyTurnResult;
     setFirstNetUsedPlayer(enemyTurnResult.updatedFirstNetUsed);
 
     const nextPlayerHp = Math.max(0, player.currentHp - eOutcome.netDamage);
-    setPlayer((prev) => ({ ...prev, currentHp: nextPlayerHp }));
+    setPlayer((prev) => ({ ...prev, currentHp: nextPlayerHp, shieldCharges: updatedDefenderShields }));
+    setEnemy((prev) => ({ ...prev, currentHp: currentEnemyHp, shieldCharges: updatedAttackerShields }));
 
-    if (eOutcome.netDamage > 0) {
+    if (eOutcome.shieldBlocked > 0) {
+      soundFx.playShieldBlock();
+      setFloatingDamage({ text: `🛡️ ${eOutcome.shieldBlocked} BLOCKED`, isEnemy: false });
+    } else if (eOutcome.netDamage > 0) {
       soundFx.playHit();
       setFloatingDamage({ text: `-${eOutcome.netDamage}`, isEnemy: false });
       triggerScreenShake();
       triggerScreenFlash('red');
-    } else if (eOutcome.shieldBlocked > 0) {
-      soundFx.playShieldBlock();
     }
 
     if (eOutcome.abilityTriggered) {
@@ -308,9 +312,12 @@ export const BattleView: React.FC<BattleViewProps> = ({
             <span className="stage-hp-val">{player.currentHp} / {player.maxHp} HP</span>
           </div>
 
-          <div style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', marginTop: '0.4rem' }}>
-            House: <strong style={{ color: '#fff' }}>Legio Invicta</strong>
-          </div>
+          {/* ACTIVE SHIELD BADGE */}
+          {player.shieldCharges > 0 && (
+            <div style={{ background: 'rgba(59, 130, 246, 0.25)', color: '#60a5fa', border: '1px solid #3b82f6', borderRadius: '12px', padding: '0.2rem 0.6rem', marginTop: '0.4rem', fontSize: '0.75rem', fontWeight: 800 }}>
+              🛡️ {player.shieldCharges} SHIELD ARMOR
+            </div>
+          )}
         </div>
 
         {/* Centerpiece Grand Casino Slot Cabinet */}
@@ -405,9 +412,12 @@ export const BattleView: React.FC<BattleViewProps> = ({
             <span className="stage-hp-val">{enemy.currentHp} / {enemy.maxHp} HP</span>
           </div>
 
-          <div style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', marginTop: '0.4rem' }}>
-            House: <strong style={{ color: '#fff' }}>Golden Falcon</strong>
-          </div>
+          {/* ACTIVE SHIELD BADGE FOR ENEMY */}
+          {enemy.shieldCharges > 0 && (
+            <div style={{ background: 'rgba(59, 130, 246, 0.25)', color: '#60a5fa', border: '1px solid #3b82f6', borderRadius: '12px', padding: '0.2rem 0.6rem', marginTop: '0.4rem', fontSize: '0.75rem', fontWeight: 800 }}>
+              🛡️ {enemy.shieldCharges} SHIELD ARMOR
+            </div>
+          )}
         </div>
       </div>
 

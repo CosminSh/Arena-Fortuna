@@ -104,9 +104,9 @@ export const AVAILABLE_GEAR: GearItem[] = [
     name: 'Imperial Scutum Plate',
     slot: 'armor',
     rarity: 'Legendary',
-    statBonus: '+10 Shield Block & +15 HP',
+    statBonus: '+15 Shield Block & +15 HP',
     damageBonus: 0,
-    shieldBonus: 10,
+    shieldBonus: 15,
     hpBonus: 15,
     icon: '🏰',
     description: 'Heavy bronze plate boosting maximum durability.',
@@ -131,9 +131,9 @@ export const AVAILABLE_GEAR: GearItem[] = [
     name: "Champion's Golden Laurel",
     slot: 'crest',
     rarity: 'Mythic',
-    statBonus: '+5 Dmg, +5 Shield, +10 HP',
+    statBonus: '+5 Dmg, +10 Shield, +10 HP',
     damageBonus: 5,
-    shieldBonus: 5,
+    shieldBonus: 10,
     hpBonus: 10,
     icon: '👑',
     description: 'Crown of the Grand Coliseum Champion.',
@@ -149,7 +149,7 @@ export const ENEMY_GLADIATORS: Gladiator[] = [
     archetypeId: 'murmillo',
     maxHp: 100,
     currentHp: 100,
-    shieldCharges: 0,
+    shieldCharges: 25, // Decimus starts with 25 shield protection!
     houseName: 'House of the Golden Falcon',
     isPlayer: false,
     avatarUrl: './assets/murmillo.png',
@@ -179,7 +179,7 @@ export const ENEMY_GLADIATORS: Gladiator[] = [
     archetypeId: 'retiarius',
     maxHp: 90,
     currentHp: 90,
-    shieldCharges: 0,
+    shieldCharges: 10,
     houseName: 'House of the Golden Falcon',
     isPlayer: false,
     avatarUrl: './assets/retiarius.png',
@@ -194,7 +194,7 @@ export const ENEMY_GLADIATORS: Gladiator[] = [
     archetypeId: 'thraex',
     maxHp: 110,
     currentHp: 110,
-    shieldCharges: 0,
+    shieldCharges: 30, // Flamma starts with 30 shield protection!
     houseName: 'House of the Golden Falcon',
     isPlayer: false,
     avatarUrl: './assets/thraex.png',
@@ -284,11 +284,15 @@ export function resolveTurn(
   reels: SymbolType[],
   activeEntangled: boolean,
   firstNetUsed: boolean
-): { outcome: TurnOutcome; updatedFirstNetUsed: boolean } {
+): {
+  outcome: TurnOutcome;
+  updatedFirstNetUsed: boolean;
+  updatedAttackerShields: number;
+  updatedDefenderShields: number;
+} {
   const combination = evaluateCombination(reels);
   const attackerArchetype = ARCHETYPES[attacker.archetypeId];
 
-  // Calculate equipped gear stat bonuses
   let gearDamageBonus = 0;
   let gearShieldBonus = 0;
   if (attacker.equippedGear) {
@@ -321,7 +325,7 @@ export function resolveTurn(
   } else if (primarySymbol === 'shield') {
     if (matchCount === 3) shieldGranted = 35 + gearShieldBonus;
     else if (matchCount === 2) shieldGranted = 20 + gearShieldBonus;
-    else shieldGranted = 8;
+    else shieldGranted = 10;
 
     if (attacker.archetypeId === 'murmillo') {
       shieldGranted = Math.round(shieldGranted * 1.25);
@@ -378,26 +382,30 @@ export function resolveTurn(
     rawDamage = Math.round(rawDamage * (1 - reduction));
   }
 
+  // Calculate Shield Absorption on Defender
   let shieldBlocked = 0;
   let remainingDamage = rawDamage;
 
   if (defender.shieldCharges > 0 && remainingDamage > 0) {
-    const shieldAbsorb = Math.min(defender.shieldCharges, remainingDamage - piercedDamage);
-    shieldBlocked = Math.max(0, Math.round(shieldAbsorb));
+    const absorblem = Math.max(0, remainingDamage - piercedDamage);
+    shieldBlocked = Math.min(defender.shieldCharges, absorblem);
     remainingDamage = Math.max(0, remainingDamage - shieldBlocked);
   }
 
   netDamage = Math.max(0, Math.round(remainingDamage));
   const updatedDefenderHp = Math.max(0, defender.currentHp - netDamage);
 
-  let logMessage = `${attacker.name} rolled [${reels.map(r => r.toUpperCase()).join(' | ')}].`;
-  if (netDamage > 0) {
-    logMessage += ` Dealt ${netDamage} HP damage`;
-    if (shieldBlocked > 0) logMessage += ` (${shieldBlocked} blocked)`;
+  const updatedAttackerShields = attacker.shieldCharges + shieldGranted;
+  const updatedDefenderShields = Math.max(0, defender.shieldCharges - shieldBlocked);
+
+  let logMessage = `${attacker.name} rolled [${reels.map((r) => r.toUpperCase()).join(' | ')}].`;
+  if (netDamage > 0 || shieldBlocked > 0) {
+    if (shieldBlocked > 0) logMessage += ` Shield absorbed ${shieldBlocked} DMG!`;
+    if (netDamage > 0) logMessage += ` Dealt ${netDamage} HP damage`;
     if (piercedDamage > 0) logMessage += ` [${piercedDamage} pierced]`;
     logMessage += `.`;
   } else if (shieldGranted > 0) {
-    logMessage += ` Gained +${shieldGranted} shield protection.`;
+    logMessage += ` Raised +${shieldGranted} shield protection!`;
   }
   if (debuffApplied) logMessage += ` Applied ${debuffApplied}!`;
 
@@ -421,5 +429,10 @@ export function resolveTurn(
     logMessage,
   };
 
-  return { outcome, updatedFirstNetUsed: newFirstNetUsed };
+  return {
+    outcome,
+    updatedFirstNetUsed: newFirstNetUsed,
+    updatedAttackerShields,
+    updatedDefenderShields,
+  };
 }
