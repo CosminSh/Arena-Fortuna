@@ -3,13 +3,15 @@ import { Gladiator, SymbolType, BattleState, TurnOutcome } from '../types/game';
 import { ARCHETYPES, spinReels, resolveTurn } from '../engine/mathEngine';
 import { soundFx } from '../engine/audioEngine';
 import { triggerGladiatorArenaSparks } from '../engine/arenaParticles';
-import { Swords, Shield, RefreshCw, Zap, ChevronDown, ChevronUp } from 'lucide-react';
+import { Swords, Shield, RefreshCw, Zap, ChevronDown, ChevronUp, AlertTriangle } from 'lucide-react';
 
 interface BattleViewProps {
   playerGladiator: Gladiator;
   enemyGladiator: Gladiator;
   onFinishBattle: (state: BattleState) => void;
 }
+
+type TurnPhase = 'player_ready' | 'player_spinning' | 'enemy_spinning';
 
 const SYMBOL_DISPLAY: Record<SymbolType, { label: string; icon: string; color: string }> = {
   sword: { label: 'Sword', icon: '🗡️', color: '#ef4444' },
@@ -26,8 +28,9 @@ export const BattleView: React.FC<BattleViewProps> = ({
   const [player, setPlayer] = useState<Gladiator>({ ...initialPlayer });
   const [enemy, setEnemy] = useState<Gladiator>({ ...initialEnemy });
   const [turn, setTurn] = useState<number>(1);
-  const [isSpinning, setIsSpinning] = useState<boolean>(false);
+  const [turnPhase, setTurnPhase] = useState<TurnPhase>('player_ready');
 
+  // Reels state
   const [reels, setReels] = useState<SymbolType[]>(['sword', 'shield', 'class']);
   const [spinningReelIndex, setSpinningReelIndex] = useState<[boolean, boolean, boolean]>([false, false, false]);
 
@@ -38,6 +41,7 @@ export const BattleView: React.FC<BattleViewProps> = ({
   const [firstNetUsedPlayer, setFirstNetUsedPlayer] = useState<boolean>(false);
   const [firstNetUsedEnemy, setFirstNetUsedEnemy] = useState<boolean>(false);
 
+  // FX States
   const [floatingDamage, setFloatingDamage] = useState<{ text: string; isEnemy: boolean } | null>(null);
   const [isShaking, setIsShaking] = useState<boolean>(false);
   const [showLogDrawer, setShowLogDrawer] = useState<boolean>(false);
@@ -45,14 +49,15 @@ export const BattleView: React.FC<BattleViewProps> = ({
   const playerArch = ARCHETYPES[player.archetypeId];
   const enemyArch = ARCHETYPES[enemy.archetypeId];
 
-  const handleSpin = () => {
-    if (isSpinning || player.currentHp <= 0 || enemy.currentHp <= 0 || turn > 8) return;
+  // 1. PLAYER SPIN SEQUENCE
+  const handlePlayerSpin = () => {
+    if (turnPhase !== 'player_ready' || player.currentHp <= 0 || enemy.currentHp <= 0 || turn > 8) return;
 
-    setIsSpinning(true);
+    setTurnPhase('player_spinning');
     setSpinningReelIndex([true, true, true]);
     setFloatingDamage(null);
 
-    const finalReels = spinReels();
+    const finalPlayerReels = spinReels();
 
     const flickerInterval = setInterval(() => {
       setReels(spinReels());
@@ -71,16 +76,16 @@ export const BattleView: React.FC<BattleViewProps> = ({
 
     setTimeout(() => {
       clearInterval(flickerInterval);
-      setReels(finalReels);
+      setReels(finalPlayerReels);
       setSpinningReelIndex([false, false, false]);
       soundFx.playReelStop();
-      setIsSpinning(false);
 
-      executeTurnSequence(finalReels);
+      // Resolve Player Action
+      executePlayerOutcome(finalPlayerReels);
     }, 1600);
   };
 
-  const executeTurnSequence = (finalReels: SymbolType[]) => {
+  const executePlayerOutcome = (finalReels: SymbolType[]) => {
     const playerTurnResult = resolveTurn(
       turn,
       player,
@@ -106,11 +111,10 @@ export const BattleView: React.FC<BattleViewProps> = ({
 
     if (pOutcome.combination.tier === 'jackpot') {
       soundFx.playJackpot();
-      triggerGladiatorArenaSparks(); // Fiery arena embers!
+      triggerGladiatorArenaSparks();
     }
 
     if (pOutcome.rerollGranted) setCanReroll(true);
-
     if (pOutcome.debuffApplied) setActiveEntangledDefender(true);
     else setActiveEntangledDefender(false);
     setActiveEntangledPlayer(false);
@@ -124,38 +128,79 @@ export const BattleView: React.FC<BattleViewProps> = ({
       return;
     }
 
+    // Trigger Enemy Counter-Turn Spin Sequence after brief pause
     setTimeout(() => {
-      const enemyReels = spinReels();
-      const enemyTurnResult = resolveTurn(
-        turn,
-        enemy,
-        player,
-        enemyReels,
-        activeEntangledDefender,
-        firstNetUsedPlayer
-      );
+      startEnemySpinSequence(nextEnemyHp, pOutcome);
+    }, 1000);
+  };
 
-      const eOutcome = enemyTurnResult.outcome;
-      setFirstNetUsedPlayer(enemyTurnResult.updatedFirstNetUsed);
+  // 2. ENEMY SPIN SEQUENCE (Player watches enemy roll!)
+  const startEnemySpinSequence = (currentEnemyHp: number, pOutcome: TurnOutcome) => {
+    setTurnPhase('enemy_spinning');
+    setSpinningReelIndex([true, true, true]);
+    setFloatingDamage(null);
 
-      const nextPlayerHp = Math.max(0, player.currentHp - eOutcome.netDamage);
-      setPlayer((prev) => ({ ...prev, currentHp: nextPlayerHp }));
+    const finalEnemyReels = spinReels();
 
-      if (eOutcome.netDamage > 0) {
-        soundFx.playHit();
-        setFloatingDamage({ text: `-${eOutcome.netDamage}`, isEnemy: false });
-        triggerScreenShake();
-      }
+    const enemyFlicker = setInterval(() => {
+      setReels(spinReels());
+      soundFx.playSpinTick();
+    }, 70);
 
-      if (eOutcome.debuffApplied) setActiveEntangledPlayer(true);
-      setCombatLogs((prev) => [eOutcome, ...prev]);
+    setTimeout(() => {
+      soundFx.playReelStop();
+      setSpinningReelIndex(([_, r2, r3]) => [false, r2, r3]);
+    }, 600);
 
-      if (nextPlayerHp <= 0 || turn >= 8) {
-        setTimeout(() => finishMatch({ ...player, currentHp: nextPlayerHp }, { ...enemy, currentHp: nextEnemyHp }, turn, eOutcome), 1400);
-      } else {
-        setTurn((prev) => prev + 1);
-      }
+    setTimeout(() => {
+      soundFx.playReelStop();
+      setSpinningReelIndex(([r1, _, r3]) => [r1, false, r3]);
     }, 1100);
+
+    setTimeout(() => {
+      clearInterval(enemyFlicker);
+      setReels(finalEnemyReels);
+      setSpinningReelIndex([false, false, false]);
+      soundFx.playReelStop();
+
+      // Resolve Enemy Action
+      executeEnemyOutcome(finalEnemyReels, currentEnemyHp);
+    }, 1600);
+  };
+
+  const executeEnemyOutcome = (finalEnemyReels: SymbolType[], currentEnemyHp: number) => {
+    const enemyTurnResult = resolveTurn(
+      turn,
+      enemy,
+      player,
+      finalEnemyReels,
+      activeEntangledDefender,
+      firstNetUsedPlayer
+    );
+
+    const eOutcome = enemyTurnResult.outcome;
+    setFirstNetUsedPlayer(enemyTurnResult.updatedFirstNetUsed);
+
+    const nextPlayerHp = Math.max(0, player.currentHp - eOutcome.netDamage);
+    setPlayer((prev) => ({ ...prev, currentHp: nextPlayerHp }));
+
+    if (eOutcome.netDamage > 0) {
+      soundFx.playHit();
+      setFloatingDamage({ text: `-${eOutcome.netDamage}`, isEnemy: false });
+      triggerScreenShake();
+    } else if (eOutcome.shieldBlocked > 0) {
+      soundFx.playShieldBlock();
+    }
+
+    if (eOutcome.debuffApplied) setActiveEntangledPlayer(true);
+    setCombatLogs((prev) => [eOutcome, ...prev]);
+
+    if (nextPlayerHp <= 0 || turn >= 8) {
+      setTimeout(() => finishMatch({ ...player, currentHp: nextPlayerHp }, { ...enemy, currentHp: currentEnemyHp }, turn, eOutcome), 1400);
+    } else {
+      setTurn((prev) => prev + 1);
+      setTurnPhase('player_ready');
+    }
   };
 
   const triggerScreenShake = () => {
@@ -185,6 +230,8 @@ export const BattleView: React.FC<BattleViewProps> = ({
     });
   };
 
+  const isEnemyTurn = turnPhase === 'enemy_spinning';
+
   return (
     <div
       className={isShaking ? 'shake' : ''}
@@ -198,21 +245,36 @@ export const BattleView: React.FC<BattleViewProps> = ({
         position: 'relative',
       }}
     >
+      {/* Floating Damage Text */}
       {floatingDamage && (
         <div className="floating-dmg" style={{ color: floatingDamage.isEnemy ? '#ef4444' : '#60a5fa' }}>
           {floatingDamage.text}
         </div>
       )}
 
-      {/* Top Turn Pill */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', background: 'rgba(12, 16, 24, 0.8)', padding: '0.2rem 0.8rem', borderRadius: '14px', border: '1px solid var(--color-border-gold)', fontSize: '0.75rem', fontWeight: 800 }}>
-        <Swords size={14} color="#f59e0b" />
-        <span>TURN {turn} / 8</span>
+      {/* Top Turn & Active Fighter Status Pill */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.5rem',
+          background: isEnemyTurn ? 'rgba(239, 68, 68, 0.25)' : 'rgba(12, 16, 24, 0.85)',
+          padding: '0.3rem 0.9rem',
+          borderRadius: '14px',
+          border: `1px solid ${isEnemyTurn ? '#ef4444' : 'var(--color-border-gold)'}`,
+          fontSize: '0.78rem',
+          fontWeight: 800,
+          color: isEnemyTurn ? '#f87171' : '#fff',
+        }}
+      >
+        {isEnemyTurn ? <AlertTriangle size={14} color="#ef4444" /> : <Swords size={14} color="#f59e0b" />}
+        <span>{isEnemyTurn ? `RIVAL ATTACK ROLLING (TURN ${turn})` : `YOUR TURN (TURN ${turn} / 8)`}</span>
       </div>
 
       {/* Duel Arena Header */}
       <div className="duel-compact-arena">
-        <div className="fighter-card player-side">
+        {/* Player Fighter */}
+        <div className={`fighter-card player-side ${!isEnemyTurn ? 'pulse' : ''}`}>
           <img src={playerArch.portrait} alt={player.name} className="fighter-avatar" />
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontSize: '0.85rem', fontWeight: 800, color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{player.name}</div>
@@ -224,9 +286,10 @@ export const BattleView: React.FC<BattleViewProps> = ({
           </div>
         </div>
 
-        <div style={{ fontSize: '0.9rem', fontWeight: 900, color: 'var(--color-gold)' }}>VS</div>
+        <div style={{ fontSize: '0.9rem', fontWeight: 900, color: isEnemyTurn ? '#ef4444' : 'var(--color-gold)' }}>VS</div>
 
-        <div className="fighter-card enemy-side">
+        {/* Enemy Fighter */}
+        <div className={`fighter-card enemy-side ${isEnemyTurn ? 'pulse' : ''}`}>
           <img src={enemy.avatarUrl} alt={enemy.name} className="fighter-avatar" />
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontSize: '0.85rem', fontWeight: 800, color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{enemy.name}</div>
@@ -239,18 +302,31 @@ export const BattleView: React.FC<BattleViewProps> = ({
         </div>
       </div>
 
-      {/* Centerpiece 3D Casino-Style Slot Machine */}
-      <div className="slot-frame">
-        <div style={{ fontSize: '0.75rem', fontWeight: 900, color: 'var(--color-gold)', letterSpacing: '0.12em' }}>
-          GLADIATOR REELS
+      {/* Centerpiece 3D Casino Slot Machine Frame (Dynamically themes based on player/enemy turn!) */}
+      <div
+        className="slot-frame"
+        style={{
+          borderColor: isEnemyTurn ? '#ef4444' : 'var(--color-gold)',
+          boxShadow: isEnemyTurn ? '0 0 40px rgba(239, 68, 68, 0.4), inset 0 0 25px rgba(0,0,0,0.9)' : '0 0 35px rgba(245, 158, 11, 0.35), inset 0 0 25px rgba(0,0,0,0.9)',
+        }}
+      >
+        <div style={{ fontSize: '0.78rem', fontWeight: 900, color: isEnemyTurn ? '#f87171' : 'var(--color-gold)', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+          {isEnemyTurn ? `⚠️ ${enemy.name.toUpperCase()}'S ATTACK REELS` : 'YOUR COMBAT REELS'}
         </div>
 
+        {/* 3 Reel Slots Container */}
         <div className="slot-reels-container">
           {reels.map((sym, idx) => {
             const display = SYMBOL_DISPLAY[sym];
             const isReelSpinning = spinningReelIndex[idx];
             return (
-              <div key={idx} className={`slot-reel ${isReelSpinning ? 'active-spin' : ''}`}>
+              <div
+                key={idx}
+                className={`slot-reel ${isReelSpinning ? 'active-spin' : ''}`}
+                style={{
+                  borderColor: isEnemyTurn ? 'rgba(239, 68, 68, 0.6)' : 'rgba(245, 158, 11, 0.6)',
+                }}
+              >
                 <div className="slot-symbol-content">
                   <span className="slot-symbol-icon">{display.icon}</span>
                   <span className="slot-symbol-tag" style={{ color: display.color }}>{display.label}</span>
@@ -260,20 +336,29 @@ export const BattleView: React.FC<BattleViewProps> = ({
           })}
         </div>
 
-        {/* Action Spin CTA */}
+        {/* Action Button Strip */}
         <div style={{ display: 'flex', gap: '0.6rem', width: '100%', justifyContent: 'center' }}>
           <button
             className="spin-cta-button"
-            onClick={handleSpin}
-            disabled={isSpinning || player.currentHp <= 0 || enemy.currentHp <= 0}
+            style={{
+              background: isEnemyTurn
+                ? 'linear-gradient(135deg, #7f1d1d 0%, #450a0a 100%)'
+                : 'linear-gradient(135deg, #ef4444 0%, #b91c1c 100%)',
+            }}
+            onClick={handlePlayerSpin}
+            disabled={turnPhase !== 'player_ready' || player.currentHp <= 0 || enemy.currentHp <= 0}
           >
-            {isSpinning ? 'SPINNING...' : 'SPIN REELS'}
+            {turnPhase === 'player_spinning'
+              ? 'SPINNING...'
+              : isEnemyTurn
+              ? 'ENEMY ROLLING...'
+              : 'SPIN REELS'}
           </button>
 
-          {canReroll && (
+          {canReroll && !isEnemyTurn && (
             <button
               className="btn btn-secondary"
-              onClick={handleSpin}
+              onClick={handlePlayerSpin}
               style={{ padding: '0.6rem 0.9rem', borderColor: '#a855f7', color: '#c084fc' }}
             >
               <RefreshCw size={16} />
@@ -287,7 +372,7 @@ export const BattleView: React.FC<BattleViewProps> = ({
       <div style={{ width: '100%', maxWidth: '580px', background: 'rgba(12, 16, 24, 0.9)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '10px', padding: '0.4rem 0.8rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }} onClick={() => setShowLogDrawer(!showLogDrawer)}>
           <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--color-gold)' }}>
-            {combatLogs[0] ? `TURN LOG: ${combatLogs[0].logMessage}` : 'Tap Spin to start battle action...'}
+            {combatLogs[0] ? `LAST ROLL: ${combatLogs[0].logMessage}` : 'Tap Spin to start battle action...'}
           </span>
           {showLogDrawer ? <ChevronDown size={16} color="var(--color-gold)" /> : <ChevronUp size={16} color="var(--color-gold)" />}
         </div>
