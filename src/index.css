@@ -1,19 +1,17 @@
 :root {
   --color-bg-dark: #06080d;
-  --color-bg-card: rgba(14, 18, 28, 0.88);
+  --color-bg-card: rgba(12, 16, 26, 0.88);
   --color-gold: #f59e0b;
   --color-gold-bright: #facc15;
-  --color-gold-glow: rgba(245, 158, 11, 0.5);
+  --color-gold-glow: rgba(245, 158, 11, 0.6);
   --color-crimson: #ef4444;
-  --color-crimson-glow: rgba(239, 68, 68, 0.5);
+  --color-crimson-glow: rgba(239, 68, 68, 0.6);
   --color-bronze: #d97706;
   --color-purple: #a855f7;
   --color-cyan: #06b6d4;
   --color-text-main: #f9fafb;
   --color-text-muted: #9ca3af;
-  --color-accent-blue: #3b82f6;
-  --color-accent-green: #10b981;
-  --color-border-gold: rgba(245, 158, 11, 0.4);
+  --color-border-gold: rgba(245, 158, 11, 0.45);
   --font-serif: 'Cinzel', serif;
   --font-sans: 'Inter', sans-serif;
 }
@@ -35,19 +33,14 @@ html, body {
   color: var(--color-text-main);
 }
 
-/* Atmospheric Background Gradient with Ember Pulse */
+/* FULL-BLEED EPIC COLOSSEUM ARENA BACKGROUND */
 body {
   background-image: 
-    radial-gradient(circle at 50% 15%, rgba(217, 119, 6, 0.28) 0%, transparent 55%),
-    radial-gradient(circle at 20% 80%, rgba(139, 0, 0, 0.35) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.15) 0%, transparent 50%);
-  background-size: 150% 150%;
-  animation: ambientBg 12s ease infinite alternate;
-}
-
-@keyframes ambientBg {
-  0% { background-position: 0% 0%; }
-  100% { background-position: 100% 100%; }
+    radial-gradient(circle at 50% 30%, rgba(10, 12, 18, 0.6) 0%, rgba(6, 8, 13, 0.92) 80%),
+    url("./assets/arena_banner.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 #root {
@@ -59,13 +52,13 @@ body {
 
 .app-container {
   width: 100%;
-  max-width: 920px;
+  max-width: 1200px;
   height: 100vh;
   margin: 0 auto;
-  padding: 0.6rem;
+  padding: 0.75rem 1rem;
   display: flex;
   flex-direction: column;
-  justify: space-between;
+  justify-content: space-between;
   position: relative;
   overflow: hidden;
 }
@@ -75,25 +68,25 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.5rem 0.9rem;
-  background: rgba(10, 14, 22, 0.9);
-  border: 1px solid var(--color-border-gold);
-  border-radius: 14px;
-  backdrop-filter: blur(14px);
-  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.75), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+  padding: 0.6rem 1.2rem;
+  background: linear-gradient(180deg, rgba(14, 18, 28, 0.95) 0%, rgba(8, 10, 16, 0.9) 100%);
+  border: 1.5px solid var(--color-border-gold);
+  border-radius: 16px;
+  backdrop-filter: blur(16px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.8), inset 0 1px 1px rgba(255, 255, 255, 0.2);
   flex-shrink: 0;
   z-index: 10;
 }
 
 .brand-title {
   font-family: var(--font-serif);
-  font-size: 1.25rem;
+  font-size: 1.4rem;
   font-weight: 900;
   background: linear-gradient(135deg, #ffffff 0%, #facc15 50%, #f59e0b 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   letter-spacing: 0.06em;
-  filter: drop-shadow(0 2px 8px rgba(245, 158, 11, 0.4));
+  filter: drop-shadow(0 2px 10px rgba(245, 158, 11, 0.5));
 }
 
 /* Main Content Area */
@@ -105,7 +98,7 @@ body {
   align-items: center;
   position: relative;
   overflow: hidden;
-  padding: 0.4rem 0;
+  padding: 0.5rem 0;
 }
 
 /* Premium Metallic Buttons */
@@ -114,15 +107,13 @@ body {
   align-items: center;
   justify-content: center;
   gap: 0.4rem;
-  padding: 0.6rem 1.2rem;
+  padding: 0.65rem 1.3rem;
   border-radius: 12px;
   font-weight: 800;
-  font-size: 0.9rem;
+  font-size: 0.92rem;
   cursor: pointer;
   transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s ease, background 0.15s ease;
   border: 1px solid transparent;
-  position: relative;
-  overflow: hidden;
 }
 
 .btn:active {
@@ -139,18 +130,18 @@ body {
 
 .btn-primary:hover {
   transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 8px 30px rgba(245, 158, 11, 0.75);
+  box-shadow: 0 8px 30px rgba(245, 158, 11, 0.8);
 }
 
 .btn-secondary {
   background: rgba(255, 255, 255, 0.08);
   color: #f3f4f6;
-  border-color: rgba(255, 255, 255, 0.18);
-  backdrop-filter: blur(8px);
+  border-color: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
 }
 
 .btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.16);
   border-color: var(--color-gold);
 }
 
@@ -162,38 +153,38 @@ body {
 /* Glassmorphic Shimmer Card */
 .card {
   background: var(--color-bg-card);
-  border: 1px solid var(--color-border-gold);
-  border-radius: 18px;
-  padding: 1rem;
-  backdrop-filter: blur(16px);
-  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.7), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+  border: 1.5px solid var(--color-border-gold);
+  border-radius: 20px;
+  padding: 1.1rem;
+  backdrop-filter: blur(18px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.8), inset 0 1px 1px rgba(255, 255, 255, 0.15);
   position: relative;
   transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .card:hover {
   border-color: var(--color-gold);
-  box-shadow: 0 12px 40px rgba(245, 158, 11, 0.25);
+  box-shadow: 0 15px 50px rgba(245, 158, 11, 0.3);
 }
 
-/* HIGH-IMPACT CASINO-STYLE 3D SLOT MACHINE */
+/* HIGH-IMPACT CASINO-STYLE 3D SLOT MACHINE CABINET */
 .slot-frame {
   width: 100%;
-  max-width: 490px;
-  background: linear-gradient(180deg, #1e2433 0%, #0e111a 60%, #06080e 100%);
-  border: 3px solid var(--color-gold);
-  border-radius: 24px;
-  padding: 0.9rem;
-  box-shadow: 0 0 45px rgba(245, 158, 11, 0.4), inset 0 0 30px rgba(0, 0, 0, 0.95);
+  max-width: 520px;
+  background: linear-gradient(180deg, #1f2738 0%, #0d111b 60%, #05070c 100%);
+  border: 3.5px solid var(--color-gold);
+  border-radius: 26px;
+  padding: 1rem;
+  box-shadow: 0 0 50px rgba(245, 158, 11, 0.45), inset 0 0 35px rgba(0, 0, 0, 0.95);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.8rem;
   position: relative;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* Perimeter LED Bulbs */
+/* LED Strips */
 .slot-led-strip {
   display: flex;
   justify-content: space-between;
@@ -202,39 +193,39 @@ body {
 }
 
 .slot-led {
-  width: 8px;
-  height: 8px;
+  width: 9px;
+  height: 9px;
   border-radius: 50%;
   background: var(--color-gold);
-  box-shadow: 0 0 8px var(--color-gold-bright);
+  box-shadow: 0 0 10px var(--color-gold-bright);
   animation: ledBlink 1.2s infinite alternate;
 }
 
 @keyframes ledBlink {
-  0% { opacity: 0.4; transform: scale(0.9); }
-  100% { opacity: 1; transform: scale(1.2); }
+  0% { opacity: 0.35; transform: scale(0.85); }
+  100% { opacity: 1; transform: scale(1.25); }
 }
 
 .slot-reels-container {
   display: flex;
-  gap: 0.8rem;
+  gap: 0.9rem;
   width: 100%;
   justify-content: center;
 }
 
 .slot-reel {
   flex: 1;
-  height: 125px;
-  background: radial-gradient(circle at 50% 50%, #151a26 0%, #05070c 100%);
-  border: 2px solid rgba(245, 158, 11, 0.7);
-  border-radius: 16px;
+  height: 135px;
+  background: radial-gradient(circle at 50% 50%, #161c2b 0%, #04060a 100%);
+  border: 2.5px solid rgba(245, 158, 11, 0.75);
+  border-radius: 18px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   position: relative;
   overflow: hidden;
-  box-shadow: inset 0 12px 18px rgba(0,0,0,0.9), inset 0 -12px 18px rgba(0,0,0,0.9);
+  box-shadow: inset 0 14px 22px rgba(0,0,0,0.95), inset 0 -14px 22px rgba(0,0,0,0.95);
   transition: border-color 0.2s ease;
 }
 
@@ -247,13 +238,15 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.2rem;
+  gap: 0.3rem;
   transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.slot-symbol-icon {
-  font-size: 3rem;
-  filter: drop-shadow(0 0 12px rgba(245, 158, 11, 0.8));
+.slot-symbol-icon-img {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 14px rgba(245, 158, 11, 0.85));
   animation: symbolPulse 2s ease-in-out infinite alternate;
 }
 
@@ -263,9 +256,9 @@ body {
 }
 
 .slot-symbol-tag {
-  font-size: 0.7rem;
+  font-size: 0.72rem;
   font-weight: 900;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   text-shadow: 0 0 8px rgba(0,0,0,0.9);
 }
@@ -273,16 +266,16 @@ body {
 /* Giant Pulsing Spin CTA */
 .spin-cta-button {
   width: 100%;
-  max-width: 290px;
-  padding: 0.9rem 1.8rem;
-  font-size: 1.2rem;
+  max-width: 320px;
+  padding: 0.95rem 2rem;
+  font-size: 1.25rem;
   font-weight: 900;
   letter-spacing: 0.08em;
   border-radius: 40px;
   background: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #991b1b 100%);
   color: #ffffff;
   border: 2px solid #fca5a5;
-  box-shadow: 0 6px 25px rgba(239, 68, 68, 0.6), inset 0 2px 4px rgba(255, 255, 255, 0.4);
+  box-shadow: 0 6px 28px rgba(239, 68, 68, 0.65), inset 0 2px 4px rgba(255, 255, 255, 0.4);
   cursor: pointer;
   transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s ease;
   text-shadow: 0 2px 4px rgba(0,0,0,0.5);
@@ -290,7 +283,7 @@ body {
 
 .spin-cta-button:hover:not(:disabled) {
   transform: scale(1.05);
-  box-shadow: 0 8px 35px rgba(239, 68, 68, 0.85);
+  box-shadow: 0 8px 38px rgba(239, 68, 68, 0.85);
 }
 
 .spin-cta-button:disabled {
@@ -299,80 +292,89 @@ body {
   transform: none;
 }
 
-/* DUEL ARENA HEADER */
-.duel-compact-arena {
+/* DYNAMIC RESPONSIVE BATTLE ARENA STAGE (DESKTOP vs MOBILE) */
+.battle-arena-stage {
   width: 100%;
-  max-width: 600px;
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  gap: 0.75rem;
-  align-items: center;
-  margin-bottom: 0.4rem;
-}
-
-.fighter-card {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 0.6rem;
-  background: rgba(14, 18, 28, 0.92);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 14px;
-  padding: 0.5rem 0.75rem;
+  gap: 1rem;
+}
+
+/* Wide screen / Desktop split layout: Fighters flank the slot cabinet on left & right! */
+@media (min-width: 820px) {
+  .battle-arena-stage {
+    display: grid;
+    grid-template-columns: 280px 1fr 280px;
+    align-items: center;
+    gap: 1.2rem;
+  }
+}
+
+.stage-fighter-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  background: rgba(12, 16, 26, 0.92);
+  border: 2px solid var(--color-border-gold);
+  border-radius: 20px;
+  padding: 1.2rem 1rem;
+  backdrop-filter: blur(16px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.8);
   position: relative;
-  transition: box-shadow 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
+  transition: transform 0.2s ease, border-color 0.2s ease;
 }
 
-.fighter-card.player-side {
-  border-color: rgba(59, 130, 246, 0.7);
-  box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);
+.stage-fighter-card.player-side {
+  border-color: rgba(59, 130, 246, 0.8);
+  box-shadow: 0 0 25px rgba(59, 130, 246, 0.3);
 }
 
-.fighter-card.enemy-side {
-  border-color: rgba(239, 68, 68, 0.7);
-  box-shadow: 0 0 15px rgba(239, 68, 68, 0.2);
-  flex-direction: row-reverse;
-  text-align: right;
+.stage-fighter-card.enemy-side {
+  border-color: rgba(239, 68, 68, 0.8);
+  box-shadow: 0 0 25px rgba(239, 68, 68, 0.3);
 }
 
-.fighter-avatar {
-  width: 54px;
-  height: 54px;
+.stage-avatar-large {
+  width: 90px;
+  height: 90px;
   border-radius: 50%;
-  border: 2px solid var(--color-gold);
+  border: 3px solid var(--color-gold);
   object-fit: cover;
-  flex-shrink: 0;
-  box-shadow: 0 0 12px rgba(245, 158, 11, 0.4);
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.5);
+  margin-bottom: 0.5rem;
 }
 
-.hp-track {
+.stage-hp-track {
   width: 100%;
-  height: 13px;
-  background: rgba(0, 0, 0, 0.8);
-  border-radius: 7px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  height: 16px;
+  background: rgba(0, 0, 0, 0.85);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
   overflow: hidden;
   position: relative;
-  margin-top: 0.25rem;
+  margin-top: 0.4rem;
 }
 
-.hp-fill {
+.stage-hp-fill {
   height: 100%;
   background: linear-gradient(90deg, #10b981 0%, #059669 100%);
   transition: width 0.35s ease-out;
-  box-shadow: 0 0 10px rgba(16, 185, 129, 0.6);
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.7);
 }
 
-.hp-fill.enemy {
+.stage-hp-fill.enemy {
   background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%);
-  box-shadow: 0 0 10px rgba(239, 68, 68, 0.6);
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.7);
 }
 
-.hp-val {
+.stage-hp-val {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 0.68rem;
+  font-size: 0.75rem;
   font-weight: 900;
   color: #fff;
   text-shadow: 0 1px 3px #000;
@@ -383,7 +385,7 @@ body {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.92);
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(12px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -396,26 +398,26 @@ body {
   border: 2px solid var(--color-gold);
   border-radius: 24px;
   width: 100%;
-  max-width: 560px;
-  max-height: 85vh;
+  max-width: 580px;
+  max-height: 88vh;
   overflow-y: auto;
-  padding: 1.5rem;
-  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.98), 0 0 40px rgba(245, 158, 11, 0.2);
+  padding: 1.6rem;
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.98), 0 0 45px rgba(245, 158, 11, 0.25);
 }
 
 /* Animations */
 @keyframes reelSpinBlur {
-  0% { transform: translateY(-5px); }
-  50% { transform: translateY(5px); }
-  100% { transform: translateY(-5px); }
+  0% { transform: translateY(-6px); }
+  50% { transform: translateY(6px); }
+  100% { transform: translateY(-6px); }
 }
 
 @keyframes screenShake {
   0% { transform: translate(0, 0); }
-  20% { transform: translate(-8px, 5px); }
-  40% { transform: translate(8px, -5px); }
-  60% { transform: translate(-5px, -3px); }
-  80% { transform: translate(5px, 3px); }
+  20% { transform: translate(-9px, 6px); }
+  40% { transform: translate(9px, -6px); }
+  60% { transform: translate(-6px, -4px); }
+  80% { transform: translate(6px, 4px); }
   100% { transform: translate(0, 0); }
 }
 
@@ -427,18 +429,18 @@ body {
 .screen-flash-gold {
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle, rgba(250, 204, 21, 0.35) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(250, 204, 21, 0.4) 0%, transparent 70%);
   pointer-events: none;
-  animation: flashFade 0.6s ease-out forwards;
+  animation: flashFade 0.65s ease-out forwards;
   z-index: 40;
 }
 
 .screen-flash-red {
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle, rgba(239, 68, 68, 0.35) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(239, 68, 68, 0.4) 0%, transparent 70%);
   pointer-events: none;
-  animation: flashFade 0.6s ease-out forwards;
+  animation: flashFade 0.65s ease-out forwards;
   z-index: 40;
 }
 
@@ -450,17 +452,17 @@ body {
 /* Floating Damage Animation */
 @keyframes damageFloat {
   0% { opacity: 1; transform: translate(-50%, 0) scale(1); }
-  50% { opacity: 1; transform: translate(-50%, -30px) scale(1.4); }
-  100% { opacity: 0; transform: translate(-50%, -55px) scale(0.8); }
+  50% { opacity: 1; transform: translate(-50%, -35px) scale(1.45); }
+  100% { opacity: 0; transform: translate(-50%, -60px) scale(0.8); }
 }
 
 .floating-dmg {
   position: absolute;
-  top: 28%;
+  top: 25%;
   left: 50%;
-  font-size: 2.2rem;
+  font-size: 2.4rem;
   font-weight: 900;
-  text-shadow: 0 0 12px #000, 0 0 25px currentColor;
+  text-shadow: 0 0 14px #000, 0 0 30px currentColor;
   animation: damageFloat 0.95s ease-out forwards;
   pointer-events: none;
   z-index: 50;
@@ -476,17 +478,17 @@ body {
 
 .ability-banner {
   position: absolute;
-  top: 15%;
+  top: 12%;
   left: 50%;
   transform: translateX(-50%);
   background: linear-gradient(135deg, rgba(245, 158, 11, 0.95) 0%, rgba(217, 119, 6, 0.95) 100%);
   color: #000;
   font-weight: 900;
-  font-size: 0.9rem;
-  padding: 0.4rem 1.2rem;
+  font-size: 0.95rem;
+  padding: 0.45rem 1.4rem;
   border-radius: 20px;
   border: 1.5px solid #fef08a;
-  box-shadow: 0 8px 25px rgba(245, 158, 11, 0.6);
+  box-shadow: 0 8px 30px rgba(245, 158, 11, 0.7);
   z-index: 45;
   pointer-events: none;
   animation: bannerSlideIn 1.4s ease-out forwards;

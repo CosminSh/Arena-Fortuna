@@ -259,162 +259,169 @@ export const BattleView: React.FC<BattleViewProps> = ({
         position: 'relative',
       }}
     >
+      {/* Screen Flashes */}
       {screenFlash === 'gold' && <div className="screen-flash-gold" />}
       {screenFlash === 'red' && <div className="screen-flash-red" />}
 
+      {/* Ability Callout Banner */}
       {abilityBanner && <div className="ability-banner">{abilityBanner}</div>}
 
+      {/* Floating Damage Text */}
       {floatingDamage && (
         <div className="floating-dmg" style={{ color: floatingDamage.isEnemy ? '#ef4444' : '#60a5fa' }}>
           {floatingDamage.text}
         </div>
       )}
 
-      {/* Top Turn & Active Fighter Status Pill */}
+      {/* Top Turn Header Pill */}
       <div
         style={{
           display: 'flex',
           alignItems: 'center',
           gap: '0.5rem',
-          background: isEnemyTurn ? 'rgba(239, 68, 68, 0.25)' : 'rgba(12, 16, 24, 0.85)',
-          padding: '0.3rem 0.9rem',
-          borderRadius: '14px',
-          border: `1px solid ${isEnemyTurn ? '#ef4444' : 'var(--color-border-gold)'}`,
-          fontSize: '0.78rem',
-          fontWeight: 800,
+          background: isEnemyTurn ? 'rgba(239, 68, 68, 0.3)' : 'rgba(14, 18, 28, 0.95)',
+          padding: '0.35rem 1.1rem',
+          borderRadius: '16px',
+          border: `1.5px solid ${isEnemyTurn ? '#ef4444' : 'var(--color-border-gold)'}`,
+          fontSize: '0.82rem',
+          fontWeight: 900,
           color: isEnemyTurn ? '#f87171' : '#fff',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.8)',
         }}
       >
-        {isEnemyTurn ? <AlertTriangle size={14} color="#ef4444" /> : <Swords size={14} color="#f59e0b" />}
+        {isEnemyTurn ? <AlertTriangle size={16} color="#ef4444" /> : <Swords size={16} color="#f59e0b" />}
         <span>{isEnemyTurn ? `RIVAL ATTACK ROLLING (TURN ${turn})` : `YOUR TURN (TURN ${turn} / 8)`}</span>
       </div>
 
-      {/* Duel Arena Header */}
-      <div className="duel-compact-arena">
-        {/* Player Fighter */}
-        <div className={`fighter-card player-side ${!isEnemyTurn ? 'pulse' : ''}`}>
-          <img src={playerArch.portrait} alt={player.name} className="fighter-avatar" />
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: '0.85rem', fontWeight: 800, color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{player.name}</div>
-            <div style={{ fontSize: '0.65rem', color: '#60a5fa', fontWeight: 700 }}>{playerArch.name}</div>
-            <div className="hp-track">
-              <div className="hp-fill" style={{ width: `${(player.currentHp / player.maxHp) * 100}%` }} />
-              <span className="hp-val">{player.currentHp} HP</span>
-            </div>
+      {/* RESPONSIVE ARENA STAGE: Flanks on Desktop, Stacks on Mobile */}
+      <div className="battle-arena-stage">
+        {/* Player Gladiator Card */}
+        <div className={`stage-fighter-card player-side ${!isEnemyTurn ? 'pulse' : ''}`}>
+          <img src={playerArch.portrait} alt={player.name} className="stage-avatar-large" />
+          <h3 style={{ fontSize: '1.1rem', fontWeight: 900, color: '#fff' }}>{player.name}</h3>
+          <span style={{ fontSize: '0.75rem', color: '#60a5fa', fontWeight: 800, textTransform: 'uppercase' }}>
+            {playerArch.name} ({playerArch.subName})
+          </span>
+
+          <div className="stage-hp-track">
+            <div className="stage-hp-fill" style={{ width: `${(player.currentHp / player.maxHp) * 100}%` }} />
+            <span className="stage-hp-val">{player.currentHp} / {player.maxHp} HP</span>
+          </div>
+
+          <div style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', marginTop: '0.4rem' }}>
+            House: <strong style={{ color: '#fff' }}>Legio Invicta</strong>
           </div>
         </div>
 
-        <div style={{ fontSize: '0.9rem', fontWeight: 900, color: isEnemyTurn ? '#ef4444' : 'var(--color-gold)' }}>VS</div>
-
-        {/* Enemy Fighter */}
-        <div className={`fighter-card enemy-side ${isEnemyTurn ? 'pulse' : ''}`}>
-          <img src={enemy.avatarUrl} alt={enemy.name} className="fighter-avatar" />
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: '0.85rem', fontWeight: 800, color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{enemy.name}</div>
-            <div style={{ fontSize: '0.65rem', color: '#f87171', fontWeight: 700 }}>{enemyArch.name}</div>
-            <div className="hp-track">
-              <div className="hp-fill enemy" style={{ width: `${(enemy.currentHp / enemy.maxHp) * 100}%` }} />
-              <span className="hp-val">{enemy.currentHp} HP</span>
-            </div>
+        {/* Centerpiece Grand Casino Slot Cabinet */}
+        <div
+          className="slot-frame"
+          style={{
+            borderColor: isEnemyTurn ? '#ef4444' : 'var(--color-gold)',
+            boxShadow: isEnemyTurn ? '0 0 55px rgba(239, 68, 68, 0.5), inset 0 0 35px rgba(0,0,0,0.95)' : '0 0 50px rgba(245, 158, 11, 0.45), inset 0 0 35px rgba(0,0,0,0.95)',
+          }}
+        >
+          {/* LED Strip */}
+          <div className="slot-led-strip">
+            <div className="slot-led" />
+            <div className="slot-led" />
+            <div className="slot-led" />
+            <div className="slot-led" />
+            <div className="slot-led" />
           </div>
-        </div>
-      </div>
 
-      {/* Centerpiece 3D Casino Slot Machine Frame */}
-      <div
-        className="slot-frame"
-        style={{
-          borderColor: isEnemyTurn ? '#ef4444' : 'var(--color-gold)',
-          boxShadow: isEnemyTurn ? '0 0 45px rgba(239, 68, 68, 0.45), inset 0 0 30px rgba(0,0,0,0.95)' : '0 0 45px rgba(245, 158, 11, 0.4), inset 0 0 30px rgba(0,0,0,0.95)',
-        }}
-      >
-        {/* LED Lights Strip */}
-        <div className="slot-led-strip">
-          <div className="slot-led" />
-          <div className="slot-led" />
-          <div className="slot-led" />
-          <div className="slot-led" />
-          <div className="slot-led" />
-        </div>
+          <div style={{ fontSize: '0.82rem', fontWeight: 900, color: isEnemyTurn ? '#f87171' : 'var(--color-gold)', letterSpacing: '0.14em', textTransform: 'uppercase' }}>
+            {isEnemyTurn ? `⚠️ ${enemy.name.toUpperCase()}'S ATTACK REELS` : 'YOUR COMBAT REELS'}
+          </div>
 
-        <div style={{ fontSize: '0.78rem', fontWeight: 900, color: isEnemyTurn ? '#f87171' : 'var(--color-gold)', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
-          {isEnemyTurn ? `⚠️ ${enemy.name.toUpperCase()}'S ATTACK REELS` : 'YOUR COMBAT REELS'}
-        </div>
-
-        {/* 3 Reel Slots Container with Rendered High-Res Symbol Images */}
-        <div className="slot-reels-container">
-          {reels.map((sym, idx) => {
-            const display = SYMBOL_DISPLAY[sym];
-            const isReelSpinning = spinningReelIndex[idx];
-            return (
-              <div
-                key={idx}
-                className={`slot-reel ${isReelSpinning ? 'active-spin' : ''}`}
-                style={{
-                  borderColor: isEnemyTurn ? 'rgba(239, 68, 68, 0.7)' : 'rgba(245, 158, 11, 0.7)',
-                }}
-              >
-                <div className="slot-symbol-content">
-                  <img
-                    src={display.image}
-                    alt={display.label}
-                    style={{
-                      width: '65px',
-                      height: '65px',
-                      objectFit: 'contain',
-                      filter: `drop-shadow(0 0 12px ${display.color})`,
-                    }}
-                  />
-                  <span className="slot-symbol-tag" style={{ color: display.color }}>{display.label}</span>
+          {/* 3 Reel Slots with Rendered High-Res Symbols */}
+          <div className="slot-reels-container">
+            {reels.map((sym, idx) => {
+              const display = SYMBOL_DISPLAY[sym];
+              const isReelSpinning = spinningReelIndex[idx];
+              return (
+                <div
+                  key={idx}
+                  className={`slot-reel ${isReelSpinning ? 'active-spin' : ''}`}
+                  style={{
+                    borderColor: isEnemyTurn ? 'rgba(239, 68, 68, 0.75)' : 'rgba(245, 158, 11, 0.75)',
+                  }}
+                >
+                  <div className="slot-symbol-content">
+                    <img
+                      src={display.image}
+                      alt={display.label}
+                      className="slot-symbol-icon-img"
+                    />
+                    <span className="slot-symbol-tag" style={{ color: display.color }}>{display.label}</span>
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
+
+          {/* Action CTA Button */}
+          <div style={{ display: 'flex', gap: '0.6rem', width: '100%', justifyContent: 'center' }}>
+            <button
+              className="spin-cta-button"
+              style={{
+                background: isEnemyTurn
+                  ? 'linear-gradient(135deg, #7f1d1d 0%, #450a0a 100%)'
+                  : 'linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #991b1b 100%)',
+              }}
+              onClick={handlePlayerSpin}
+              disabled={turnPhase !== 'player_ready' || player.currentHp <= 0 || enemy.currentHp <= 0}
+            >
+              {turnPhase === 'player_spinning'
+                ? 'SPINNING...'
+                : isEnemyTurn
+                ? 'ENEMY ROLLING...'
+                : 'SPIN REELS'}
+            </button>
+
+            {canReroll && !isEnemyTurn && (
+              <button
+                className="btn btn-secondary"
+                onClick={handlePlayerSpin}
+                style={{ padding: '0.6rem 0.9rem', borderColor: '#a855f7', color: '#c084fc' }}
+              >
+                <RefreshCw size={16} />
+                <span>REROLL</span>
+              </button>
+            )}
+          </div>
         </div>
 
-        {/* Action Button Strip */}
-        <div style={{ display: 'flex', gap: '0.6rem', width: '100%', justifyContent: 'center' }}>
-          <button
-            className="spin-cta-button"
-            style={{
-              background: isEnemyTurn
-                ? 'linear-gradient(135deg, #7f1d1d 0%, #450a0a 100%)'
-                : 'linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #991b1b 100%)',
-            }}
-            onClick={handlePlayerSpin}
-            disabled={turnPhase !== 'player_ready' || player.currentHp <= 0 || enemy.currentHp <= 0}
-          >
-            {turnPhase === 'player_spinning'
-              ? 'SPINNING...'
-              : isEnemyTurn
-              ? 'ENEMY ROLLING...'
-              : 'SPIN REELS'}
-          </button>
+        {/* Rival Gladiator Card */}
+        <div className={`stage-fighter-card enemy-side ${isEnemyTurn ? 'pulse' : ''}`}>
+          <img src={enemy.avatarUrl} alt={enemy.name} className="stage-avatar-large" style={{ borderColor: '#ef4444' }} />
+          <h3 style={{ fontSize: '1.1rem', fontWeight: 900, color: '#fff' }}>{enemy.name}</h3>
+          <span style={{ fontSize: '0.75rem', color: '#f87171', fontWeight: 800, textTransform: 'uppercase' }}>
+            {enemyArch.name} ({enemyArch.subName})
+          </span>
 
-          {canReroll && !isEnemyTurn && (
-            <button
-              className="btn btn-secondary"
-              onClick={handlePlayerSpin}
-              style={{ padding: '0.6rem 0.9rem', borderColor: '#a855f7', color: '#c084fc' }}
-            >
-              <RefreshCw size={16} />
-              <span>REROLL</span>
-            </button>
-          )}
+          <div className="stage-hp-track">
+            <div className="stage-hp-fill enemy" style={{ width: `${(enemy.currentHp / enemy.maxHp) * 100}%` }} />
+            <span className="stage-hp-val">{enemy.currentHp} / {enemy.maxHp} HP</span>
+          </div>
+
+          <div style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', marginTop: '0.4rem' }}>
+            House: <strong style={{ color: '#fff' }}>Golden Falcon</strong>
+          </div>
         </div>
       </div>
 
       {/* Expandable Log Strip */}
-      <div style={{ width: '100%', maxWidth: '600px', background: 'rgba(10, 14, 22, 0.9)', border: '1px solid rgba(255, 255, 255, 0.12)', borderRadius: '12px', padding: '0.4rem 0.8rem' }}>
+      <div style={{ width: '100%', maxWidth: '640px', background: 'rgba(10, 14, 22, 0.92)', border: '1px solid rgba(255, 255, 255, 0.15)', borderRadius: '14px', padding: '0.4rem 0.9rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }} onClick={() => setShowLogDrawer(!showLogDrawer)}>
-          <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--color-gold)' }}>
+          <span style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--color-gold)' }}>
             {combatLogs[0] ? `LAST ROLL: ${combatLogs[0].logMessage}` : 'Tap Spin to start battle action...'}
           </span>
           {showLogDrawer ? <ChevronDown size={16} color="var(--color-gold)" /> : <ChevronUp size={16} color="var(--color-gold)" />}
         </div>
 
         {showLogDrawer && (
-          <div style={{ marginTop: '0.4rem', maxHeight: '90px', overflowY: 'auto', fontSize: '0.72rem', display: 'flex', flexDirection: 'column', gap: '0.3rem', borderTop: '1px solid rgba(255, 255, 255, 0.1)', paddingTop: '0.4rem' }}>
+          <div style={{ marginTop: '0.4rem', maxHeight: '90px', overflowY: 'auto', fontSize: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.3rem', borderTop: '1px solid rgba(255, 255, 255, 0.12)', paddingTop: '0.4rem' }}>
             {combatLogs.map((l, i) => (
               <div key={i} style={{ color: l.attackerId === player.id ? '#60a5fa' : '#f87171' }}>
                 <strong>{l.attackerName}:</strong> {l.logMessage}
