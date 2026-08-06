@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ARCHETYPES } from '../engine/mathEngine';
 import { ArchetypeId } from '../types/game';
+import { soundFx } from '../engine/audioEngine';
 import { ArrowLeft, Zap, Info, ChevronRight, Check } from 'lucide-react';
 
 interface ArchetypeSelectViewProps {
@@ -24,7 +25,15 @@ export const ArchetypeSelectView: React.FC<ArchetypeSelectViewProps> = ({ onSele
     >
       {/* Header Bar */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <button className="btn btn-secondary" style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem' }} onClick={onBack}>
+        <button
+          className="btn btn-secondary"
+          style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem' }}
+          onClick={() => {
+            soundFx.playClick();
+            onBack();
+          }}
+          onMouseEnter={() => soundFx.playHover()}
+        >
           <ArrowLeft size={16} />
           <span>Back</span>
         </button>
@@ -51,7 +60,11 @@ export const ArchetypeSelectView: React.FC<ArchetypeSelectViewProps> = ({ onSele
                 borderColor: 'var(--color-border-gold)',
                 background: 'linear-gradient(180deg, rgba(20, 25, 36, 0.95) 0%, rgba(10, 12, 16, 0.98) 100%)',
               }}
-              onClick={() => onSelectArchetype(id)}
+              onMouseEnter={() => soundFx.playHover()}
+              onClick={() => {
+                soundFx.playClick();
+                onSelectArchetype(id);
+              }}
             >
               {/* Portrait & Icon */}
               <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -92,8 +105,10 @@ export const ArchetypeSelectView: React.FC<ArchetypeSelectViewProps> = ({ onSele
                 style={{ width: '100%', padding: '0.5rem', fontSize: '0.8rem', borderRadius: '8px' }}
                 onClick={(e) => {
                   e.stopPropagation();
+                  soundFx.playClick();
                   onSelectArchetype(id);
                 }}
+                onMouseEnter={() => soundFx.playHover()}
               >
                 <span>CHOOSE</span>
                 <ChevronRight size={14} />

@@ -1,6 +1,7 @@
 import React from 'react';
 import { BattleState } from '../types/game';
 import { ARCHETYPES } from '../engine/mathEngine';
+import { soundFx } from '../engine/audioEngine';
 import { Trophy, Skull, RefreshCw, Home, Zap, Swords, Shield, Info } from 'lucide-react';
 
 interface ResultModalProps {
@@ -146,12 +147,28 @@ export const ResultModal: React.FC<ResultModalProps> = ({ battleState, onReturnH
 
         {/* Action Buttons */}
         <div style={{ display: 'flex', gap: '0.8rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-          <button className="btn btn-primary" style={{ padding: '0.75rem 1.6rem' }} onClick={onReturnHome}>
+          <button
+            className="btn btn-primary"
+            style={{ padding: '0.75rem 1.6rem' }}
+            onClick={() => {
+              soundFx.playClick();
+              onReturnHome();
+            }}
+            onMouseEnter={() => soundFx.playHover()}
+          >
             <Home size={18} />
             <span>RETURN TO WAR</span>
           </button>
 
-          <button className="btn btn-secondary" style={{ padding: '0.75rem 1.4rem' }} onClick={onRematch}>
+          <button
+            className="btn btn-secondary"
+            style={{ padding: '0.75rem 1.4rem' }}
+            onClick={() => {
+              soundFx.playClick();
+              onRematch();
+            }}
+            onMouseEnter={() => soundFx.playHover()}
+          >
             <RefreshCw size={18} />
             <span>REMATCH</span>
           </button>

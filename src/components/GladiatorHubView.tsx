@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ArchetypeId, GearItem } from '../types/game';
 import { ARCHETYPES, AVAILABLE_GEAR } from '../engine/mathEngine';
+import { soundFx } from '../engine/audioEngine';
 import { ArrowLeft, Shield, Swords, Sparkles, Crown, Check, Zap } from 'lucide-react';
 
 interface GladiatorHubViewProps {
@@ -22,6 +23,7 @@ export const GladiatorHubView: React.FC<GladiatorHubViewProps> = ({
   const arch = ARCHETYPES[selectedArchId];
 
   const handleSelectGear = (gear: GearItem) => {
+    soundFx.playClick();
     setGearLoadout((prev) => ({
       ...prev,
       [gear.slot]: gear,
@@ -29,6 +31,7 @@ export const GladiatorHubView: React.FC<GladiatorHubViewProps> = ({
   };
 
   const handleSave = () => {
+    soundFx.playClick();
     onUpdateGladiator(selectedArchId, gearLoadout);
     onBack();
   };
@@ -55,7 +58,15 @@ export const GladiatorHubView: React.FC<GladiatorHubViewProps> = ({
     >
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <button className="btn btn-secondary" style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem' }} onClick={onBack}>
+        <button
+          className="btn btn-secondary"
+          style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem' }}
+          onClick={() => {
+            soundFx.playClick();
+            onBack();
+          }}
+          onMouseEnter={() => soundFx.playHover()}
+        >
           <ArrowLeft size={16} />
           <span>Home</span>
         </button>
@@ -105,7 +116,11 @@ export const GladiatorHubView: React.FC<GladiatorHubViewProps> = ({
                   borderColor: isSelected ? 'var(--color-gold)' : 'rgba(255, 255, 255, 0.15)',
                   color: isSelected ? '#fff' : 'var(--color-text-muted)',
                 }}
-                onClick={() => setSelectedArchId(id)}
+                onClick={() => {
+                  soundFx.playClick();
+                  setSelectedArchId(id);
+                }}
+                onMouseEnter={() => soundFx.playHover()}
               >
                 <span>{item.icon}</span>
                 <span>{item.name}</span>
@@ -136,6 +151,7 @@ export const GladiatorHubView: React.FC<GladiatorHubViewProps> = ({
                 borderColor: isEquipped ? '#10b981' : 'rgba(255, 255, 255, 0.12)',
                 background: isEquipped ? 'rgba(16, 185, 129, 0.15)' : 'rgba(12, 16, 24, 0.85)',
               }}
+              onMouseEnter={() => soundFx.playHover()}
               onClick={() => handleSelectGear(item)}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
@@ -160,6 +176,7 @@ export const GladiatorHubView: React.FC<GladiatorHubViewProps> = ({
                   e.stopPropagation();
                   handleSelectGear(item);
                 }}
+                onMouseEnter={() => soundFx.playHover()}
               >
                 {isEquipped ? <Check size={14} color="#10b981" /> : 'EQUIP'}
               </button>
@@ -169,7 +186,12 @@ export const GladiatorHubView: React.FC<GladiatorHubViewProps> = ({
       </div>
 
       {/* Save & Confirm Button */}
-      <button className="btn btn-primary" style={{ width: '100%', padding: '0.75rem', fontSize: '1rem' }} onClick={handleSave}>
+      <button
+        className="btn btn-primary"
+        style={{ width: '100%', padding: '0.75rem', fontSize: '1rem' }}
+        onClick={handleSave}
+        onMouseEnter={() => soundFx.playHover()}
+      >
         <Check size={18} />
         <span>SAVE BUILD & DEPLOY</span>
       </button>

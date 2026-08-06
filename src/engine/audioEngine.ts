@@ -23,6 +23,50 @@ class AudioEngine {
     return this.isMuted;
   }
 
+  public playHover() {
+    if (this.isMuted) return;
+    this.initCtx();
+    if (!this.ctx) return;
+
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(650, this.ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(850, this.ctx.currentTime + 0.025);
+
+    gain.gain.setValueAtTime(0.015, this.ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.025);
+
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+
+    osc.start();
+    osc.stop(this.ctx.currentTime + 0.025);
+  }
+
+  public playClick() {
+    if (this.isMuted) return;
+    this.initCtx();
+    if (!this.ctx) return;
+
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(500, this.ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(150, this.ctx.currentTime + 0.035);
+
+    gain.gain.setValueAtTime(0.07, this.ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.035);
+
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+
+    osc.start();
+    osc.stop(this.ctx.currentTime + 0.035);
+  }
+
   public playSpinTick() {
     if (this.isMuted) return;
     this.initCtx();

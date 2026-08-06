@@ -3,7 +3,7 @@ import { Gladiator, SymbolType, BattleState, TurnOutcome } from '../types/game';
 import { ARCHETYPES, spinReels, resolveTurn } from '../engine/mathEngine';
 import { soundFx } from '../engine/audioEngine';
 import { triggerGladiatorArenaSparks } from '../engine/arenaParticles';
-import { Swords, Shield, RefreshCw, Zap, ChevronDown, ChevronUp, AlertTriangle } from 'lucide-react';
+import { Swords, Shield, RefreshCw, Zap, ChevronDown, ChevronUp, AlertTriangle, Bot } from 'lucide-react';
 
 interface BattleViewProps {
   playerGladiator: Gladiator;
@@ -29,6 +29,7 @@ export const BattleView: React.FC<BattleViewProps> = ({
   const [enemy, setEnemy] = useState<Gladiator>({ ...initialEnemy });
   const [turn, setTurn] = useState<number>(1);
   const [turnPhase, setTurnPhase] = useState<TurnPhase>('player_ready');
+  const [isAutoBattle, setIsAutoBattle] = useState<boolean>(false);
 
   const [reels, setReels] = useState<SymbolType[]>(['sword', 'shield', 'class']);
   const [spinningReelIndex, setSpinningReelIndex] = useState<[boolean, boolean, boolean]>([false, false, false]);
@@ -50,9 +51,39 @@ export const BattleView: React.FC<BattleViewProps> = ({
   const playerArch = ARCHETYPES[player.archetypeId];
   const enemyArch = ARCHETYPES[enemy.archetypeId];
 
+  // Auto Battle spectator mode loop
+  React.useEffect(() => {
+    if (!isAutoBattle) return;
+
+    let autoTimer: number | undefined;
+    if (turnPhase === 'player_ready' && player.currentHp > 0 && enemy.currentHp > 0 && turn <= 8) {
+      autoTimer = window.setTimeout(() => {
+        handlePlayerSpin();
+      }, 700);
+    }
+    return () => {
+      if (autoTimer) clearTimeout(autoTimer);
+    };
+  }, [isAutoBattle, turnPhase, player.currentHp, enemy.currentHp, turn]);
+
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.code === 'Space' || e.key === ' ') {
+        if (turnPhase === 'player_ready' && player.currentHp > 0 && enemy.currentHp > 0 && turn <= 8) {
+          e.preventDefault();
+          soundFx.playClick();
+          handlePlayerSpin();
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [turnPhase, player.currentHp, enemy.currentHp, turn]);
+
   const handlePlayerSpin = () => {
     if (turnPhase !== 'player_ready' || player.currentHp <= 0 || enemy.currentHp <= 0 || turn > 8) return;
 
+    soundFx.playClick();
     setTurnPhase('player_spinning');
     setSpinningReelIndex([true, true, true]);
     setFloatingDamage(null);
@@ -277,24 +308,64 @@ export const BattleView: React.FC<BattleViewProps> = ({
         </div>
       )}
 
-      {/* Top Turn Header Pill */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.5rem',
-          background: isEnemyTurn ? 'rgba(239, 68, 68, 0.3)' : 'rgba(14, 18, 28, 0.95)',
-          padding: '0.35rem 1.1rem',
-          borderRadius: '16px',
-          border: `1.5px solid ${isEnemyTurn ? '#ef4444' : 'var(--color-border-gold)'}`,
-          fontSize: '0.82rem',
-          fontWeight: 900,
-          color: isEnemyTurn ? '#f87171' : '#fff',
-          boxShadow: '0 4px 20px rgba(0,0,0,0.8)',
-        }}
-      >
-        {isEnemyTurn ? <AlertTriangle size={16} color="#ef4444" /> : <Swords size={16} color="#f59e0b" />}
-        <span>{isEnemyTurn ? `RIVAL ATTACK ROLLING (TURN ${turn})` : `YOUR TURN (TURN ${turn} / 8)`}</span>
+      {/* Top Turn Header Pill & Auto Battle Toggle */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            background: isEnemyTurn ? 'rgba(239, 68, 68, 0.3)' : 'rgba(14, 18, 28, 0.95)',
+            padding: '0.35rem 1.1rem',
+            borderRadius: '16px',
+            border: `1.5px solid ${isEnemyTurn ? '#ef4444' : 'var(--color-border-gold)'}`,
+            fontSize: '0.82rem',
+            fontWeight: 900,
+            color: isEnemyTurn ? '#f87171' : '#fff',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.8)',
+          }}
+        >
+          {isEnemyTurn ? <AlertTriangle size={16} color="#ef4444" /> : <Swords size={16} color="#f59e0b" />}
+          <span>{isEnemyTurn ? `RIVAL ATTACK ROLLING (TURN ${turn})` : `YOUR TURN (TURN ${turn} / 8)`}</span>
+        </div>
+
+        {/* Auto Battle Checkbox Toggle */}
+        <label
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.45rem',
+            background: isAutoBattle ? 'linear-gradient(135deg, rgba(245, 158, 11, 0.35) 0%, rgba(217, 119, 6, 0.35) 100%)' : 'rgba(14, 18, 28, 0.95)',
+            border: `1.5px solid ${isAutoBattle ? '#facc15' : 'rgba(255, 255, 255, 0.25)'}`,
+            borderRadius: '16px',
+            padding: '0.35rem 0.9rem',
+            fontSize: '0.82rem',
+            fontWeight: 900,
+            color: isAutoBattle ? '#facc15' : '#9ca3af',
+            cursor: 'pointer',
+            boxShadow: isAutoBattle ? '0 0 15px rgba(245, 158, 11, 0.45)' : 'none',
+            transition: 'all 0.2s ease-in-out',
+            userSelect: 'none',
+          }}
+          onMouseEnter={() => soundFx.playHover()}
+        >
+          <input
+            type="checkbox"
+            checked={isAutoBattle}
+            onChange={(e) => {
+              soundFx.playClick();
+              setIsAutoBattle(e.target.checked);
+            }}
+            style={{
+              width: '16px',
+              height: '16px',
+              accentColor: '#f59e0b',
+              cursor: 'pointer',
+            }}
+          />
+          <Bot size={16} color={isAutoBattle ? '#facc15' : '#9ca3af'} />
+          <span>AUTO BATTLE {isAutoBattle ? '(ON)' : '(OFF)'}</span>
+        </label>
       </div>
 
       {/* RESPONSIVE ARENA STAGE: Flanks on Desktop, Stacks on Mobile */}
@@ -368,33 +439,44 @@ export const BattleView: React.FC<BattleViewProps> = ({
           </div>
 
           {/* Action CTA Button */}
-          <div style={{ display: 'flex', gap: '0.6rem', width: '100%', justifyContent: 'center' }}>
-            <button
-              className="spin-cta-button"
-              style={{
-                background: isEnemyTurn
-                  ? 'linear-gradient(135deg, #7f1d1d 0%, #450a0a 100%)'
-                  : 'linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #991b1b 100%)',
-              }}
-              onClick={handlePlayerSpin}
-              disabled={turnPhase !== 'player_ready' || player.currentHp <= 0 || enemy.currentHp <= 0}
-            >
-              {turnPhase === 'player_spinning'
-                ? 'SPINNING...'
-                : isEnemyTurn
-                ? 'ENEMY ROLLING...'
-                : 'SPIN REELS'}
-            </button>
-
-            {canReroll && !isEnemyTurn && (
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.4rem', width: '100%' }}>
+            <div style={{ display: 'flex', gap: '0.6rem', width: '100%', justifyContent: 'center' }}>
               <button
-                className="btn btn-secondary"
+                className="spin-cta-button"
+                style={{
+                  background: isEnemyTurn
+                    ? 'linear-gradient(135deg, #7f1d1d 0%, #450a0a 100%)'
+                    : 'linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #991b1b 100%)',
+                }}
                 onClick={handlePlayerSpin}
-                style={{ padding: '0.6rem 0.9rem', borderColor: '#a855f7', color: '#c084fc' }}
+                onMouseEnter={() => soundFx.playHover()}
+                disabled={turnPhase !== 'player_ready' || player.currentHp <= 0 || enemy.currentHp <= 0}
               >
-                <RefreshCw size={16} />
-                <span>REROLL</span>
+                {turnPhase === 'player_spinning'
+                  ? 'SPINNING...'
+                  : isEnemyTurn
+                  ? 'ENEMY ROLLING...'
+                  : isAutoBattle
+                  ? '⚡ AUTO ROLLING...'
+                  : 'SPIN REELS'}
               </button>
+
+              {canReroll && !isEnemyTurn && (
+                <button
+                  className="btn btn-secondary"
+                  onClick={handlePlayerSpin}
+                  onMouseEnter={() => soundFx.playHover()}
+                  style={{ padding: '0.6rem 0.9rem', borderColor: '#a855f7', color: '#c084fc' }}
+                >
+                  <RefreshCw size={16} />
+                  <span>REROLL</span>
+                </button>
+              )}
+            </div>
+            {turnPhase === 'player_ready' && (
+              <span style={{ fontSize: '0.68rem', color: isAutoBattle ? '#facc15' : 'rgba(255,255,255,0.45)', fontWeight: 700, letterSpacing: '0.05em' }}>
+                {isAutoBattle ? '⚡ AUTO BATTLE SPECTATOR MODE ACTIVE' : '[PRESS SPACEBAR OR CLICK TO SPIN]'}
+              </span>
             )}
           </div>
         </div>

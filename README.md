@@ -1,6 +1,6 @@
 # Arena Reels — Prototype Vertical Slice
 
-> **Live GitHub Pages Demo**: [https://cosminsh.github.io/arena-reels-prototype/](https://cosminsh.github.io/arena-reels-prototype/)  
+> **Live GitHub Pages Demo**: [https://cosminsh.github.io/Arena-Reels/](https://cosminsh.github.io/Arena-Reels/)  
 > **Game Design Document**: [Arena_Reels_GDD.md](./Arena_Reels_GDD.md)
 
 ---

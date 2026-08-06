@@ -1,5 +1,6 @@
 import React from 'react';
 import { Shield, Swords, Info, Trophy, ChevronRight, User, Sparkles } from 'lucide-react';
+import { soundFx } from '../engine/audioEngine';
 
 interface HomeViewProps {
   onStartWar: () => void;
@@ -86,7 +87,11 @@ export const HomeView: React.FC<HomeViewProps> = ({ onStartWar, onOpenGladiatorH
           <button
             className="btn btn-secondary"
             style={{ width: '100%', padding: '0.85rem', fontSize: '1.05rem', borderRadius: '25px', borderColor: 'var(--color-gold)', background: 'rgba(245, 158, 11, 0.15)' }}
-            onClick={onOpenGladiatorHub}
+            onClick={() => {
+              soundFx.playClick();
+              onOpenGladiatorHub();
+            }}
+            onMouseEnter={() => soundFx.playHover()}
           >
             <User size={20} color="#f59e0b" />
             <span style={{ color: '#fff', fontWeight: 900 }}>MY GLADIATOR & GEAR</span>
@@ -96,7 +101,11 @@ export const HomeView: React.FC<HomeViewProps> = ({ onStartWar, onOpenGladiatorH
           <button
             className="btn btn-primary pulse"
             style={{ width: '100%', padding: '0.95rem', fontSize: '1.15rem', borderRadius: '25px' }}
-            onClick={onStartWar}
+            onClick={() => {
+              soundFx.playClick();
+              onStartWar();
+            }}
+            onMouseEnter={() => soundFx.playHover()}
           >
             <Swords size={22} />
             <span>ENTER ARENA WAR</span>
@@ -107,7 +116,15 @@ export const HomeView: React.FC<HomeViewProps> = ({ onStartWar, onOpenGladiatorH
 
       {/* Bottom Quick Info Toggle */}
       <div style={{ display: 'flex', gap: '0.6rem', justifyContent: 'center' }}>
-        <button className="btn btn-secondary" style={{ fontSize: '0.78rem', padding: '0.4rem 0.9rem' }} onClick={onOpenMath}>
+        <button
+          className="btn btn-secondary"
+          style={{ fontSize: '0.78rem', padding: '0.4rem 0.9rem' }}
+          onClick={() => {
+            soundFx.playClick();
+            onOpenMath();
+          }}
+          onMouseEnter={() => soundFx.playHover()}
+        >
           <Info size={14} />
           <span>Combat Rules & Math Drawer</span>
         </button>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { HeaderNav } from './components/HeaderNav';
 import { HomeView } from './components/HomeView';
 import { GladiatorHubView } from './components/GladiatorHubView';
@@ -7,6 +7,7 @@ import { TargetSelectView } from './components/TargetSelectView';
 import { BattleView } from './components/BattleView';
 import { ResultModal } from './components/ResultModal';
 import { ProbabilityModal } from './components/ProbabilityModal';
+import { BackgroundParticles } from './components/BackgroundParticles';
 import { ArchetypeId, Gladiator, BattleState, GearItem } from './types/game';
 import { ARCHETYPES } from './engine/mathEngine';
 
@@ -19,6 +20,18 @@ export const App: React.FC = () => {
   const [selectedEnemy, setSelectedEnemy] = useState<Gladiator | null>(null);
   const [battleState, setBattleState] = useState<BattleState | null>(null);
   const [showProbabilityModal, setShowProbabilityModal] = useState<boolean>(false);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (showProbabilityModal) {
+          setShowProbabilityModal(false);
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showProbabilityModal]);
 
   const handleStartWar = () => {
     setViewMode('target');
@@ -92,8 +105,11 @@ export const App: React.FC = () => {
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
         transition: 'background-image 0.4s ease-in-out',
+        position: 'relative',
+        overflow: 'hidden',
       }}
     >
+      <BackgroundParticles />
       <div className="app-container">
         <HeaderNav
           onOpenProbabilityModal={() => setShowProbabilityModal(true)}

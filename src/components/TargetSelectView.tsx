@@ -1,6 +1,7 @@
 import React from 'react';
 import { Gladiator, ArchetypeId } from '../types/game';
 import { ARCHETYPES, ENEMY_GLADIATORS } from '../engine/mathEngine';
+import { soundFx } from '../engine/audioEngine';
 import { ArrowLeft, Swords } from 'lucide-react';
 
 interface TargetSelectViewProps {
@@ -29,7 +30,15 @@ export const TargetSelectView: React.FC<TargetSelectViewProps> = ({
     >
       {/* Header Bar */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <button className="btn btn-secondary" style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem' }} onClick={onBack}>
+        <button
+          className="btn btn-secondary"
+          style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem' }}
+          onClick={() => {
+            soundFx.playClick();
+            onBack();
+          }}
+          onMouseEnter={() => soundFx.playHover()}
+        >
           <ArrowLeft size={16} />
           <span>Change Archetype</span>
         </button>
@@ -69,7 +78,11 @@ export const TargetSelectView: React.FC<TargetSelectViewProps> = ({
                 borderColor: isFavored ? '#10b981' : isWeak ? '#ef4444' : 'var(--color-border-gold)',
                 background: 'linear-gradient(180deg, rgba(18, 22, 31, 0.95) 0%, rgba(10, 12, 16, 0.98) 100%)',
               }}
-              onClick={() => onSelectTarget(enemy)}
+              onMouseEnter={() => soundFx.playHover()}
+              onClick={() => {
+                soundFx.playClick();
+                onSelectTarget(enemy);
+              }}
             >
               {/* Avatar & Badge */}
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -99,8 +112,10 @@ export const TargetSelectView: React.FC<TargetSelectViewProps> = ({
                 style={{ width: '100%', padding: '0.4rem', fontSize: '0.78rem', borderRadius: '8px' }}
                 onClick={(e) => {
                   e.stopPropagation();
+                  soundFx.playClick();
                   onSelectTarget(enemy);
                 }}
+                onMouseEnter={() => soundFx.playHover()}
               >
                 <Swords size={14} />
                 <span>FIGHT</span>

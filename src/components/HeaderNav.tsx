@@ -11,13 +11,22 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({ onOpenProbabilityModal, on
   const [muted, setMuted] = useState(soundFx.getMuted());
 
   const handleToggleSound = () => {
+    soundFx.playClick();
     const isNowMuted = soundFx.toggleMute();
     setMuted(isNowMuted);
   };
 
   return (
     <header className="app-header">
-      <div className="brand" onClick={onResetToHome} style={{ cursor: 'pointer' }}>
+      <div
+        className="brand"
+        onClick={() => {
+          soundFx.playClick();
+          onResetToHome();
+        }}
+        onMouseEnter={() => soundFx.playHover()}
+        style={{ cursor: 'pointer' }}
+      >
         <Shield size={32} className="text-amber-500" style={{ color: '#f59e0b' }} />
         <div>
           <h1 className="brand-title">ARENA REELS</h1>
@@ -28,7 +37,11 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({ onOpenProbabilityModal, on
       <div className="header-actions">
         <button
           className="btn btn-secondary"
-          onClick={onOpenProbabilityModal}
+          onClick={() => {
+            soundFx.playClick();
+            onOpenProbabilityModal();
+          }}
+          onMouseEnter={() => soundFx.playHover()}
           title="Inspect Math & Symbol Probabilities"
         >
           <BarChart2 size={18} />
@@ -38,6 +51,7 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({ onOpenProbabilityModal, on
         <button
           className="btn btn-secondary btn-icon"
           onClick={handleToggleSound}
+          onMouseEnter={() => soundFx.playHover()}
           title={muted ? 'Unmute Sound' : 'Mute Sound'}
         >
           {muted ? <VolumeX size={20} color="#ef4444" /> : <Volume2 size={20} color="#10b981" />}

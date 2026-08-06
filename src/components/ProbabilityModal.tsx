@@ -1,5 +1,6 @@
 import React from 'react';
 import { X, BarChart2, Zap, Layers, Cpu } from 'lucide-react';
+import { soundFx } from '../engine/audioEngine';
 
 interface ProbabilityModalProps {
   onClose: () => void;
@@ -7,8 +8,8 @@ interface ProbabilityModalProps {
 
 export const ProbabilityModal: React.FC<ProbabilityModalProps> = ({ onClose }) => {
   return (
-    <div className="modal-overlay">
-      <div className="modal-content">
+    <div className="modal-overlay" onClick={() => { soundFx.playClick(); onClose(); }}>
+      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         {/* Modal Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', borderBottom: '1px solid rgba(255, 255, 255, 0.1)', paddingBottom: '1rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
@@ -18,7 +19,14 @@ export const ProbabilityModal: React.FC<ProbabilityModalProps> = ({ onClose }) =
               <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>Arena Reels Combat Resolution & Symbol Matrix</span>
             </div>
           </div>
-          <button className="btn btn-secondary btn-icon" onClick={onClose}>
+          <button
+            className="btn btn-secondary btn-icon"
+            onClick={() => {
+              soundFx.playClick();
+              onClose();
+            }}
+            onMouseEnter={() => soundFx.playHover()}
+          >
             <X size={20} />
           </button>
         </div>
