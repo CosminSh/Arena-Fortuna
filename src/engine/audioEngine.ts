@@ -1,6 +1,10 @@
 class AudioEngine {
   private ctx: AudioContext | null = null;
   private isMuted: boolean = false;
+  private musicAudio: HTMLAudioElement | null = null;
+  private currentTrackIndex: number = 0;
+  private musicTracks: string[] = ['./music/nocturnal.mp3', './music/nocturnal-2.mp3'];
+  private isMusicPlaying: boolean = false;
 
   private initCtx() {
     if (!this.ctx) {
@@ -14,8 +18,41 @@ class AudioEngine {
     }
   }
 
+  public startMusic() {
+    if (this.isMuted) return;
+    if (!this.musicAudio) {
+      this.musicAudio = new Audio(this.musicTracks[this.currentTrackIndex]);
+      this.musicAudio.loop = false;
+      this.musicAudio.volume = 0.35;
+      this.musicAudio.addEventListener('ended', () => {
+        this.currentTrackIndex = (this.currentTrackIndex + 1) % this.musicTracks.length;
+        if (this.musicAudio) {
+          this.musicAudio.src = this.musicTracks[this.currentTrackIndex];
+          this.musicAudio.play().catch(() => {});
+        }
+      });
+    }
+    this.musicAudio.play().then(() => {
+      this.isMusicPlaying = true;
+    }).catch(() => {
+      // Autoplay policy fallback until first user interaction
+    });
+  }
+
+  public stopMusic() {
+    if (this.musicAudio) {
+      this.musicAudio.pause();
+      this.isMusicPlaying = false;
+    }
+  }
+
   public toggleMute(): boolean {
     this.isMuted = !this.isMuted;
+    if (this.isMuted) {
+      this.stopMusic();
+    } else {
+      this.startMusic();
+    }
     return this.isMuted;
   }
 

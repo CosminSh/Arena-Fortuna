@@ -10,6 +10,7 @@ import { ProbabilityModal } from './components/ProbabilityModal';
 import { BackgroundParticles } from './components/BackgroundParticles';
 import { ArchetypeId, Gladiator, BattleState, GearItem } from './types/game';
 import { ARCHETYPES } from './engine/mathEngine';
+import { soundFx } from './engine/audioEngine';
 
 type ViewMode = 'home' | 'gladiator' | 'archetype' | 'target' | 'battle';
 
@@ -20,6 +21,20 @@ export const App: React.FC = () => {
   const [selectedEnemy, setSelectedEnemy] = useState<Gladiator | null>(null);
   const [battleState, setBattleState] = useState<BattleState | null>(null);
   const [showProbabilityModal, setShowProbabilityModal] = useState<boolean>(false);
+
+  useEffect(() => {
+    const handleFirstInteraction = () => {
+      soundFx.startMusic();
+      window.removeEventListener('pointerdown', handleFirstInteraction);
+      window.removeEventListener('keydown', handleFirstInteraction);
+    };
+    window.addEventListener('pointerdown', handleFirstInteraction);
+    window.addEventListener('keydown', handleFirstInteraction);
+    return () => {
+      window.removeEventListener('pointerdown', handleFirstInteraction);
+      window.removeEventListener('keydown', handleFirstInteraction);
+    };
+  }, []);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
