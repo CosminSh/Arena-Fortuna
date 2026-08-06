@@ -5,6 +5,7 @@ class AudioEngine {
   private currentTrackIndex: number = 0;
   private musicTracks: string[] = ['./music/nocturnal.mp3', './music/nocturnal-2.mp3'];
   private isMusicPlaying: boolean = false;
+  private gestureListenerAttached: boolean = false;
 
   private initCtx() {
     if (!this.ctx) {
@@ -14,7 +15,17 @@ class AudioEngine {
       }
     }
     if (this.ctx && this.ctx.state === 'suspended') {
-      this.ctx.resume();
+      this.ctx.resume().catch(() => {});
+    }
+  }
+
+  public resumeAudio() {
+    this.initCtx();
+    if (this.ctx && this.ctx.state === 'suspended') {
+      this.ctx.resume().catch(() => {});
+    }
+    if (!this.isMuted) {
+      this.startMusic();
     }
   }
 
@@ -32,11 +43,29 @@ class AudioEngine {
         }
       });
     }
-    this.musicAudio.play().then(() => {
-      this.isMusicPlaying = true;
-    }).catch(() => {
-      // Autoplay policy fallback until first user interaction
-    });
+
+    const playPromise = this.musicAudio.play();
+    if (playPromise !== undefined) {
+      playPromise
+        .then(() => {
+          this.isMusicPlaying = true;
+        })
+        .catch(() => {
+          this.isMusicPlaying = false;
+          if (!this.gestureListenerAttached) {
+            this.gestureListenerAttached = true;
+            const resumeOnGesture = () => {
+              this.resumeAudio();
+              window.removeEventListener('pointerdown', resumeOnGesture);
+              window.removeEventListener('keydown', resumeOnGesture);
+              window.removeEventListener('click', resumeOnGesture);
+            };
+            window.addEventListener('pointerdown', resumeOnGesture);
+            window.addEventListener('keydown', resumeOnGesture);
+            window.addEventListener('click', resumeOnGesture);
+          }
+        });
+    }
   }
 
   public stopMusic() {
@@ -51,7 +80,7 @@ class AudioEngine {
     if (this.isMuted) {
       this.stopMusic();
     } else {
-      this.startMusic();
+      this.resumeAudio();
     }
     return this.isMuted;
   }

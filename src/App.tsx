@@ -24,15 +24,18 @@ export const App: React.FC = () => {
 
   useEffect(() => {
     const handleFirstInteraction = () => {
-      soundFx.startMusic();
+      soundFx.resumeAudio();
       window.removeEventListener('pointerdown', handleFirstInteraction);
       window.removeEventListener('keydown', handleFirstInteraction);
+      window.removeEventListener('click', handleFirstInteraction);
     };
     window.addEventListener('pointerdown', handleFirstInteraction);
     window.addEventListener('keydown', handleFirstInteraction);
+    window.addEventListener('click', handleFirstInteraction);
     return () => {
       window.removeEventListener('pointerdown', handleFirstInteraction);
       window.removeEventListener('keydown', handleFirstInteraction);
+      window.removeEventListener('click', handleFirstInteraction);
     };
   }, []);
 
