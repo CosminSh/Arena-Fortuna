@@ -33,7 +33,6 @@ export const GladiatorHubView: React.FC<GladiatorHubViewProps> = ({
     onBack();
   };
 
-  // Stat totals
   const totalDmgBonus = (gearLoadout.weapon?.damageBonus || 0) + (gearLoadout.crest?.damageBonus || 0);
   const totalShieldBonus = (gearLoadout.armor?.shieldBonus || 0) + (gearLoadout.crest?.shieldBonus || 0);
   const totalHpBonus = (gearLoadout.armor?.hpBonus || 0) + (gearLoadout.crest?.hpBonus || 0);
@@ -47,6 +46,11 @@ export const GladiatorHubView: React.FC<GladiatorHubViewProps> = ({
         flexDirection: 'column',
         justifyContent: 'space-between',
         gap: '0.4rem',
+        backgroundImage: 'linear-gradient(180deg, rgba(6, 8, 13, 0.7) 0%, rgba(6, 8, 13, 0.95) 100%), url("./assets/armory_bg.png")',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        padding: '0.5rem',
+        borderRadius: '16px',
       }}
     >
       {/* Header */}
@@ -55,7 +59,7 @@ export const GladiatorHubView: React.FC<GladiatorHubViewProps> = ({
           <ArrowLeft size={16} />
           <span>Home</span>
         </button>
-        <h2 style={{ fontSize: '1.2rem', color: '#fff', textAlign: 'center' }}>MY GLADIATOR PROGRESSION</h2>
+        <h2 style={{ fontSize: '1.2rem', color: '#fff', textAlign: 'center' }}>GLADIATOR ARMORY</h2>
         <div style={{ width: '60px' }}></div>
       </div>
 
@@ -64,17 +68,17 @@ export const GladiatorHubView: React.FC<GladiatorHubViewProps> = ({
         <img
           src={arch.portrait}
           alt={arch.name}
-          style={{ width: '50px', height: '50px', borderRadius: '50%', border: '2px solid var(--color-gold)', objectFit: 'cover' }}
+          style={{ width: '55px', height: '55px', borderRadius: '50%', border: '2px solid var(--color-gold)', objectFit: 'cover' }}
         />
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: '1rem', fontWeight: 900, color: '#fff' }}>Imperator</div>
+          <div style={{ fontSize: '1.05rem', fontWeight: 900, color: '#fff' }}>Imperator</div>
           <div style={{ fontSize: '0.72rem', color: 'var(--color-gold)', fontWeight: 700 }}>
             {arch.name} ({arch.subName})
           </div>
         </div>
 
         {/* Stats Pill */}
-        <div style={{ display: 'flex', gap: '0.4rem', fontSize: '0.7rem', background: 'rgba(0,0,0,0.6)', padding: '0.3rem 0.6rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)' }}>
+        <div style={{ display: 'flex', gap: '0.4rem', fontSize: '0.72rem', background: 'rgba(0,0,0,0.7)', padding: '0.35rem 0.7rem', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.15)' }}>
           <span style={{ color: '#ef4444' }}>⚔️ +{totalDmgBonus}</span>
           <span style={{ color: '#3b82f6' }}>🛡️ +{totalShieldBonus}</span>
           <span style={{ color: '#10b981' }}>❤️ +{totalHpBonus} HP</span>
@@ -95,10 +99,10 @@ export const GladiatorHubView: React.FC<GladiatorHubViewProps> = ({
                 key={id}
                 className="btn"
                 style={{
-                  padding: '0.4rem',
-                  fontSize: '0.75rem',
-                  background: isSelected ? 'rgba(245, 158, 11, 0.2)' : 'rgba(255, 255, 255, 0.05)',
-                  borderColor: isSelected ? 'var(--color-gold)' : 'rgba(255, 255, 255, 0.1)',
+                  padding: '0.45rem',
+                  fontSize: '0.78rem',
+                  background: isSelected ? 'rgba(245, 158, 11, 0.25)' : 'rgba(0, 0, 0, 0.5)',
+                  borderColor: isSelected ? 'var(--color-gold)' : 'rgba(255, 255, 255, 0.15)',
                   color: isSelected ? '#fff' : 'var(--color-text-muted)',
                 }}
                 onClick={() => setSelectedArchId(id)}
@@ -111,10 +115,10 @@ export const GladiatorHubView: React.FC<GladiatorHubViewProps> = ({
         </div>
       </div>
 
-      {/* Equipment Gear Shop Catalog (Suggesting monetization & progression) */}
+      {/* Equipment Gear Shop Catalog */}
       <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
         <span style={{ fontSize: '0.68rem', fontWeight: 800, color: 'var(--color-text-muted)', textTransform: 'uppercase' }}>
-          Armory & Gear Loadout (Boost Combat Stats)
+          Armory Loadout (Boost Combat Stats)
         </span>
 
         {AVAILABLE_GEAR.map((item) => {
@@ -129,8 +133,8 @@ export const GladiatorHubView: React.FC<GladiatorHubViewProps> = ({
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 cursor: 'pointer',
-                borderColor: isEquipped ? '#10b981' : 'rgba(255, 255, 255, 0.1)',
-                background: isEquipped ? 'rgba(16, 185, 129, 0.1)' : 'rgba(18, 22, 31, 0.8)',
+                borderColor: isEquipped ? '#10b981' : 'rgba(255, 255, 255, 0.12)',
+                background: isEquipped ? 'rgba(16, 185, 129, 0.15)' : 'rgba(12, 16, 24, 0.85)',
               }}
               onClick={() => handleSelectGear(item)}
             >
@@ -140,7 +144,7 @@ export const GladiatorHubView: React.FC<GladiatorHubViewProps> = ({
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
                     <span style={{ fontSize: '0.82rem', fontWeight: 800, color: '#fff' }}>{item.name}</span>
                     {item.isPremium && (
-                      <span style={{ fontSize: '0.6rem', background: '#d97706', color: '#000', padding: '0.1rem 0.3rem', borderRadius: '4px', fontWeight: 900 }}>
+                      <span style={{ fontSize: '0.6rem', background: '#d97706', color: '#000', padding: '0.1rem 0.35rem', borderRadius: '4px', fontWeight: 900 }}>
                         PASS
                       </span>
                     )}
@@ -151,7 +155,7 @@ export const GladiatorHubView: React.FC<GladiatorHubViewProps> = ({
 
               <button
                 className={`btn ${isEquipped ? 'btn-secondary' : 'btn-primary'}`}
-                style={{ padding: '0.3rem 0.7rem', fontSize: '0.72rem' }}
+                style={{ padding: '0.35rem 0.75rem', fontSize: '0.75rem' }}
                 onClick={(e) => {
                   e.stopPropagation();
                   handleSelectGear(item);

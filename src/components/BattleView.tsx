@@ -3,7 +3,7 @@ import { Gladiator, SymbolType, BattleState, TurnOutcome } from '../types/game';
 import { ARCHETYPES, spinReels, resolveTurn } from '../engine/mathEngine';
 import { soundFx } from '../engine/audioEngine';
 import { triggerGladiatorArenaSparks } from '../engine/arenaParticles';
-import { Swords, Shield, RefreshCw, Zap, ChevronDown, ChevronUp, AlertTriangle, Sparkles } from 'lucide-react';
+import { Swords, Shield, RefreshCw, Zap, ChevronDown, ChevronUp, AlertTriangle } from 'lucide-react';
 
 interface BattleViewProps {
   playerGladiator: Gladiator;
@@ -13,11 +13,11 @@ interface BattleViewProps {
 
 type TurnPhase = 'player_ready' | 'player_spinning' | 'enemy_spinning';
 
-const SYMBOL_DISPLAY: Record<SymbolType, { label: string; icon: string; color: string }> = {
-  sword: { label: 'Sword', icon: '🗡️', color: '#ef4444' },
-  shield: { label: 'Shield', icon: '🛡️', color: '#3b82f6' },
-  class: { label: 'Ability', icon: '⭐', color: '#f59e0b' },
-  wild: { label: 'Wild', icon: '🃏', color: '#a855f7' },
+const SYMBOL_DISPLAY: Record<SymbolType, { label: string; icon: string; image: string; color: string }> = {
+  sword: { label: 'Sword', icon: '🗡️', image: './assets/symbol_sword.png', color: '#ef4444' },
+  shield: { label: 'Shield', icon: '🛡️', image: './assets/symbol_shield.png', color: '#3b82f6' },
+  class: { label: 'Ability', icon: '⭐', image: './assets/symbol_class.png', color: '#f59e0b' },
+  wild: { label: 'Wild', icon: '🃏', image: './assets/symbol_wild.png', color: '#a855f7' },
 };
 
 export const BattleView: React.FC<BattleViewProps> = ({
@@ -259,14 +259,11 @@ export const BattleView: React.FC<BattleViewProps> = ({
         position: 'relative',
       }}
     >
-      {/* Screen Flashes */}
       {screenFlash === 'gold' && <div className="screen-flash-gold" />}
       {screenFlash === 'red' && <div className="screen-flash-red" />}
 
-      {/* Ability Callout Banner */}
       {abilityBanner && <div className="ability-banner">{abilityBanner}</div>}
 
-      {/* Floating Damage Text */}
       {floatingDamage && (
         <div className="floating-dmg" style={{ color: floatingDamage.isEnemy ? '#ef4444' : '#60a5fa' }}>
           {floatingDamage.text}
@@ -344,7 +341,7 @@ export const BattleView: React.FC<BattleViewProps> = ({
           {isEnemyTurn ? `⚠️ ${enemy.name.toUpperCase()}'S ATTACK REELS` : 'YOUR COMBAT REELS'}
         </div>
 
-        {/* 3 Reel Slots Container */}
+        {/* 3 Reel Slots Container with Rendered High-Res Symbol Images */}
         <div className="slot-reels-container">
           {reels.map((sym, idx) => {
             const display = SYMBOL_DISPLAY[sym];
@@ -358,7 +355,16 @@ export const BattleView: React.FC<BattleViewProps> = ({
                 }}
               >
                 <div className="slot-symbol-content">
-                  <span className="slot-symbol-icon">{display.icon}</span>
+                  <img
+                    src={display.image}
+                    alt={display.label}
+                    style={{
+                      width: '65px',
+                      height: '65px',
+                      objectFit: 'contain',
+                      filter: `drop-shadow(0 0 12px ${display.color})`,
+                    }}
+                  />
                   <span className="slot-symbol-tag" style={{ color: display.color }}>{display.label}</span>
                 </div>
               </div>
