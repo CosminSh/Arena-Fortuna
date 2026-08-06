@@ -12,8 +12,14 @@
   --color-text-main: #f9fafb;
   --color-text-muted: #9ca3af;
   --color-border-gold: rgba(245, 158, 11, 0.45);
-  --font-serif: 'Cinzel', serif;
-  --font-sans: 'Inter', sans-serif;
+  --font-serif: 'Cinzel Decorative', 'Cinzel', serif;
+  --font-roman: 'Marcellus', 'Cinzel', serif;
+  --font-sans: 'Outfit', 'Inter', sans-serif;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-roman);
+  letter-spacing: 0.04em;
 }
 
 * {
@@ -111,8 +117,10 @@ body {
   gap: 0.4rem;
   padding: 0.65rem 1.3rem;
   border-radius: 12px;
+  font-family: var(--font-roman);
   font-weight: 800;
   font-size: 0.92rem;
+  letter-spacing: 0.04em;
   cursor: pointer;
   transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s ease, background 0.15s ease;
   border: 1px solid transparent;
@@ -270,6 +278,7 @@ body {
   width: 100%;
   max-width: 320px;
   padding: 0.95rem 2rem;
+  font-family: var(--font-serif);
   font-size: 1.25rem;
   font-weight: 900;
   letter-spacing: 0.08em;
