@@ -24,7 +24,7 @@ export const App: React.FC = () => {
 
   useEffect(() => {
     const handleFirstInteraction = () => {
-      soundFx.resumeAudio();
+      soundFx.initAndPlayMusic();
       window.removeEventListener('pointerdown', handleFirstInteraction);
       window.removeEventListener('keydown', handleFirstInteraction);
       window.removeEventListener('click', handleFirstInteraction);

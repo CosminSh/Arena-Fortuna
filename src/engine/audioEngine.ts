@@ -1,49 +1,61 @@
 class AudioEngine {
   private ctx: AudioContext | null = null;
   private isMuted: boolean = false;
+  private isMusicMuted: boolean = false;
   private musicAudio: HTMLAudioElement | null = null;
   private currentTrackIndex: number = 0;
   private musicTrackNames: string[] = ['nocturnal.mp3', 'nocturnal-2.mp3'];
   private isMusicPlaying: boolean = false;
-  private gestureListenerAttached: boolean = false;
 
-  private getTrackUrl(filename: string): string {
+  private getTrackUrls(filename: string): string[] {
     const meta = import.meta as unknown as { env?: { BASE_URL?: string } };
     const base = meta.env?.BASE_URL || './';
     const cleanBase = base.endsWith('/') ? base : base + '/';
-    return `${cleanBase}music/${filename}`;
+    return [
+      `${cleanBase}music/${filename}`,
+      `./music/${filename}`,
+      `music/${filename}`,
+      `/Arena-Reels/music/${filename}`,
+    ];
   }
 
-  private initCtx() {
+  public initCtx() {
     if (!this.ctx) {
       const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
       if (AudioCtx) {
         this.ctx = new AudioCtx();
       }
     }
-  }
-
-  public resumeAudio() {
-    this.initCtx();
     if (this.ctx && this.ctx.state === 'suspended') {
       this.ctx.resume().catch(() => {});
     }
-    if (!this.isMuted) {
-      this.startMusic();
-    }
   }
 
-  public startMusic() {
-    if (this.isMuted) return;
+  public initAndPlayMusic() {
+    this.initCtx();
+    if (this.isMuted || this.isMusicMuted) return;
+
     if (!this.musicAudio) {
-      const initialSrc = this.getTrackUrl(this.musicTrackNames[this.currentTrackIndex]);
-      this.musicAudio = new Audio(initialSrc);
-      this.musicAudio.loop = false;
+      const candidateUrls = this.getTrackUrls(this.musicTrackNames[this.currentTrackIndex]);
+      this.musicAudio = new Audio(candidateUrls[0]);
+      this.musicAudio.preload = 'auto';
       this.musicAudio.volume = 0.35;
+
+      // Handle track error fallback to alternative paths
+      let urlAttempt = 0;
+      this.musicAudio.addEventListener('error', () => {
+        urlAttempt++;
+        if (urlAttempt < candidateUrls.length && this.musicAudio) {
+          this.musicAudio.src = candidateUrls[urlAttempt];
+          this.musicAudio.play().catch(() => {});
+        }
+      });
+
       this.musicAudio.addEventListener('ended', () => {
         this.currentTrackIndex = (this.currentTrackIndex + 1) % this.musicTrackNames.length;
         if (this.musicAudio) {
-          this.musicAudio.src = this.getTrackUrl(this.musicTrackNames[this.currentTrackIndex]);
+          const nextUrls = this.getTrackUrls(this.musicTrackNames[this.currentTrackIndex]);
+          this.musicAudio.src = nextUrls[0];
           this.musicAudio.play().catch(() => {});
         }
       });
@@ -57,18 +69,6 @@ class AudioEngine {
         })
         .catch(() => {
           this.isMusicPlaying = false;
-          if (!this.gestureListenerAttached) {
-            this.gestureListenerAttached = true;
-            const resumeOnGesture = () => {
-              this.resumeAudio();
-              window.removeEventListener('pointerdown', resumeOnGesture);
-              window.removeEventListener('keydown', resumeOnGesture);
-              window.removeEventListener('click', resumeOnGesture);
-            };
-            window.addEventListener('pointerdown', resumeOnGesture);
-            window.addEventListener('keydown', resumeOnGesture);
-            window.addEventListener('click', resumeOnGesture);
-          }
         });
     }
   }
@@ -80,18 +80,32 @@ class AudioEngine {
     }
   }
 
+  public toggleMusic(): boolean {
+    this.isMusicMuted = !this.isMusicMuted;
+    if (this.isMusicMuted) {
+      this.stopMusic();
+    } else {
+      this.initAndPlayMusic();
+    }
+    return !this.isMusicMuted;
+  }
+
   public toggleMute(): boolean {
     this.isMuted = !this.isMuted;
     if (this.isMuted) {
       this.stopMusic();
     } else {
-      this.resumeAudio();
+      this.initAndPlayMusic();
     }
     return this.isMuted;
   }
 
   public getMuted(): boolean {
     return this.isMuted;
+  }
+
+  public getIsMusicPlaying(): boolean {
+    return this.isMusicPlaying && !this.isMusicMuted;
   }
 
   public playHover() {
