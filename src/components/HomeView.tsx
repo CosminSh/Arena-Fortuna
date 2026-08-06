@@ -1,12 +1,13 @@
 import React from 'react';
-import { Shield, Swords, Info, Trophy, ChevronRight, Zap } from 'lucide-react';
+import { Shield, Swords, Info, Trophy, ChevronRight, User, Sparkles } from 'lucide-react';
 
 interface HomeViewProps {
   onStartWar: () => void;
+  onOpenGladiatorHub: () => void;
   onOpenMath: () => void;
 }
 
-export const HomeView: React.FC<HomeViewProps> = ({ onStartWar, onOpenMath }) => {
+export const HomeView: React.FC<HomeViewProps> = ({ onStartWar, onOpenGladiatorHub, onOpenMath }) => {
   return (
     <div
       style={{
@@ -17,7 +18,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onStartWar, onOpenMath }) =>
         alignItems: 'center',
         justifyContent: 'space-between',
         textAlign: 'center',
-        padding: '1rem 0',
+        padding: '0.8rem 0',
       }}
     >
       {/* Top Badge */}
@@ -47,13 +48,13 @@ export const HomeView: React.FC<HomeViewProps> = ({ onStartWar, onOpenMath }) =>
           backgroundImage: 'linear-gradient(180deg, rgba(8, 10, 15, 0.5) 0%, rgba(8, 10, 15, 0.95) 100%), url("./assets/arena_banner.png")',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          padding: '2rem 1.5rem',
+          padding: '1.8rem 1.2rem',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
           gap: '1rem',
           border: '2px solid var(--color-gold)',
-          boxShadow: '0 0 40px rgba(245, 158, 11, 0.3)',
+          boxShadow: '0 0 40px rgba(245, 158, 11, 0.35)',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
@@ -64,7 +65,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onStartWar, onOpenMath }) =>
         </div>
 
         {/* Verses House Banner */}
-        <div style={{ width: '100%', display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: '0.5rem', alignItems: 'center', background: 'rgba(0, 0, 0, 0.6)', padding: '0.75rem', borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.1)' }}>
+        <div style={{ width: '100%', display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: '0.5rem', alignItems: 'center', background: 'rgba(0, 0, 0, 0.65)', padding: '0.75rem', borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.15)' }}>
           <div>
             <span style={{ fontSize: '0.68rem', color: '#60a5fa', fontWeight: 800, textTransform: 'uppercase' }}>YOUR HOUSE</span>
             <div style={{ fontSize: '0.95rem', fontWeight: 900, color: '#fff' }}>LEGIO INVICTA</div>
@@ -80,22 +81,34 @@ export const HomeView: React.FC<HomeViewProps> = ({ onStartWar, onOpenMath }) =>
           </div>
         </div>
 
-        {/* Play CTA */}
-        <button
-          className="btn btn-primary"
-          style={{ width: '100%', padding: '1rem', fontSize: '1.2rem', borderRadius: '30px' }}
-          onClick={onStartWar}
-        >
-          <Swords size={22} />
-          <span>ENTER ARENA WAR</span>
-          <ChevronRight size={20} />
-        </button>
+        {/* 2 MAIN BUTTONS: MY GLADIATOR & ENTER ARENA WAR */}
+        <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+          <button
+            className="btn btn-secondary"
+            style={{ width: '100%', padding: '0.85rem', fontSize: '1.05rem', borderRadius: '25px', borderColor: 'var(--color-gold)', background: 'rgba(245, 158, 11, 0.15)' }}
+            onClick={onOpenGladiatorHub}
+          >
+            <User size={20} color="#f59e0b" />
+            <span style={{ color: '#fff', fontWeight: 900 }}>MY GLADIATOR & GEAR</span>
+            <Sparkles size={16} color="#f59e0b" />
+          </button>
+
+          <button
+            className="btn btn-primary pulse"
+            style={{ width: '100%', padding: '0.95rem', fontSize: '1.15rem', borderRadius: '25px' }}
+            onClick={onStartWar}
+          >
+            <Swords size={22} />
+            <span>ENTER ARENA WAR</span>
+            <ChevronRight size={20} />
+          </button>
+        </div>
       </div>
 
       {/* Bottom Quick Info Toggle */}
       <div style={{ display: 'flex', gap: '0.6rem', justifyContent: 'center' }}>
-        <button className="btn btn-secondary" style={{ fontSize: '0.8rem', padding: '0.4rem 0.9rem' }} onClick={onOpenMath}>
-          <Info size={16} />
+        <button className="btn btn-secondary" style={{ fontSize: '0.78rem', padding: '0.4rem 0.9rem' }} onClick={onOpenMath}>
+          <Info size={14} />
           <span>Combat Rules & Math Drawer</span>
         </button>
       </div>

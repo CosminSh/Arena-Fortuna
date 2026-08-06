@@ -1,30 +1,40 @@
 import React, { useState } from 'react';
 import { HeaderNav } from './components/HeaderNav';
 import { HomeView } from './components/HomeView';
+import { GladiatorHubView } from './components/GladiatorHubView';
 import { ArchetypeSelectView } from './components/ArchetypeSelectView';
 import { TargetSelectView } from './components/TargetSelectView';
 import { BattleView } from './components/BattleView';
 import { ResultModal } from './components/ResultModal';
 import { ProbabilityModal } from './components/ProbabilityModal';
-import { ArchetypeId, Gladiator, BattleState } from './types/game';
+import { ArchetypeId, Gladiator, BattleState, GearItem } from './types/game';
 import { ARCHETYPES } from './engine/mathEngine';
 
-type ViewMode = 'home' | 'archetype' | 'target' | 'battle';
+type ViewMode = 'home' | 'gladiator' | 'archetype' | 'target' | 'battle';
 
 export const App: React.FC = () => {
   const [viewMode, setViewMode] = useState<ViewMode>('home');
   const [selectedArchetypeId, setSelectedArchetypeId] = useState<ArchetypeId>('murmillo');
+  const [equippedGear, setEquippedGear] = useState<{ weapon?: GearItem; armor?: GearItem; crest?: GearItem }>({});
   const [selectedEnemy, setSelectedEnemy] = useState<Gladiator | null>(null);
   const [battleState, setBattleState] = useState<BattleState | null>(null);
   const [showProbabilityModal, setShowProbabilityModal] = useState<boolean>(false);
 
   const handleStartWar = () => {
-    setViewMode('archetype');
+    setViewMode('target');
   };
 
   const handleSelectArchetype = (archetypeId: ArchetypeId) => {
     setSelectedArchetypeId(archetypeId);
     setViewMode('target');
+  };
+
+  const handleUpdateGladiator = (
+    archetypeId: ArchetypeId,
+    gear: { weapon?: GearItem; armor?: GearItem; crest?: GearItem }
+  ) => {
+    setSelectedArchetypeId(archetypeId);
+    setEquippedGear(gear);
   };
 
   const handleSelectTarget = (enemy: Gladiator) => {
@@ -49,17 +59,20 @@ export const App: React.FC = () => {
 
   const createPlayerGladiator = (): Gladiator => {
     const arch = ARCHETYPES[selectedArchetypeId];
+    const hpBonus = (equippedGear.armor?.hpBonus || 0) + (equippedGear.crest?.hpBonus || 0);
+    const maxHp = 100 + hpBonus;
     return {
       id: 'player_hero',
       name: 'Imperator',
       title: 'Gladiator Champion of Invicta',
       archetypeId: selectedArchetypeId,
-      maxHp: 100,
-      currentHp: 100,
+      maxHp,
+      currentHp: maxHp,
       shieldCharges: 0,
       houseName: 'Legio Invicta',
       isPlayer: true,
       avatarUrl: arch.portrait,
+      equippedGear,
     };
   };
 
@@ -74,7 +87,17 @@ export const App: React.FC = () => {
         {viewMode === 'home' && (
           <HomeView
             onStartWar={handleStartWar}
+            onOpenGladiatorHub={() => setViewMode('gladiator')}
             onOpenMath={() => setShowProbabilityModal(true)}
+          />
+        )}
+
+        {viewMode === 'gladiator' && (
+          <GladiatorHubView
+            currentArchetypeId={selectedArchetypeId}
+            equippedGear={equippedGear}
+            onUpdateGladiator={handleUpdateGladiator}
+            onBack={() => setViewMode('home')}
           />
         )}
 
@@ -89,7 +112,7 @@ export const App: React.FC = () => {
           <TargetSelectView
             playerArchetypeId={selectedArchetypeId}
             onSelectTarget={handleSelectTarget}
-            onBack={() => setViewMode('archetype')}
+            onBack={() => setViewMode('home')}
           />
         )}
 

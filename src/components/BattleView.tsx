@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { Gladiator, SymbolType, BattleState, TurnOutcome } from '../types/game';
 import { ARCHETYPES, spinReels, resolveTurn } from '../engine/mathEngine';
 import { soundFx } from '../engine/audioEngine';
+import { triggerGladiatorArenaSparks } from '../engine/arenaParticles';
 import { Swords, Shield, RefreshCw, Zap, ChevronDown, ChevronUp } from 'lucide-react';
-import confetti from 'canvas-confetti';
 
 interface BattleViewProps {
   playerGladiator: Gladiator;
@@ -28,7 +28,6 @@ export const BattleView: React.FC<BattleViewProps> = ({
   const [turn, setTurn] = useState<number>(1);
   const [isSpinning, setIsSpinning] = useState<boolean>(false);
 
-  // Individual Reel States for Staggered Casino Spin Feeling!
   const [reels, setReels] = useState<SymbolType[]>(['sword', 'shield', 'class']);
   const [spinningReelIndex, setSpinningReelIndex] = useState<[boolean, boolean, boolean]>([false, false, false]);
 
@@ -39,7 +38,6 @@ export const BattleView: React.FC<BattleViewProps> = ({
   const [firstNetUsedPlayer, setFirstNetUsedPlayer] = useState<boolean>(false);
   const [firstNetUsedEnemy, setFirstNetUsedEnemy] = useState<boolean>(false);
 
-  // FX States
   const [floatingDamage, setFloatingDamage] = useState<{ text: string; isEnemy: boolean } | null>(null);
   const [isShaking, setIsShaking] = useState<boolean>(false);
   const [showLogDrawer, setShowLogDrawer] = useState<boolean>(false);
@@ -56,34 +54,28 @@ export const BattleView: React.FC<BattleViewProps> = ({
 
     const finalReels = spinReels();
 
-    // Fast reel flicker loop
     const flickerInterval = setInterval(() => {
       setReels(spinReels());
       soundFx.playSpinTick();
     }, 70);
 
-    // Staggered Reel Stopping Sequence (Casinos use 0.6s, 1.2s, 1.8s)
     setTimeout(() => {
-      // Reel 1 Stops
       soundFx.playReelStop();
       setSpinningReelIndex(([_, r2, r3]) => [false, r2, r3]);
     }, 600);
 
     setTimeout(() => {
-      // Reel 2 Stops
       soundFx.playReelStop();
       setSpinningReelIndex(([r1, _, r3]) => [r1, false, r3]);
     }, 1100);
 
     setTimeout(() => {
-      // Reel 3 Stops — Final Lock!
       clearInterval(flickerInterval);
       setReels(finalReels);
       setSpinningReelIndex([false, false, false]);
       soundFx.playReelStop();
       setIsSpinning(false);
 
-      // Trigger Turn Resolution
       executeTurnSequence(finalReels);
     }, 1600);
   };
@@ -114,7 +106,7 @@ export const BattleView: React.FC<BattleViewProps> = ({
 
     if (pOutcome.combination.tier === 'jackpot') {
       soundFx.playJackpot();
-      confetti({ particleCount: 50, spread: 70, origin: { y: 0.5 } });
+      triggerGladiatorArenaSparks(); // Fiery arena embers!
     }
 
     if (pOutcome.rerollGranted) setCanReroll(true);
@@ -127,12 +119,11 @@ export const BattleView: React.FC<BattleViewProps> = ({
 
     if (nextEnemyHp <= 0) {
       soundFx.playVictory();
-      confetti({ particleCount: 120, spread: 100, origin: { y: 0.4 } });
+      triggerGladiatorArenaSparks();
       setTimeout(() => finishMatch(player, { ...enemy, currentHp: 0 }, turn, pOutcome), 1400);
       return;
     }
 
-    // Enemy Counter-Turn
     setTimeout(() => {
       const enemyReels = spinReels();
       const enemyTurnResult = resolveTurn(
@@ -207,7 +198,6 @@ export const BattleView: React.FC<BattleViewProps> = ({
         position: 'relative',
       }}
     >
-      {/* Floating Damage Text */}
       {floatingDamage && (
         <div className="floating-dmg" style={{ color: floatingDamage.isEnemy ? '#ef4444' : '#60a5fa' }}>
           {floatingDamage.text}
@@ -220,9 +210,8 @@ export const BattleView: React.FC<BattleViewProps> = ({
         <span>TURN {turn} / 8</span>
       </div>
 
-      {/* Duel Arena Header (Fits cleanly at top) */}
+      {/* Duel Arena Header */}
       <div className="duel-compact-arena">
-        {/* Player Fighter */}
         <div className="fighter-card player-side">
           <img src={playerArch.portrait} alt={player.name} className="fighter-avatar" />
           <div style={{ flex: 1, minWidth: 0 }}>
@@ -237,7 +226,6 @@ export const BattleView: React.FC<BattleViewProps> = ({
 
         <div style={{ fontSize: '0.9rem', fontWeight: 900, color: 'var(--color-gold)' }}>VS</div>
 
-        {/* Enemy Fighter */}
         <div className="fighter-card enemy-side">
           <img src={enemy.avatarUrl} alt={enemy.name} className="fighter-avatar" />
           <div style={{ flex: 1, minWidth: 0 }}>
@@ -295,7 +283,7 @@ export const BattleView: React.FC<BattleViewProps> = ({
         </div>
       </div>
 
-      {/* Expandable Combat Log Strip at Bottom */}
+      {/* Expandable Log Strip */}
       <div style={{ width: '100%', maxWidth: '580px', background: 'rgba(12, 16, 24, 0.9)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '10px', padding: '0.4rem 0.8rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }} onClick={() => setShowLogDrawer(!showLogDrawer)}>
           <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--color-gold)' }}>

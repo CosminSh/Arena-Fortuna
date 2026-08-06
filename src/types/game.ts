@@ -2,6 +2,22 @@ export type ArchetypeId = 'murmillo' | 'thraex' | 'retiarius';
 
 export type SymbolType = 'sword' | 'shield' | 'class' | 'wild';
 
+export type GearSlot = 'weapon' | 'armor' | 'crest';
+
+export interface GearItem {
+  id: string;
+  name: string;
+  slot: GearSlot;
+  rarity: 'Common' | 'Rare' | 'Legendary' | 'Mythic';
+  statBonus: string;
+  damageBonus: number; // e.g. 5 = +5 dmg
+  shieldBonus: number; // e.g. 10 = +10 shield
+  hpBonus: number;     // e.g. 15 = +15 HP
+  icon: string;
+  description: string;
+  isPremium?: boolean;
+}
+
 export interface Archetype {
   id: ArchetypeId;
   name: string;
@@ -29,6 +45,11 @@ export interface Gladiator {
   isPlayer: boolean;
   avatarUrl: string;
   buildDescription?: string;
+  equippedGear?: {
+    weapon?: GearItem;
+    armor?: GearItem;
+    crest?: GearItem;
+  };
   wins?: number;
   losses?: number;
 }
@@ -84,10 +105,10 @@ export interface TurnOutcome {
 export interface BattleState {
   playerGladiator: Gladiator;
   enemyGladiator: Gladiator;
-  currentTurn: number; // 1 to 8
+  currentTurn: number;
   isPlayerTurn: boolean;
   isSpinning: boolean;
-  lockedReelIndexes: boolean[]; // reel indices locked if applicable
+  lockedReelIndexes: boolean[];
   history: TurnOutcome[];
   winnerId: string | null;
   isOver: boolean;
@@ -98,12 +119,4 @@ export interface BattleState {
     defenderAdvantage: boolean;
     percentage: number;
   };
-}
-
-export interface SymbolProbability {
-  symbol: SymbolType;
-  label: string;
-  weight: number; // e.g., 35 for 35%
-  singleOdds: string; // "35%"
-  tripleOdds: string; // "4.29%"
 }

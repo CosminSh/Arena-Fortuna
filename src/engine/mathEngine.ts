@@ -1,4 +1,4 @@
-import { Archetype, ArchetypeId, Gladiator, SymbolType, CombinationResult, TurnOutcome } from '../types/game';
+import { Archetype, ArchetypeId, Gladiator, SymbolType, CombinationResult, TurnOutcome, GearItem } from '../types/game';
 
 export const ARCHETYPES: Record<ArchetypeId, Archetype> = {
   murmillo: {
@@ -44,6 +44,102 @@ export const ARCHETYPES: Record<ArchetypeId, Archetype> = {
     weakAgainst: 'murmillo',
   },
 };
+
+export const AVAILABLE_GEAR: GearItem[] = [
+  // Weapons
+  {
+    id: 'wep_1',
+    name: 'Standard Iron Blade',
+    slot: 'weapon',
+    rarity: 'Common',
+    statBonus: '+0 Damage',
+    damageBonus: 0,
+    shieldBonus: 0,
+    hpBonus: 0,
+    icon: '🗡️',
+    description: 'Basic arena issue gladius.',
+  },
+  {
+    id: 'wep_2',
+    name: 'Gladius of Conquest',
+    slot: 'weapon',
+    rarity: 'Legendary',
+    statBonus: '+8 Sword Damage',
+    damageBonus: 8,
+    shieldBonus: 0,
+    hpBonus: 0,
+    icon: '⚔️',
+    description: 'Tempered steel forged for high direct damage.',
+    isPremium: true,
+  },
+  {
+    id: 'wep_3',
+    name: 'Hooked Sica of the Viper',
+    slot: 'weapon',
+    rarity: 'Mythic',
+    statBonus: '+12 Damage & Piercing',
+    damageBonus: 12,
+    shieldBonus: 0,
+    hpBonus: 0,
+    icon: '🩸',
+    description: 'Vicious curved blade designed to strip shield armor.',
+    isPremium: true,
+  },
+
+  // Armor
+  {
+    id: 'armor_1',
+    name: 'Leather Manica',
+    slot: 'armor',
+    rarity: 'Common',
+    statBonus: '+0 Shield',
+    damageBonus: 0,
+    shieldBonus: 0,
+    hpBonus: 0,
+    icon: '🛡️',
+    description: 'Standard leather arm guard.',
+  },
+  {
+    id: 'armor_2',
+    name: 'Imperial Scutum Plate',
+    slot: 'armor',
+    rarity: 'Legendary',
+    statBonus: '+10 Shield Block & +15 HP',
+    damageBonus: 0,
+    shieldBonus: 10,
+    hpBonus: 15,
+    icon: '🏰',
+    description: 'Heavy bronze plate boosting maximum durability.',
+    isPremium: true,
+  },
+
+  // Crests / Banners
+  {
+    id: 'crest_1',
+    name: 'Standard House Ribbon',
+    slot: 'crest',
+    rarity: 'Common',
+    statBonus: '+0 Stats',
+    damageBonus: 0,
+    shieldBonus: 0,
+    hpBonus: 0,
+    icon: '🚩',
+    description: 'Basic recruitment banner.',
+  },
+  {
+    id: 'crest_2',
+    name: "Champion's Golden Laurel",
+    slot: 'crest',
+    rarity: 'Mythic',
+    statBonus: '+5 Dmg, +5 Shield, +10 HP',
+    damageBonus: 5,
+    shieldBonus: 5,
+    hpBonus: 10,
+    icon: '👑',
+    description: 'Crown of the Grand Coliseum Champion.',
+    isPremium: true,
+  },
+];
 
 export const ENEMY_GLADIATORS: Gladiator[] = [
   {
@@ -108,14 +204,6 @@ export const ENEMY_GLADIATORS: Gladiator[] = [
   },
 ];
 
-export const SYMBOL_WEIGHTS: Record<SymbolType, number> = {
-  sword: 35,
-  shield: 30,
-  class: 25,
-  wild: 10,
-};
-
-// Generate a random reel spin result
 export function getRandomSymbol(): SymbolType {
   const rand = Math.random() * 100;
   if (rand < 35) return 'sword';
@@ -128,7 +216,6 @@ export function spinReels(): SymbolType[] {
   return [getRandomSymbol(), getRandomSymbol(), getRandomSymbol()];
 }
 
-// Evaluates 3 symbols including Wild substitution
 export function evaluateCombination(reels: SymbolType[]): CombinationResult {
   const nonWilds = reels.filter((s) => s !== 'wild');
   const wildCount = reels.length - nonWilds.length;
@@ -136,21 +223,19 @@ export function evaluateCombination(reels: SymbolType[]): CombinationResult {
   if (wildCount === 3) {
     return {
       matchCount: 3,
-      primarySymbol: 'sword', // Triple Wild defaults to sword jackpot
+      primarySymbol: 'sword',
       hasWild: true,
       rawSymbols: reels,
-      description: 'TRIPLE WILD JACKPOT! Unleashes maximum combat potential.',
+      description: 'TRIPLE WILD JACKPOT! Critical Strike.',
       tier: 'jackpot',
     };
   }
 
-  // Count frequency of non-wild symbols
   const counts: Record<string, number> = {};
   for (const s of nonWilds) {
     counts[s] = (counts[s] || 0) + 1;
   }
 
-  // Find symbol with highest frequency
   let bestSymbol: SymbolType = nonWilds[0] || 'sword';
   let maxFreq = 0;
   for (const [sym, freq] of Object.entries(counts)) {
@@ -168,7 +253,7 @@ export function evaluateCombination(reels: SymbolType[]): CombinationResult {
       primarySymbol: bestSymbol,
       hasWild: wildCount > 0,
       rawSymbols: reels,
-      description: `3-OF-A-KIND ${bestSymbol.toUpperCase()}! Full power outcome.`,
+      description: `3-OF-A-KIND ${bestSymbol.toUpperCase()} JACKPOT!`,
       tier: 'jackpot',
     };
   } else if (effectiveMatch === 2) {
@@ -177,7 +262,7 @@ export function evaluateCombination(reels: SymbolType[]): CombinationResult {
       primarySymbol: bestSymbol,
       hasWild: wildCount > 0,
       rawSymbols: reels,
-      description: `2-OF-A-KIND ${bestSymbol.toUpperCase()}. Standard effective outcome.`,
+      description: `2-OF-A-KIND ${bestSymbol.toUpperCase()}.`,
       tier: 'common',
     };
   } else {
@@ -186,26 +271,35 @@ export function evaluateCombination(reels: SymbolType[]): CombinationResult {
       primarySymbol: nonWilds[0] || 'sword',
       hasWild: false,
       rawSymbols: reels,
-      description: 'NO MATCH! Weak roll, minimal effect.',
+      description: 'NO MATCH! Low effect.',
       tier: 'fumble',
     };
   }
 }
 
-// Calculate battle turn combat resolution
 export function resolveTurn(
   turnNumber: number,
   attacker: Gladiator,
   defender: Gladiator,
   reels: SymbolType[],
-  activeEntangled: boolean, // If defender applied entangled on attacker
-  firstNetUsed: boolean // For Murmillo Scutum Wall
+  activeEntangled: boolean,
+  firstNetUsed: boolean
 ): { outcome: TurnOutcome; updatedFirstNetUsed: boolean } {
   const combination = evaluateCombination(reels);
   const attackerArchetype = ARCHETYPES[attacker.archetypeId];
-  const defenderArchetype = ARCHETYPES[defender.archetypeId];
 
-  // Soft triangle check
+  // Calculate equipped gear stat bonuses
+  let gearDamageBonus = 0;
+  let gearShieldBonus = 0;
+  if (attacker.equippedGear) {
+    if (attacker.equippedGear.weapon) gearDamageBonus += attacker.equippedGear.weapon.damageBonus;
+    if (attacker.equippedGear.armor) gearShieldBonus += attacker.equippedGear.armor.shieldBonus;
+    if (attacker.equippedGear.crest) {
+      gearDamageBonus += attacker.equippedGear.crest.damageBonus;
+      gearShieldBonus += attacker.equippedGear.crest.shieldBonus;
+    }
+  }
+
   const hasTriangleAdvantage = attackerArchetype.favoredAgainst === defender.archetypeId;
   const triangleMultiplier = hasTriangleAdvantage ? 1.15 : 1.0;
 
@@ -220,54 +314,49 @@ export function resolveTurn(
 
   const { primarySymbol, matchCount } = combination;
 
-  // Base outcome calculations based on combination
   if (primarySymbol === 'sword') {
-    if (matchCount === 3) rawDamage = Math.round(40 * triangleMultiplier);
-    else if (matchCount === 2) rawDamage = Math.round(25 * triangleMultiplier);
-    else rawDamage = Math.round(10 * triangleMultiplier);
+    if (matchCount === 3) rawDamage = Math.round((40 + gearDamageBonus) * triangleMultiplier);
+    else if (matchCount === 2) rawDamage = Math.round((25 + gearDamageBonus) * triangleMultiplier);
+    else rawDamage = Math.round((10 + gearDamageBonus) * triangleMultiplier);
   } else if (primarySymbol === 'shield') {
-    if (matchCount === 3) shieldGranted = 35;
-    else if (matchCount === 2) shieldGranted = 20;
+    if (matchCount === 3) shieldGranted = 35 + gearShieldBonus;
+    else if (matchCount === 2) shieldGranted = 20 + gearShieldBonus;
     else shieldGranted = 8;
 
-    // Murmillo Ability: Scutum Wall (+25% shield block)
     if (attacker.archetypeId === 'murmillo') {
       shieldGranted = Math.round(shieldGranted * 1.25);
-      abilityTriggered = 'Scutum Wall (+25% Shield Protection)';
+      abilityTriggered = 'Scutum Wall (+25% Shield)';
     }
   } else if (primarySymbol === 'class') {
     abilityTriggered = `${attackerArchetype.name}: ${attackerArchetype.abilityName}`;
 
     if (attacker.archetypeId === 'murmillo') {
-      // Murmillo Class ability: Defense & Fortify
       if (matchCount === 3) {
-        shieldGranted = 45;
-        rawDamage = 15;
+        shieldGranted = 45 + gearShieldBonus;
+        rawDamage = 15 + gearDamageBonus;
       } else if (matchCount === 2) {
-        shieldGranted = 25;
-        rawDamage = 10;
+        shieldGranted = 25 + gearShieldBonus;
+        rawDamage = 10 + gearDamageBonus;
       } else {
         shieldGranted = 10;
       }
     } else if (attacker.archetypeId === 'thraex') {
-      // Thraex Class ability: Hooked Blade (High damage + ignore shield)
       if (matchCount === 3) {
-        rawDamage = Math.round(45 * triangleMultiplier);
-        piercedDamage = Math.round(rawDamage * 0.4); // 40% shield bypass
+        rawDamage = Math.round((45 + gearDamageBonus) * triangleMultiplier);
+        piercedDamage = Math.round(rawDamage * 0.4);
       } else if (matchCount === 2) {
-        rawDamage = Math.round(28 * triangleMultiplier);
-        piercedDamage = Math.round(rawDamage * 0.25); // 25% shield bypass
+        rawDamage = Math.round((28 + gearDamageBonus) * triangleMultiplier);
+        piercedDamage = Math.round(rawDamage * 0.25);
       } else {
         rawDamage = 12;
       }
     } else if (attacker.archetypeId === 'retiarius') {
-      // Retiarius Class ability: Entangling Net
       if (matchCount === 3) {
-        rawDamage = Math.round(35 * triangleMultiplier);
+        rawDamage = Math.round((35 + gearDamageBonus) * triangleMultiplier);
         debuffApplied = 'Entangled (-30% enemy next dmg)';
         rerollGranted = true;
       } else if (matchCount === 2) {
-        rawDamage = Math.round(22 * triangleMultiplier);
+        rawDamage = Math.round((22 + gearDamageBonus) * triangleMultiplier);
         debuffApplied = 'Entangled (-30% enemy next dmg)';
       } else {
         rawDamage = 10;
@@ -275,27 +364,20 @@ export function resolveTurn(
     }
   }
 
-  // Thraex passive: 25% of Sword damage ignores shields; 2 sword symbols strip 1 enemy shield charge
   if (attacker.archetypeId === 'thraex' && primarySymbol === 'sword') {
     piercedDamage = Math.round(rawDamage * 0.25);
-    if (matchCount >= 2 && defender.shieldCharges > 0) {
-      abilityTriggered = (abilityTriggered ? abilityTriggered + ' | ' : '') + 'Hooked Blade (Stripped 1 Enemy Shield)';
-    }
   }
 
-  // Apply Entangled debuff penalty if attacker is entangled
   if (activeEntangled) {
-    let reduction = 0.3; // 30% reduction
-    // Murmillo passive: First Net effect received is reduced by half (15% reduction instead of 30%)
+    let reduction = 0.3;
     if (attacker.archetypeId === 'murmillo' && !firstNetUsed) {
       reduction = 0.15;
       newFirstNetUsed = true;
-      abilityTriggered = (abilityTriggered ? abilityTriggered + ' | ' : '') + 'Scutum Wall (Resisted 50% Net Disruption)';
+      abilityTriggered = (abilityTriggered ? abilityTriggered + ' | ' : '') + 'Resisted 50% Net';
     }
     rawDamage = Math.round(rawDamage * (1 - reduction));
   }
 
-  // Calculate damage against defender's shield charges
   let shieldBlocked = 0;
   let remainingDamage = rawDamage;
 
@@ -306,29 +388,18 @@ export function resolveTurn(
   }
 
   netDamage = Math.max(0, Math.round(remainingDamage));
-
-  // Thraex strip shield check
-  let updatedDefenderShields = Math.max(0, defender.shieldCharges - shieldBlocked + shieldGranted * 0); 
-  // (Shield granted goes to attacker, defender shields absorb damage)
-  if (attacker.archetypeId === 'thraex' && primarySymbol === 'sword' && matchCount >= 2) {
-    updatedDefenderShields = Math.max(0, updatedDefenderShields - 15);
-  }
-
   const updatedDefenderHp = Math.max(0, defender.currentHp - netDamage);
-  const updatedAttackerShields = attacker.shieldCharges + shieldGranted;
 
-  // Build combat log message
-  let logMessage = `${attacker.name} rolled [${reels.map(r => r.toUpperCase()).join(' | ')}]. ${combination.description}`;
+  let logMessage = `${attacker.name} rolled [${reels.map(r => r.toUpperCase()).join(' | ')}].`;
   if (netDamage > 0) {
     logMessage += ` Dealt ${netDamage} HP damage`;
-    if (shieldBlocked > 0) logMessage += ` (${shieldBlocked} blocked by shield)`;
-    if (piercedDamage > 0) logMessage += ` [${piercedDamage} shield-piercing]`;
+    if (shieldBlocked > 0) logMessage += ` (${shieldBlocked} blocked)`;
+    if (piercedDamage > 0) logMessage += ` [${piercedDamage} pierced]`;
     logMessage += `.`;
   } else if (shieldGranted > 0) {
-    logMessage += ` Raised +${shieldGranted} shield protection.`;
+    logMessage += ` Gained +${shieldGranted} shield protection.`;
   }
   if (debuffApplied) logMessage += ` Applied ${debuffApplied}!`;
-  if (rerollGranted) logMessage += ` Granted a FREE REROLL!`;
 
   const outcome: TurnOutcome = {
     turnNumber,
