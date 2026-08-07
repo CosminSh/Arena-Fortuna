@@ -16,7 +16,7 @@ export const ProbabilityModal: React.FC<ProbabilityModalProps> = ({ onClose }) =
             <BarChart2 size={28} color="#f59e0b" />
             <div>
               <h2 style={{ fontSize: '1.6rem', color: '#fff' }}>MATH & PROBABILITY SPECIFICATION</h2>
-              <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>Arena Reels Combat Resolution & Symbol Matrix</span>
+              <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>Arena Fortuna Combat Resolution & Symbol Matrix</span>
             </div>
           </div>
           <button

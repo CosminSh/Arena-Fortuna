@@ -58,10 +58,14 @@ export const HomeView: React.FC<HomeViewProps> = ({ onStartWar, onOpenGladiatorH
           boxShadow: '0 0 40px rgba(245, 158, 11, 0.35)',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-          <Shield size={38} color="#f59e0b" />
-          <h2 style={{ fontSize: '2.2rem', fontWeight: 900, color: '#fff', textShadow: '0 2px 10px #000' }}>
-            ARENA REELS
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
+          <img
+            src="./assets/Arena-Fortuna-logo-transparent.png"
+            alt="Arena Fortuna Logo"
+            style={{ height: '85px', width: 'auto', objectFit: 'contain', filter: 'drop-shadow(0 0 25px rgba(245, 158, 11, 0.6))' }}
+          />
+          <h2 style={{ fontSize: '2.2rem', fontWeight: 900, color: '#fff', textShadow: '0 2px 12px #000', margin: 0, fontFamily: 'var(--font-serif)' }}>
+            ARENA FORTUNA
           </h2>
         </div>
 

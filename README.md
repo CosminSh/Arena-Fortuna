@@ -1,6 +1,6 @@
-# Arena Reels — PvP Gladiator Slot Combat Prototype
+# Arena Fortuna — Tactical Gladiator Slot Combat
 
-**Arena Reels** is an innovative hybrid vertical slice combining **Casino Slot Machine Mechanics** with a **Tactical RPG Gladiator Combat Engine**. Players customize gladiator archetypes, equip armory gear, scout rival house targets using Monte Carlo win-rate simulations, and spin combat reels to execute battle strikes and shield tactics.
+**Arena Fortuna** is an innovative hybrid vertical slice combining **Casino Slot Machine Mechanics** with a **Tactical RPG Gladiator Combat Engine**. Players customize gladiator archetypes, equip armory gear, scout rival house targets using Monte Carlo win-rate simulations, and spin combat reels to execute battle strikes and shield tactics.
 
 ---
 

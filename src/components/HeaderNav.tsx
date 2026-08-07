@@ -42,7 +42,12 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({ onOpenProbabilityModal, on
         }}
         onMouseEnter={() => soundFx.playHover()}
       >
-        <h1 className="brand-title">ARENA REELS</h1>
+        <img
+          src="./assets/Arena-Fortuna-logo-transparent.png"
+          alt="Arena Fortuna Logo"
+          style={{ height: '30px', width: 'auto', objectFit: 'contain', flexShrink: 0 }}
+        />
+        <h1 className="brand-title">ARENA FORTUNA</h1>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', flexShrink: 0 }}>
           <span className="brand-badge">PVP WAR</span>
           <span
