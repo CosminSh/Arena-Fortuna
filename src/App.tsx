@@ -11,6 +11,7 @@ import { BackgroundParticles } from './components/BackgroundParticles';
 import { ArchetypeId, Gladiator, BattleState, GearItem } from './types/game';
 import { ARCHETYPES } from './engine/mathEngine';
 import { soundFx } from './engine/audioEngine';
+import { loadPlayerProfile } from './engine/storageEngine';
 
 type ViewMode = 'home' | 'gladiator' | 'archetype' | 'target' | 'battle';
 
@@ -89,12 +90,13 @@ export const App: React.FC = () => {
   };
 
   const createPlayerGladiator = (): Gladiator => {
+    const profile = loadPlayerProfile();
     const arch = ARCHETYPES[selectedArchetypeId];
     const hpBonus = (equippedGear.armor?.hpBonus || 0) + (equippedGear.crest?.hpBonus || 0);
     const maxHp = 100 + hpBonus;
     return {
       id: 'player_hero',
-      name: 'Imperator',
+      name: profile.playerName || 'Imperator',
       title: 'Gladiator Champion of Invicta',
       archetypeId: selectedArchetypeId,
       maxHp,

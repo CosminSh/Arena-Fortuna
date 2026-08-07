@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { ArchetypeId, GearItem } from '../types/game';
 import { ARCHETYPES, AVAILABLE_GEAR } from '../engine/mathEngine';
 import { soundFx } from '../engine/audioEngine';
-import { ArrowLeft, Shield, Swords, Sparkles, Crown, Check, Zap } from 'lucide-react';
+import { loadPlayerProfile, updatePlayerName } from '../engine/storageEngine';
+import { ArrowLeft, Shield, Swords, Sparkles, Crown, Check, Zap, Edit3 } from 'lucide-react';
 
 interface GladiatorHubViewProps {
   currentArchetypeId: ArchetypeId;
@@ -19,6 +20,7 @@ export const GladiatorHubView: React.FC<GladiatorHubViewProps> = ({
 }) => {
   const [selectedArchId, setSelectedArchId] = useState<ArchetypeId>(currentArchetypeId);
   const [gearLoadout, setGearLoadout] = useState(initialGear);
+  const [playerName, setPlayerNameState] = useState<string>(() => loadPlayerProfile().playerName || 'Imperator');
 
   const arch = ARCHETYPES[selectedArchId];
 
@@ -32,6 +34,7 @@ export const GladiatorHubView: React.FC<GladiatorHubViewProps> = ({
 
   const handleSave = () => {
     soundFx.playClick();
+    updatePlayerName(playerName);
     onUpdateGladiator(selectedArchId, gearLoadout);
     onBack();
   };
@@ -82,7 +85,27 @@ export const GladiatorHubView: React.FC<GladiatorHubViewProps> = ({
           style={{ width: '55px', height: '55px', borderRadius: '50%', border: '2px solid var(--color-gold)', objectFit: 'cover' }}
         />
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: '1.05rem', fontWeight: 900, color: '#fff' }}>Imperator</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.2rem' }}>
+            <Edit3 size={14} color="var(--color-gold)" />
+            <input
+              type="text"
+              value={playerName}
+              onChange={(e) => setPlayerNameState(e.target.value)}
+              placeholder="Enter Gladiator Name..."
+              style={{
+                background: 'rgba(0, 0, 0, 0.6)',
+                border: '1.5px solid var(--color-gold)',
+                borderRadius: '8px',
+                color: '#fff',
+                fontSize: '0.95rem',
+                fontWeight: 900,
+                padding: '0.2rem 0.5rem',
+                width: '100%',
+                maxWidth: '200px',
+                outline: 'none',
+              }}
+            />
+          </div>
           <div style={{ fontSize: '0.72rem', color: 'var(--color-gold)', fontWeight: 700 }}>
             {arch.name} ({arch.subName})
           </div>

@@ -1,4 +1,5 @@
 export interface PlayerProfile {
+  playerName: string;
   warPoints: number;
   victories: number;
   defeats: number;
@@ -11,6 +12,7 @@ export interface PlayerProfile {
 const STORAGE_KEY = 'arena_reels_player_profile_v1';
 
 const DEFAULT_PROFILE: PlayerProfile = {
+  playerName: 'Imperator',
   warPoints: 0,
   victories: 0,
   defeats: 0,
@@ -28,6 +30,7 @@ export function loadPlayerProfile(): PlayerProfile {
     return {
       ...DEFAULT_PROFILE,
       ...parsed,
+      playerName: parsed.playerName && parsed.playerName.trim() !== '' ? parsed.playerName.trim() : 'Imperator',
       level: Math.floor((parsed.exp || 0) / 300) + 1,
     };
   } catch (e) {
@@ -42,6 +45,17 @@ export function savePlayerProfile(profile: PlayerProfile): void {
   } catch (e) {
     console.error('Failed to save profile to localStorage', e);
   }
+}
+
+export function updatePlayerName(name: string): PlayerProfile {
+  const current = loadPlayerProfile();
+  const trimmed = name.trim() || 'Imperator';
+  const updated: PlayerProfile = {
+    ...current,
+    playerName: trimmed,
+  };
+  savePlayerProfile(updated);
+  return updated;
 }
 
 export function recordBattleOutcome(isVictory: boolean, streakAchieved: number = 0): {
@@ -65,6 +79,7 @@ export function recordBattleOutcome(isVictory: boolean, streakAchieved: number =
   const newHighestStreak = Math.max(current.highestStreak, streakAchieved, newCurrentStreak);
 
   const updatedProfile: PlayerProfile = {
+    ...current,
     warPoints: current.warPoints + earnedPoints,
     victories: newVictories,
     defeats: newDefeats,
@@ -83,3 +98,4 @@ export function recordBattleOutcome(isVictory: boolean, streakAchieved: number =
     leveledUp,
   };
 }
+

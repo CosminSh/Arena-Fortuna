@@ -56,7 +56,7 @@ export const TargetSelectView: React.FC<TargetSelectViewProps> = ({
           onMouseEnter={() => soundFx.playHover()}
         >
           <ArrowLeft size={15} />
-          <span>Archetype</span>
+          <span>Back</span>
         </button>
 
         <h2 style={{ fontSize: '1.15rem', color: '#fff', textAlign: 'center', margin: 0 }}>
