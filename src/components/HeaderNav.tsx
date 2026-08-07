@@ -45,6 +45,7 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({ onOpenProbabilityModal, on
         <img
           src="./assets/Arena-Fortuna-logo-transparent.png"
           alt="Arena Fortuna Logo"
+          className="brand-logo"
           style={{ height: '30px', width: 'auto', objectFit: 'contain', flexShrink: 0 }}
         />
         <h1 className="brand-title">ARENA FORTUNA</h1>

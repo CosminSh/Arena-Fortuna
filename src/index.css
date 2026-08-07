@@ -913,11 +913,11 @@ body {
   }
 
   .brand-title {
-    font-size: 0.98rem;
+    display: none !important;
   }
 
   .brand-badge {
-    display: none;
+    display: none !important;
   }
 
   .header-actions {
