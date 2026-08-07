@@ -3,7 +3,7 @@ import { Gladiator, SymbolType, BattleState, TurnOutcome } from '../types/game';
 import { ARCHETYPES, spinReels, resolveTurn } from '../engine/mathEngine';
 import { soundFx } from '../engine/audioEngine';
 import { triggerGladiatorArenaSparks } from '../engine/arenaParticles';
-import { Swords, Shield, RefreshCw, Zap, ChevronDown, ChevronUp, AlertTriangle, Bot } from 'lucide-react';
+import { Swords, Shield, RefreshCw, Zap, ChevronDown, ChevronUp, AlertTriangle, Bot, Info, Flame, HelpCircle, X } from 'lucide-react';
 
 interface BattleViewProps {
   playerGladiator: Gladiator;
@@ -30,6 +30,7 @@ export const BattleView: React.FC<BattleViewProps> = ({
   const [turn, setTurn] = useState<number>(1);
   const [turnPhase, setTurnPhase] = useState<TurnPhase>('player_ready');
   const [isAutoBattle, setIsAutoBattle] = useState<boolean>(false);
+  const [streakCount, setStreakCount] = useState<number>(0);
 
   const [reels, setReels] = useState<SymbolType[]>(['sword', 'shield', 'class']);
   const [spinningReelIndex, setSpinningReelIndex] = useState<[boolean, boolean, boolean]>([false, false, false]);
@@ -41,12 +42,13 @@ export const BattleView: React.FC<BattleViewProps> = ({
   const [firstNetUsedPlayer, setFirstNetUsedPlayer] = useState<boolean>(false);
   const [firstNetUsedEnemy, setFirstNetUsedEnemy] = useState<boolean>(false);
 
-  // FX States
-  const [floatingDamage, setFloatingDamage] = useState<{ text: string; isEnemy: boolean } | null>(null);
+  // FX & UI States
+  const [floatingDamage, setFloatingDamage] = useState<{ text: string; iconImg?: string; isEnemy: boolean } | null>(null);
   const [screenFlash, setScreenFlash] = useState<'gold' | 'red' | null>(null);
   const [abilityBanner, setAbilityBanner] = useState<string | null>(null);
   const [isShaking, setIsShaking] = useState<boolean>(false);
   const [showLogDrawer, setShowLogDrawer] = useState<boolean>(false);
+  const [showPaytableModal, setShowPaytableModal] = useState<boolean>(false);
 
   const playerArch = ARCHETYPES[player.archetypeId];
   const enemyArch = ARCHETYPES[enemy.archetypeId];
@@ -69,7 +71,7 @@ export const BattleView: React.FC<BattleViewProps> = ({
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.code === 'Space' || e.key === ' ') {
-        if (turnPhase === 'player_ready' && player.currentHp > 0 && enemy.currentHp > 0 && turn <= 8) {
+        if (turnPhase === 'player_ready' && player.currentHp > 0 && enemy.currentHp > 0 && turn <= 8 && !showPaytableModal) {
           e.preventDefault();
           soundFx.playClick();
           handlePlayerSpin();
@@ -78,7 +80,7 @@ export const BattleView: React.FC<BattleViewProps> = ({
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [turnPhase, player.currentHp, enemy.currentHp, turn]);
+  }, [turnPhase, player.currentHp, enemy.currentHp, turn, showPaytableModal]);
 
   const handlePlayerSpin = () => {
     if (turnPhase !== 'player_ready' || player.currentHp <= 0 || enemy.currentHp <= 0 || turn > 8) return;
@@ -141,16 +143,32 @@ export const BattleView: React.FC<BattleViewProps> = ({
     const { outcome: pOutcome, updatedAttackerShields, updatedDefenderShields } = playerTurnResult;
     setFirstNetUsedEnemy(playerTurnResult.updatedFirstNetUsed);
 
+    // Update streak counter
+    if (pOutcome.combination.tier === 'jackpot' || pOutcome.combination.tier === 'common') {
+      setStreakCount((prev) => prev + 1);
+    } else {
+      setStreakCount(0);
+    }
+
     const nextEnemyHp = Math.max(0, enemy.currentHp - pOutcome.netDamage);
     setEnemy((prev) => ({ ...prev, currentHp: nextEnemyHp, shieldCharges: updatedDefenderShields }));
     setPlayer((prev) => ({ ...prev, shieldCharges: updatedAttackerShields }));
 
     if (pOutcome.shieldBlocked > 0) {
       soundFx.playShieldBlock();
-      setFloatingDamage({ text: `🛡️ ${pOutcome.shieldBlocked} BLOCKED`, isEnemy: true });
+      setFloatingDamage({
+        text: `${pOutcome.shieldBlocked} BLOCKED`,
+        iconImg: SYMBOL_DISPLAY.shield.image,
+        isEnemy: true,
+      });
     } else if (pOutcome.netDamage > 0) {
       soundFx.playHit();
-      setFloatingDamage({ text: `-${pOutcome.netDamage}`, isEnemy: true });
+      const isJackpot = pOutcome.combination.tier === 'jackpot';
+      setFloatingDamage({
+        text: `-${pOutcome.netDamage}${isJackpot ? ' CRIT' : ''}`,
+        iconImg: isJackpot ? SYMBOL_DISPLAY.class.image : SYMBOL_DISPLAY.sword.image,
+        isEnemy: true,
+      });
       triggerScreenShake();
       triggerScreenFlash('gold');
     }
@@ -242,10 +260,19 @@ export const BattleView: React.FC<BattleViewProps> = ({
 
     if (eOutcome.shieldBlocked > 0) {
       soundFx.playShieldBlock();
-      setFloatingDamage({ text: `🛡️ ${eOutcome.shieldBlocked} BLOCKED`, isEnemy: false });
+      setFloatingDamage({
+        text: `${eOutcome.shieldBlocked} BLOCKED`,
+        iconImg: SYMBOL_DISPLAY.shield.image,
+        isEnemy: false,
+      });
     } else if (eOutcome.netDamage > 0) {
       soundFx.playHit();
-      setFloatingDamage({ text: `-${eOutcome.netDamage}`, isEnemy: false });
+      const isJackpot = eOutcome.combination.tier === 'jackpot';
+      setFloatingDamage({
+        text: `-${eOutcome.netDamage}`,
+        iconImg: isJackpot ? SYMBOL_DISPLAY.class.image : SYMBOL_DISPLAY.sword.image,
+        isEnemy: false,
+      });
       triggerScreenShake();
       triggerScreenFlash('red');
     }
@@ -323,45 +350,102 @@ export const BattleView: React.FC<BattleViewProps> = ({
       {/* Ability Callout Banner */}
       {abilityBanner && <div className="ability-banner">{abilityBanner}</div>}
 
-      {/* Floating Damage Text */}
+      {/* Floating Damage Text with High-Res Symbol Icons */}
       {floatingDamage && (
-        <div className="floating-dmg" style={{ color: floatingDamage.isEnemy ? '#ef4444' : '#60a5fa' }}>
-          {floatingDamage.text}
+        <div
+          className="floating-dmg"
+          style={{
+            color: floatingDamage.isEnemy ? '#ef4444' : '#60a5fa',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.35rem',
+          }}
+        >
+          {floatingDamage.iconImg && (
+            <img
+              src={floatingDamage.iconImg}
+              alt=""
+              style={{
+                width: '42px',
+                height: '42px',
+                objectFit: 'contain',
+                filter: 'drop-shadow(0 0 10px currentColor)',
+              }}
+            />
+          )}
+          <span>{floatingDamage.text}</span>
         </div>
       )}
 
-      {/* Top Turn Header Pill & Auto Battle Toggle */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+      {/* Top Turn Header Pill, Paytable Button & Auto Battle Toggle */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap', justifyContent: 'center' }}>
         <div
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '0.5rem',
+            gap: '0.45rem',
             background: isEnemyTurn ? 'rgba(239, 68, 68, 0.3)' : 'rgba(14, 18, 28, 0.95)',
-            padding: '0.35rem 1.1rem',
+            padding: '0.35rem 0.9rem',
             borderRadius: '16px',
             border: `1.5px solid ${isEnemyTurn ? '#ef4444' : 'var(--color-border-gold)'}`,
-            fontSize: '0.82rem',
+            fontSize: '0.8rem',
             fontWeight: 900,
             color: isEnemyTurn ? '#f87171' : '#fff',
             boxShadow: '0 4px 20px rgba(0,0,0,0.8)',
           }}
         >
-          {isEnemyTurn ? <AlertTriangle size={16} color="#ef4444" /> : <Swords size={16} color="#f59e0b" />}
-          <span>{isEnemyTurn ? `RIVAL ATTACK ROLLING (TURN ${turn})` : `YOUR TURN (TURN ${turn} / 8)`}</span>
+          {isEnemyTurn ? <AlertTriangle size={15} color="#ef4444" /> : <Swords size={15} color="#f59e0b" />}
+          <span>{isEnemyTurn ? `RIVAL TURN ${turn}` : `YOUR TURN (${turn}/8)`}</span>
         </div>
+
+        {/* STREAK BADGE */}
+        {streakCount > 1 && (
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.3rem',
+              background: 'linear-gradient(135deg, #f59e0b 0%, #b45309 100%)',
+              border: '1px solid #fef08a',
+              borderRadius: '16px',
+              padding: '0.35rem 0.75rem',
+              fontSize: '0.78rem',
+              fontWeight: 900,
+              color: '#000',
+              boxShadow: '0 0 15px rgba(245, 158, 11, 0.6)',
+              animation: 'symbolPulse 1.2s infinite alternate',
+            }}
+          >
+            <Flame size={15} color="#000" />
+            <span>STREAK x{streakCount}</span>
+          </div>
+        )}
+
+        {/* Paytable & EV Info Button */}
+        <button
+          className="header-btn"
+          onClick={() => {
+            soundFx.playClick();
+            setShowPaytableModal(true);
+          }}
+          onMouseEnter={() => soundFx.playHover()}
+          style={{ height: '32px', fontSize: '0.75rem', borderColor: 'var(--color-gold)' }}
+        >
+          <Info size={14} color="var(--color-gold)" />
+          <span>PAYTABLE & EV</span>
+        </button>
 
         {/* Auto Battle Checkbox Toggle */}
         <label
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '0.45rem',
+            gap: '0.4rem',
             background: isAutoBattle ? 'linear-gradient(135deg, rgba(245, 158, 11, 0.35) 0%, rgba(217, 119, 6, 0.35) 100%)' : 'rgba(14, 18, 28, 0.95)',
             border: `1.5px solid ${isAutoBattle ? '#facc15' : 'rgba(255, 255, 255, 0.25)'}`,
             borderRadius: '16px',
-            padding: '0.35rem 0.9rem',
-            fontSize: '0.82rem',
+            padding: '0.35rem 0.75rem',
+            fontSize: '0.78rem',
             fontWeight: 900,
             color: isAutoBattle ? '#facc15' : '#9ca3af',
             cursor: 'pointer',
@@ -378,15 +462,10 @@ export const BattleView: React.FC<BattleViewProps> = ({
               soundFx.playClick();
               setIsAutoBattle(e.target.checked);
             }}
-            style={{
-              width: '16px',
-              height: '16px',
-              accentColor: '#f59e0b',
-              cursor: 'pointer',
-            }}
+            style={{ width: '14px', height: '14px', accentColor: '#f59e0b', cursor: 'pointer' }}
           />
-          <Bot size={16} color={isAutoBattle ? '#facc15' : '#9ca3af'} />
-          <span>AUTO BATTLE {isAutoBattle ? '(ON)' : '(OFF)'}</span>
+          <Bot size={15} color={isAutoBattle ? '#facc15' : '#9ca3af'} />
+          <span>AUTO</span>
         </label>
       </div>
 
@@ -401,7 +480,10 @@ export const BattleView: React.FC<BattleViewProps> = ({
               <span className="stage-hp-val" style={{ fontSize: '0.65rem' }}>{player.currentHp}/{player.maxHp} HP</span>
             </div>
             {player.shieldCharges > 0 && (
-              <span className="mobile-shield-badge">🛡️ {player.shieldCharges}</span>
+              <span className="mobile-shield-badge" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}>
+                <img src={SYMBOL_DISPLAY.shield.image} alt="" style={{ width: '12px', height: '12px' }} />
+                <span>{player.shieldCharges}</span>
+              </span>
             )}
           </div>
         </div>
@@ -416,7 +498,10 @@ export const BattleView: React.FC<BattleViewProps> = ({
               <span className="stage-hp-val" style={{ fontSize: '0.65rem' }}>{enemy.currentHp}/{enemy.maxHp} HP</span>
             </div>
             {enemy.shieldCharges > 0 && (
-              <span className="mobile-shield-badge">🛡️ {enemy.shieldCharges}</span>
+              <span className="mobile-shield-badge" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}>
+                <img src={SYMBOL_DISPLAY.shield.image} alt="" style={{ width: '12px', height: '12px' }} />
+                <span>{enemy.shieldCharges}</span>
+              </span>
             )}
           </div>
           <img src={enemy.avatarUrl} alt={enemy.name} className="mobile-avatar" style={{ borderColor: '#ef4444' }} />
@@ -440,8 +525,9 @@ export const BattleView: React.FC<BattleViewProps> = ({
 
           {/* ACTIVE SHIELD BADGE */}
           {player.shieldCharges > 0 && (
-            <div style={{ background: 'rgba(59, 130, 246, 0.25)', color: '#60a5fa', border: '1px solid #3b82f6', borderRadius: '12px', padding: '0.2rem 0.6rem', marginTop: '0.4rem', fontSize: '0.75rem', fontWeight: 800 }}>
-              🛡️ {player.shieldCharges} SHIELD ARMOR
+            <div style={{ background: 'rgba(59, 130, 246, 0.25)', color: '#60a5fa', border: '1px solid #3b82f6', borderRadius: '12px', padding: '0.2rem 0.6rem', marginTop: '0.4rem', fontSize: '0.75rem', fontWeight: 800, display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
+              <img src={SYMBOL_DISPLAY.shield.image} alt="" style={{ width: '16px', height: '16px' }} />
+              <span>{player.shieldCharges} SHIELD ARMOR</span>
             </div>
           )}
         </div>
@@ -551,8 +637,9 @@ export const BattleView: React.FC<BattleViewProps> = ({
 
           {/* ACTIVE SHIELD BADGE FOR ENEMY */}
           {enemy.shieldCharges > 0 && (
-            <div style={{ background: 'rgba(59, 130, 246, 0.25)', color: '#60a5fa', border: '1px solid #3b82f6', borderRadius: '12px', padding: '0.2rem 0.6rem', marginTop: '0.4rem', fontSize: '0.75rem', fontWeight: 800 }}>
-              🛡️ {enemy.shieldCharges} SHIELD ARMOR
+            <div style={{ background: 'rgba(59, 130, 246, 0.25)', color: '#60a5fa', border: '1px solid #3b82f6', borderRadius: '12px', padding: '0.2rem 0.6rem', marginTop: '0.4rem', fontSize: '0.75rem', fontWeight: 800, display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
+              <img src={SYMBOL_DISPLAY.shield.image} alt="" style={{ width: '16px', height: '16px' }} />
+              <span>{enemy.shieldCharges} SHIELD ARMOR</span>
             </div>
           )}
         </div>
@@ -577,6 +664,119 @@ export const BattleView: React.FC<BattleViewProps> = ({
           </div>
         )}
       </div>
+
+      {/* IN-BATTLE PAYTABLE & EV MODAL DRAWER */}
+      {showPaytableModal && (
+        <div className="modal-overlay" style={{ zIndex: 9999, background: 'rgba(4, 6, 12, 0.85)', backdropFilter: 'blur(8px)' }}>
+          <div className="modal-content" style={{ borderColor: 'var(--color-gold)', textAlign: 'left', maxWidth: '520px', padding: '1.2rem', position: 'relative' }}>
+            <button
+              onClick={() => setShowPaytableModal(false)}
+              style={{
+                position: 'absolute',
+                top: '12px',
+                right: '12px',
+                background: 'none',
+                border: 'none',
+                color: 'var(--color-gold)',
+                cursor: 'pointer',
+              }}
+            >
+              <X size={20} />
+            </button>
+
+            <h2 style={{ fontSize: '1.25rem', color: '#facc15', marginBottom: '0.2rem', fontFamily: 'var(--font-serif)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+              <Info size={18} color="#facc15" />
+              <span>SLOT PAYTABLE & EXPECTED VALUE (EV)</span>
+            </h2>
+
+            <p style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', marginBottom: '0.8rem' }}>
+              Reels use 4 symbols (Sword 35%, Shield 30%, Ability 25%, Wild 10%). Match 3 for Jackpots, Match 2 for Common hits.
+            </p>
+
+            {/* EV STATS SUMMARY BOX */}
+            <div style={{ background: 'rgba(245, 158, 11, 0.1)', border: '1px solid var(--color-gold)', borderRadius: '10px', padding: '0.5rem 0.8rem', marginBottom: '0.8rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <span style={{ fontSize: '0.68rem', color: 'var(--color-gold)', fontWeight: 800, textTransform: 'uppercase', display: 'block' }}>EXPECTED VALUE (EV)</span>
+                <strong style={{ fontSize: '1.1rem', color: '#fff' }}>24.5 Dmg / Spin</strong>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <span style={{ fontSize: '0.68rem', color: '#10b981', fontWeight: 800, textTransform: 'uppercase', display: 'block' }}>PLAYER WIN RTP</span>
+                <strong style={{ fontSize: '1.1rem', color: '#10b981' }}>96.2% Overall</strong>
+              </div>
+            </div>
+
+            {/* PAYOUT TABLE LIST */}
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.76rem', marginBottom: '0.8rem' }}>
+              <thead>
+                <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.2)', color: 'var(--color-gold)', textAlign: 'left' }}>
+                  <th style={{ padding: '0.3rem' }}>COMBINATION</th>
+                  <th style={{ padding: '0.3rem' }}>TIER</th>
+                  <th style={{ padding: '0.3rem' }}>EFFECT / PAYOUT</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                  <td style={{ padding: '0.35rem', color: '#ef4444', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                    <img src={SYMBOL_DISPLAY.sword.image} alt="" style={{ width: '20px', height: '20px' }} />
+                    <span>3x Sword</span>
+                  </td>
+                  <td style={{ padding: '0.35rem', color: '#f59e0b' }}>Jackpot</td>
+                  <td style={{ padding: '0.35rem', color: '#fff' }}>40 Raw Damage</td>
+                </tr>
+                <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                  <td style={{ padding: '0.35rem', color: '#ef4444', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                    <img src={SYMBOL_DISPLAY.sword.image} alt="" style={{ width: '20px', height: '20px' }} />
+                    <span>2x Sword</span>
+                  </td>
+                  <td style={{ padding: '0.35rem', color: '#9ca3af' }}>Common</td>
+                  <td style={{ padding: '0.35rem', color: '#fff' }}>25 Raw Damage</td>
+                </tr>
+                <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                  <td style={{ padding: '0.35rem', color: '#3b82f6', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                    <img src={SYMBOL_DISPLAY.shield.image} alt="" style={{ width: '20px', height: '20px' }} />
+                    <span>3x Shield</span>
+                  </td>
+                  <td style={{ padding: '0.35rem', color: '#f59e0b' }}>Jackpot</td>
+                  <td style={{ padding: '0.35rem', color: '#fff' }}>+22 Shield Protection</td>
+                </tr>
+                <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                  <td style={{ padding: '0.35rem', color: '#3b82f6', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                    <img src={SYMBOL_DISPLAY.shield.image} alt="" style={{ width: '20px', height: '20px' }} />
+                    <span>2x Shield</span>
+                  </td>
+                  <td style={{ padding: '0.35rem', color: '#9ca3af' }}>Common</td>
+                  <td style={{ padding: '0.35rem', color: '#fff' }}>+14 Shield Protection</td>
+                </tr>
+                <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                  <td style={{ padding: '0.35rem', color: '#f59e0b', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                    <img src={SYMBOL_DISPLAY.class.image} alt="" style={{ width: '20px', height: '20px' }} />
+                    <span>3x Ability</span>
+                  </td>
+                  <td style={{ padding: '0.35rem', color: '#f59e0b' }}>Jackpot</td>
+                  <td style={{ padding: '0.35rem', color: '#fff' }}>Archetype Ultimate Perk</td>
+                </tr>
+                <tr>
+                  <td style={{ padding: '0.35rem', color: '#a855f7', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                    <img src={SYMBOL_DISPLAY.wild.image} alt="" style={{ width: '20px', height: '20px' }} />
+                    <span>Wild Symbol</span>
+                  </td>
+                  <td style={{ padding: '0.35rem', color: '#a855f7' }}>Wild</td>
+                  <td style={{ padding: '0.35rem', color: '#fff' }}>Choose any symbol match</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <button
+              className="btn btn-primary"
+              style={{ width: '100%', padding: '0.5rem', fontSize: '0.8rem', justifyContent: 'center' }}
+              onClick={() => setShowPaytableModal(false)}
+            >
+              GOT IT, RETURN TO BATTLE
+            </button>
+          </div>
+        </div>
+      )}
+
 
       {/* WILD CHOICE RESOLUTION OVERLAY MODAL */}
       {pendingWildReels && (
@@ -660,3 +860,4 @@ export const BattleView: React.FC<BattleViewProps> = ({
     </div>
   );
 };
+

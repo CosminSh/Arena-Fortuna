@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import { Volume2, VolumeX, Music, BarChart2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Volume2, VolumeX, Music, BarChart2, Shield } from 'lucide-react';
 import { soundFx } from '../engine/audioEngine';
+import { loadPlayerProfile, PlayerProfile } from '../engine/storageEngine';
 
 interface HeaderNavProps {
   onOpenProbabilityModal: () => void;
@@ -10,6 +11,13 @@ interface HeaderNavProps {
 export const HeaderNav: React.FC<HeaderNavProps> = ({ onOpenProbabilityModal, onResetToHome }) => {
   const [muted, setMuted] = useState(soundFx.getMuted());
   const [musicPlaying, setMusicPlaying] = useState(soundFx.getIsMusicPlaying());
+  const [profile, setProfile] = useState<PlayerProfile>(() => loadPlayerProfile());
+
+  useEffect(() => {
+    const handleStorageChange = () => setProfile(loadPlayerProfile());
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
 
   const handleToggleSound = () => {
     soundFx.playClick();
@@ -35,7 +43,12 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({ onOpenProbabilityModal, on
         onMouseEnter={() => soundFx.playHover()}
       >
         <h1 className="brand-title">ARENA REELS</h1>
-        <span className="brand-badge">PVP WAR CONCEPT DEMO</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+          <span className="brand-badge">PVP WAR</span>
+          <span style={{ fontSize: '0.65rem', fontWeight: 800, color: '#facc15', background: 'rgba(250, 204, 21, 0.15)', border: '1px solid rgba(250, 204, 21, 0.4)', borderRadius: '6px', padding: '0.15rem 0.45rem' }}>
+            LVL {profile.level}
+          </span>
+        </div>
       </div>
 
       <div className="header-actions">
@@ -73,4 +86,5 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({ onOpenProbabilityModal, on
     </header>
   );
 };
+
 
