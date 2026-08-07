@@ -48,19 +48,22 @@ export const GladiatorHubView: React.FC<GladiatorHubViewProps> = ({
       style={{
         width: '100%',
         height: '100%',
+        maxHeight: '100%',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
-        gap: '0.4rem',
+        gap: '0.45rem',
         backgroundImage: 'linear-gradient(180deg, rgba(6, 8, 13, 0.7) 0%, rgba(6, 8, 13, 0.95) 100%), url("./assets/armory_bg.png")',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         padding: '0.5rem',
         borderRadius: '16px',
+        overflow: 'hidden',
+        boxSizing: 'border-box',
       }}
     >
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      {/* 1. Header */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
         <button
           className="btn btn-secondary"
           style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem' }}
@@ -73,19 +76,19 @@ export const GladiatorHubView: React.FC<GladiatorHubViewProps> = ({
           <ArrowLeft size={16} />
           <span>Home</span>
         </button>
-        <h2 style={{ fontSize: '1.2rem', color: '#fff', textAlign: 'center' }}>GLADIATOR ARMORY</h2>
+        <h2 style={{ fontSize: '1.2rem', color: '#fff', textAlign: 'center', margin: 0 }}>GLADIATOR ARMORY</h2>
         <div style={{ width: '60px' }}></div>
       </div>
 
-      {/* Hero Overview Bar */}
-      <div className="card" style={{ padding: '0.6rem 0.9rem', display: 'flex', alignItems: 'center', gap: '0.8rem', borderColor: 'var(--color-gold)' }}>
+      {/* 2. Hero Overview Bar */}
+      <div className="card" style={{ padding: '0.5rem 0.8rem', display: 'flex', alignItems: 'center', gap: '0.8rem', borderColor: 'var(--color-gold)', flexShrink: 0 }}>
         <img
           src={arch.portrait}
           alt={arch.name}
-          style={{ width: '55px', height: '55px', borderRadius: '50%', border: '2px solid var(--color-gold)', objectFit: 'cover' }}
+          style={{ width: '50px', height: '50px', borderRadius: '50%', border: '2px solid var(--color-gold)', objectFit: 'cover', flexShrink: 0 }}
         />
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.2rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.15rem' }}>
             <Edit3 size={14} color="var(--color-gold)" />
             <input
               type="text"
@@ -97,7 +100,7 @@ export const GladiatorHubView: React.FC<GladiatorHubViewProps> = ({
                 border: '1.5px solid var(--color-gold)',
                 borderRadius: '8px',
                 color: '#fff',
-                fontSize: '0.95rem',
+                fontSize: '0.92rem',
                 fontWeight: 900,
                 padding: '0.2rem 0.5rem',
                 width: '100%',
@@ -112,15 +115,15 @@ export const GladiatorHubView: React.FC<GladiatorHubViewProps> = ({
         </div>
 
         {/* Stats Pill */}
-        <div style={{ display: 'flex', gap: '0.4rem', fontSize: '0.72rem', background: 'rgba(0,0,0,0.7)', padding: '0.35rem 0.7rem', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.15)' }}>
+        <div style={{ display: 'flex', gap: '0.4rem', fontSize: '0.72rem', background: 'rgba(0,0,0,0.7)', padding: '0.35rem 0.7rem', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.15)', flexShrink: 0 }}>
           <span style={{ color: '#ef4444' }}>⚔️ +{totalDmgBonus}</span>
           <span style={{ color: '#3b82f6' }}>🛡️ +{totalShieldBonus}</span>
           <span style={{ color: '#10b981' }}>❤️ +{totalHpBonus} HP</span>
         </div>
       </div>
 
-      {/* Archetype Class Selector Pills */}
-      <div>
+      {/* 3. Archetype Class Selector Pills */}
+      <div style={{ flexShrink: 0 }}>
         <span style={{ fontSize: '0.68rem', fontWeight: 800, color: 'var(--color-text-muted)', textTransform: 'uppercase', marginBottom: '0.2rem', display: 'block' }}>
           Select Class Archetype
         </span>
@@ -133,7 +136,7 @@ export const GladiatorHubView: React.FC<GladiatorHubViewProps> = ({
                 key={id}
                 className="btn"
                 style={{
-                  padding: '0.45rem',
+                  padding: '0.4rem',
                   fontSize: '0.78rem',
                   background: isSelected ? 'rgba(245, 158, 11, 0.25)' : 'rgba(0, 0, 0, 0.5)',
                   borderColor: isSelected ? 'var(--color-gold)' : 'rgba(255, 255, 255, 0.15)',
@@ -151,8 +154,21 @@ export const GladiatorHubView: React.FC<GladiatorHubViewProps> = ({
             );
           })}
         </div>
-       {/* Equipment Gear Shop Catalog */}
-      <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.6rem', paddingRight: '0.2rem' }}>
+      </div>
+
+      {/* 4. Equipment Gear Shop Catalog (Scrollable) */}
+      <div
+        style={{
+          flex: 1,
+          minHeight: 0,
+          overflowY: 'auto',
+          WebkitOverflowScrolling: 'touch',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '0.6rem',
+          paddingRight: '0.3rem',
+        }}
+      >
         {(['weapon', 'armor', 'crest'] as const).map((slotType) => {
           const slotTitle = slotType === 'weapon' ? '⚔️ WEAPONS (Attack Strategy)' : slotType === 'armor' ? '🛡️ ARMOR (Defense Strategy)' : '🚩 CRESTS & BANNERS (Build Synergy)';
           const slotItems = AVAILABLE_GEAR.filter((g) => g.slot === slotType);
@@ -215,12 +231,11 @@ export const GladiatorHubView: React.FC<GladiatorHubViewProps> = ({
           );
         })}
       </div>
-      </div>
 
-      {/* Save & Confirm Button */}
+      {/* 5. Save & Confirm Button */}
       <button
         className="btn btn-primary"
-        style={{ width: '100%', padding: '0.75rem', fontSize: '1rem' }}
+        style={{ width: '100%', padding: '0.7rem', fontSize: '0.98rem', flexShrink: 0 }}
         onClick={handleSave}
         onMouseEnter={() => soundFx.playHover()}
       >
