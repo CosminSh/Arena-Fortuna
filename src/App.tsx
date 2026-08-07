@@ -7,6 +7,7 @@ import { TargetSelectView } from './components/TargetSelectView';
 import { BattleView } from './components/BattleView';
 import { ResultModal } from './components/ResultModal';
 import { ProbabilityModal } from './components/ProbabilityModal';
+import { HouseLeaderboardModal } from './components/HouseLeaderboardModal';
 import { BackgroundParticles } from './components/BackgroundParticles';
 import { ArchetypeId, Gladiator, BattleState, GearItem } from './types/game';
 import { ARCHETYPES } from './engine/mathEngine';
@@ -22,6 +23,7 @@ export const App: React.FC = () => {
   const [selectedEnemy, setSelectedEnemy] = useState<Gladiator | null>(null);
   const [battleState, setBattleState] = useState<BattleState | null>(null);
   const [showProbabilityModal, setShowProbabilityModal] = useState<boolean>(false);
+  const [showLeaderboardModal, setShowLeaderboardModal] = useState<boolean>(false);
 
   useEffect(() => {
     const handleFirstInteraction = () => {
@@ -45,20 +47,24 @@ export const App: React.FC = () => {
       if (e.key === 'Escape') {
         if (showProbabilityModal) {
           setShowProbabilityModal(false);
+        } else if (showLeaderboardModal) {
+          setShowLeaderboardModal(false);
         }
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [showProbabilityModal]);
+  }, [showProbabilityModal, showLeaderboardModal]);
 
   const handleStartWar = () => {
+    soundFx.playClick();
     setViewMode('target');
   };
 
   const handleSelectArchetype = (archetypeId: ArchetypeId) => {
+    soundFx.playClick();
     setSelectedArchetypeId(archetypeId);
-    setViewMode('target');
+    setViewMode('home');
   };
 
   const handleUpdateGladiator = (
@@ -70,7 +76,9 @@ export const App: React.FC = () => {
   };
 
   const handleSelectTarget = (enemy: Gladiator) => {
+    soundFx.playClick();
     setSelectedEnemy(enemy);
+    setBattleState(null);
     setViewMode('battle');
   };
 
@@ -79,12 +87,14 @@ export const App: React.FC = () => {
   };
 
   const handleReturnHome = () => {
+    soundFx.playClick();
     setBattleState(null);
     setSelectedEnemy(null);
     setViewMode('home');
   };
 
   const handleRematch = () => {
+    soundFx.playClick();
     setBattleState(null);
     setViewMode('battle');
   };
@@ -142,6 +152,7 @@ export const App: React.FC = () => {
               onStartWar={handleStartWar}
               onOpenGladiatorHub={() => setViewMode('gladiator')}
               onOpenMath={() => setShowProbabilityModal(true)}
+              onOpenLeaderboard={() => setShowLeaderboardModal(true)}
             />
           )}
 
@@ -190,6 +201,11 @@ export const App: React.FC = () => {
         {/* Probability Modal Overlay */}
         {showProbabilityModal && (
           <ProbabilityModal onClose={() => setShowProbabilityModal(false)} />
+        )}
+
+        {/* House Leaderboard & Roster Modal Overlay */}
+        {showLeaderboardModal && (
+          <HouseLeaderboardModal onClose={() => setShowLeaderboardModal(false)} />
         )}
       </div>
     </div>
