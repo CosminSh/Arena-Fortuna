@@ -43,9 +43,23 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({ onOpenProbabilityModal, on
         onMouseEnter={() => soundFx.playHover()}
       >
         <h1 className="brand-title">ARENA REELS</h1>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', flexShrink: 0 }}>
           <span className="brand-badge">PVP WAR</span>
-          <span style={{ fontSize: '0.65rem', fontWeight: 800, color: '#facc15', background: 'rgba(250, 204, 21, 0.15)', border: '1px solid rgba(250, 204, 21, 0.4)', borderRadius: '6px', padding: '0.15rem 0.45rem' }}>
+          <span
+            style={{
+              fontSize: '0.65rem',
+              fontWeight: 900,
+              color: '#facc15',
+              background: 'rgba(250, 204, 21, 0.15)',
+              border: '1px solid rgba(250, 204, 21, 0.4)',
+              borderRadius: '6px',
+              padding: '0.15rem 0.45rem',
+              whiteSpace: 'nowrap',
+              display: 'inline-flex',
+              alignItems: 'center',
+              lineHeight: 1,
+            }}
+          >
             LVL {profile.level}
           </span>
         </div>
@@ -61,8 +75,8 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({ onOpenProbabilityModal, on
           onMouseEnter={() => soundFx.playHover()}
           title="Inspect Math & Symbol Probabilities"
         >
-          <BarChart2 size={16} color="#f59e0b" />
-          <span>Math & Odds</span>
+          <BarChart2 size={15} color="#f59e0b" />
+          <span>Odds</span>
         </button>
 
         <button
@@ -71,7 +85,7 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({ onOpenProbabilityModal, on
           onMouseEnter={() => soundFx.playHover()}
           title={musicPlaying ? 'Pause Background Music' : 'Play Background Music'}
         >
-          <Music size={18} color={musicPlaying ? '#facc15' : '#6b7280'} />
+          <Music size={16} color={musicPlaying ? '#facc15' : '#6b7280'} />
         </button>
 
         <button
@@ -80,7 +94,7 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({ onOpenProbabilityModal, on
           onMouseEnter={() => soundFx.playHover()}
           title={muted ? 'Unmute Master Sound' : 'Mute Master Sound'}
         >
-          {muted ? <VolumeX size={18} color="#ef4444" /> : <Volume2 size={18} color="#10b981" />}
+          {muted ? <VolumeX size={16} color="#ef4444" /> : <Volume2 size={16} color="#10b981" />}
         </button>
       </div>
     </header>

@@ -475,9 +475,11 @@ export const BattleView: React.FC<BattleViewProps> = ({
           <img src={playerArch.portrait} alt={player.name} className="mobile-avatar" />
           <div className="mobile-fighter-info">
             <div className="mobile-fighter-name">{player.name}</div>
-            <div className="stage-hp-track" style={{ height: '12px', marginTop: '0.15rem' }}>
+            <div className="stage-hp-track" style={{ height: '18px', marginTop: '0.2rem' }}>
               <div className="stage-hp-fill" style={{ width: `${(player.currentHp / player.maxHp) * 100}%` }} />
-              <span className="stage-hp-val" style={{ fontSize: '0.65rem' }}>{player.currentHp}/{player.maxHp} HP</span>
+              <span className="stage-hp-val" style={{ fontSize: '0.64rem', fontWeight: 900, lineHeight: '18px', textShadow: '0 1px 2px #000' }}>
+                {player.currentHp}/{player.maxHp} HP
+              </span>
             </div>
             {player.shieldCharges > 0 && (
               <span className="mobile-shield-badge" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}>
@@ -493,9 +495,11 @@ export const BattleView: React.FC<BattleViewProps> = ({
         <div className="mobile-fighter-col enemy">
           <div className="mobile-fighter-info" style={{ textAlign: 'right' }}>
             <div className="mobile-fighter-name">{enemy.name}</div>
-            <div className="stage-hp-track" style={{ height: '12px', marginTop: '0.15rem' }}>
+            <div className="stage-hp-track" style={{ height: '18px', marginTop: '0.2rem' }}>
               <div className="stage-hp-fill enemy" style={{ width: `${(enemy.currentHp / enemy.maxHp) * 100}%` }} />
-              <span className="stage-hp-val" style={{ fontSize: '0.65rem' }}>{enemy.currentHp}/{enemy.maxHp} HP</span>
+              <span className="stage-hp-val" style={{ fontSize: '0.64rem', fontWeight: 900, lineHeight: '18px', textShadow: '0 1px 2px #000' }}>
+                {enemy.currentHp}/{enemy.maxHp} HP
+              </span>
             </div>
             {enemy.shieldCharges > 0 && (
               <span className="mobile-shield-badge" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}>
