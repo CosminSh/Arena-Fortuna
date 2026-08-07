@@ -46,98 +46,118 @@ export const ARCHETYPES: Record<ArchetypeId, Archetype> = {
 };
 
 export const AVAILABLE_GEAR: GearItem[] = [
-  // Weapons
+  // --- WEAPONS ---
   {
-    id: 'wep_1',
-    name: 'Standard Iron Blade',
+    id: 'wep_gladius',
+    name: 'Gladius of Invicta',
     slot: 'weapon',
-    rarity: 'Common',
-    statBonus: '+0 Damage',
-    damageBonus: 0,
-    shieldBonus: 0,
-    hpBonus: 0,
-    icon: '🗡️',
-    description: 'Basic arena issue gladius.',
-  },
-  {
-    id: 'wep_2',
-    name: 'Gladius of Conquest',
-    slot: 'weapon',
-    rarity: 'Legendary',
-    statBonus: '+8 Sword Damage',
+    rarity: 'Rare',
+    statBonus: '+8 Dmg, +4 Shield Armor',
     damageBonus: 8,
-    shieldBonus: 0,
+    shieldBonus: 4,
     hpBonus: 0,
     icon: '⚔️',
-    description: 'Tempered steel forged for high direct damage.',
-    isPremium: true,
+    description: 'Tempered Roman steel providing balanced offense and parrying stance.',
   },
   {
-    id: 'wep_3',
+    id: 'wep_sica',
     name: 'Hooked Sica of the Viper',
     slot: 'weapon',
     rarity: 'Mythic',
-    statBonus: '+12 Damage & Piercing',
-    damageBonus: 12,
+    statBonus: '+15 Direct Damage',
+    damageBonus: 15,
     shieldBonus: 0,
     hpBonus: 0,
     icon: '🩸',
-    description: 'Vicious curved blade designed to strip shield armor.',
-    isPremium: true,
+    description: 'Vicious curved blade designed to strip rival defense with raw burst power.',
+  },
+  {
+    id: 'wep_trident',
+    name: 'Retiarius Weighted Trident',
+    slot: 'weapon',
+    rarity: 'Legendary',
+    statBonus: '+6 Dmg, +8 Shield, +10 HP',
+    damageBonus: 6,
+    shieldBonus: 8,
+    hpBonus: 10,
+    icon: '🔱',
+    description: 'Versatile long-range prongs balancing tactical control and survivability.',
   },
 
-  // Armor
+  // --- ARMOR ---
   {
-    id: 'armor_1',
-    name: 'Leather Manica',
-    slot: 'armor',
-    rarity: 'Common',
-    statBonus: '+0 Shield',
-    damageBonus: 0,
-    shieldBonus: 0,
-    hpBonus: 0,
-    icon: '🛡️',
-    description: 'Standard leather arm guard.',
-  },
-  {
-    id: 'armor_2',
-    name: 'Imperial Scutum Plate',
+    id: 'armor_scutum',
+    name: 'Imperial Scutum Guard',
     slot: 'armor',
     rarity: 'Legendary',
-    statBonus: '+15 Shield Block & +15 HP',
+    statBonus: '+16 Shield Armor, +10 Max HP',
     damageBonus: 0,
-    shieldBonus: 15,
-    hpBonus: 15,
+    shieldBonus: 16,
+    hpBonus: 10,
     icon: '🏰',
-    description: 'Heavy bronze plate boosting maximum durability.',
-    isPremium: true,
+    description: 'Heavy bronze plate boosting maximum shield mitigation for tank builds.',
+  },
+  {
+    id: 'armor_lorica',
+    name: 'Centurion Lorica Hamata',
+    slot: 'armor',
+    rarity: 'Rare',
+    statBonus: '+25 Max HP, +6 Shield Armor',
+    damageBonus: 0,
+    shieldBonus: 6,
+    hpBonus: 25,
+    icon: '🛡️',
+    description: 'Reinforced chainmail maximizing your gladiator overall health pool.',
+  },
+  {
+    id: 'armor_galerus',
+    name: 'Light Feathered Galerus',
+    slot: 'armor',
+    rarity: 'Mythic',
+    statBonus: '+8 Dmg, +10 Shield Armor',
+    damageBonus: 8,
+    shieldBonus: 10,
+    hpBonus: 0,
+    icon: '🦅',
+    description: 'Agile shoulder guard enabling rapid counter-strikes without slowing tempo.',
   },
 
-  // Crests / Banners
+  // --- CRESTS / BANNERS ---
   {
-    id: 'crest_1',
-    name: 'Standard House Ribbon',
-    slot: 'crest',
-    rarity: 'Common',
-    statBonus: '+0 Stats',
-    damageBonus: 0,
-    shieldBonus: 0,
-    hpBonus: 0,
-    icon: '🚩',
-    description: 'Basic recruitment banner.',
-  },
-  {
-    id: 'crest_2',
+    id: 'crest_laurel',
     name: "Champion's Golden Laurel",
     slot: 'crest',
     rarity: 'Mythic',
-    statBonus: '+5 Dmg, +10 Shield, +10 HP',
-    damageBonus: 5,
-    shieldBonus: 10,
-    hpBonus: 10,
+    statBonus: '+6 Dmg, +8 Shield, +12 Max HP',
+    damageBonus: 6,
+    shieldBonus: 8,
+    hpBonus: 12,
     icon: '👑',
-    description: 'Crown of the Grand Coliseum Champion.',
-    isPremium: true,
+    description: 'Golden crown awarded to victorious Coliseum champions.',
+  },
+  {
+    id: 'crest_mars',
+    name: 'Warhorn Crest of Mars',
+    slot: 'crest',
+    rarity: 'Legendary',
+    statBonus: '+10 Damage, +5 Max HP',
+    damageBonus: 10,
+    shieldBonus: 0,
+    hpBonus: 5,
+    icon: '🔥',
+    description: 'Crimson plume of Mars inspiring relentless offensive strike power.',
+  },
+  {
+    id: 'crest_aegis',
+    name: 'Aegis Banner of Invicta',
+    slot: 'crest',
+    rarity: 'Rare',
+    statBonus: '+12 Shield Armor, +15 Max HP',
+    damageBonus: 0,
+    shieldBonus: 12,
+    hpBonus: 15,
+    icon: '🚩',
+    description: 'Sacred legionary banner granting massive defensive resilience.',
   },
 ];
 
@@ -157,6 +177,9 @@ export const ENEMY_GLADIATORS: Gladiator[] = [
     buildDescription: 'Heavy defensive specialist. High shield mitigation.',
     wins: 14,
     losses: 2,
+    equippedGear: {
+      armor: AVAILABLE_GEAR[3], // Imperial Scutum Guard
+    },
   },
   {
     id: 'enemy_varia',
@@ -172,6 +195,9 @@ export const ENEMY_GLADIATORS: Gladiator[] = [
     buildDescription: 'Aggressive armor-piercer focused on high direct damage.',
     wins: 18,
     losses: 5,
+    equippedGear: {
+      weapon: AVAILABLE_GEAR[1], // Hooked Sica of Viper
+    },
   },
   {
     id: 'enemy_batiatus',
@@ -187,6 +213,9 @@ export const ENEMY_GLADIATORS: Gladiator[] = [
     buildDescription: 'Disruptive crowd-pleaser using web control.',
     wins: 11,
     losses: 4,
+    equippedGear: {
+      weapon: AVAILABLE_GEAR[2], // Weighted Trident
+    },
   },
   {
     id: 'enemy_flamma',
@@ -203,7 +232,8 @@ export const ENEMY_GLADIATORS: Gladiator[] = [
     wins: 34,
     losses: 1,
     equippedGear: {
-      weapon: AVAILABLE_GEAR[1], // Gladius of Conquest (+8 Dmg)
+      weapon: AVAILABLE_GEAR[0], // Gladius of Invicta
+      crest: AVAILABLE_GEAR[6], // Champion's Golden Laurel
     },
   },
 
@@ -222,6 +252,10 @@ export const ENEMY_GLADIATORS: Gladiator[] = [
     buildDescription: 'Fierce Gaulic warlord with reinforced Scutum shielding.',
     wins: 22,
     losses: 3,
+    equippedGear: {
+      weapon: AVAILABLE_GEAR[0],
+      armor: AVAILABLE_GEAR[4],
+    },
   },
   {
     id: 'enemy_spartacus',
@@ -238,7 +272,8 @@ export const ENEMY_GLADIATORS: Gladiator[] = [
     wins: 40,
     losses: 0,
     equippedGear: {
-      weapon: AVAILABLE_GEAR[2], // Hooked Sica of Viper (+12 Dmg)
+      weapon: AVAILABLE_GEAR[1], // Hooked Sica of Viper
+      crest: AVAILABLE_GEAR[7], // Warhorn Crest of Mars
     },
   },
   {
@@ -255,6 +290,10 @@ export const ENEMY_GLADIATORS: Gladiator[] = [
     buildDescription: 'High risk, high evasion net master.',
     wins: 28,
     losses: 6,
+    equippedGear: {
+      weapon: AVAILABLE_GEAR[2],
+      armor: AVAILABLE_GEAR[5],
+    },
   },
   {
     id: 'enemy_oenomaus',
@@ -271,7 +310,8 @@ export const ENEMY_GLADIATORS: Gladiator[] = [
     wins: 30,
     losses: 4,
     equippedGear: {
-      armor: AVAILABLE_GEAR[4], // Imperial Scutum Plate
+      armor: AVAILABLE_GEAR[3], // Imperial Scutum Guard
+      crest: AVAILABLE_GEAR[8], // Aegis Banner
     },
   },
 
@@ -290,6 +330,9 @@ export const ENEMY_GLADIATORS: Gladiator[] = [
     buildDescription: 'Specializes in entangling nets and turn disruption.',
     wins: 15,
     losses: 7,
+    equippedGear: {
+      weapon: AVAILABLE_GEAR[2],
+    },
   },
   {
     id: 'enemy_verus',
@@ -305,6 +348,9 @@ export const ENEMY_GLADIATORS: Gladiator[] = [
     buildDescription: 'Crowd-favorite curved sica striker.',
     wins: 19,
     losses: 8,
+    equippedGear: {
+      weapon: AVAILABLE_GEAR[1],
+    },
   },
   {
     id: 'enemy_commodus',
@@ -321,7 +367,8 @@ export const ENEMY_GLADIATORS: Gladiator[] = [
     wins: 50,
     losses: 0,
     equippedGear: {
-      armor: AVAILABLE_GEAR[4],
+      weapon: AVAILABLE_GEAR[0],
+      armor: AVAILABLE_GEAR[3],
       crest: AVAILABLE_GEAR[6],
     },
   },

@@ -151,61 +151,70 @@ export const GladiatorHubView: React.FC<GladiatorHubViewProps> = ({
             );
           })}
         </div>
-      </div>
+       {/* Equipment Gear Shop Catalog */}
+      <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.6rem', paddingRight: '0.2rem' }}>
+        {(['weapon', 'armor', 'crest'] as const).map((slotType) => {
+          const slotTitle = slotType === 'weapon' ? '⚔️ WEAPONS (Attack Strategy)' : slotType === 'armor' ? '🛡️ ARMOR (Defense Strategy)' : '🚩 CRESTS & BANNERS (Build Synergy)';
+          const slotItems = AVAILABLE_GEAR.filter((g) => g.slot === slotType);
 
-      {/* Equipment Gear Shop Catalog */}
-      <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-        <span style={{ fontSize: '0.68rem', fontWeight: 800, color: 'var(--color-text-muted)', textTransform: 'uppercase' }}>
-          Armory Loadout (Boost Combat Stats)
-        </span>
-
-        {AVAILABLE_GEAR.map((item) => {
-          const isEquipped = gearLoadout[item.slot]?.id === item.id;
           return (
-            <div
-              key={item.id}
-              className="card"
-              style={{
-                padding: '0.5rem 0.8rem',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                cursor: 'pointer',
-                borderColor: isEquipped ? '#10b981' : 'rgba(255, 255, 255, 0.12)',
-                background: isEquipped ? 'rgba(16, 185, 129, 0.15)' : 'rgba(12, 16, 24, 0.85)',
-              }}
-              onMouseEnter={() => soundFx.playHover()}
-              onClick={() => handleSelectGear(item)}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-                <span style={{ fontSize: '1.4rem' }}>{item.icon}</span>
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                    <span style={{ fontSize: '0.82rem', fontWeight: 800, color: '#fff' }}>{item.name}</span>
-                    {item.isPremium && (
-                      <span style={{ fontSize: '0.6rem', background: '#d97706', color: '#000', padding: '0.1rem 0.35rem', borderRadius: '4px', fontWeight: 900 }}>
-                        UNLOCKED
-                      </span>
-                    )}
-                  </div>
-                  <span style={{ fontSize: '0.68rem', color: '#10b981', fontWeight: 700 }}>{item.statBonus}</span>
-                </div>
-              </div>
+            <div key={slotType} style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+              <span style={{ fontSize: '0.68rem', fontWeight: 900, color: 'var(--color-gold)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                {slotTitle}
+              </span>
 
-              <button
-                className={`btn ${isEquipped ? 'btn-secondary' : 'btn-primary'}`}
-                style={{ padding: '0.35rem 0.75rem', fontSize: '0.75rem' }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleSelectGear(item);
-                }}
-                onMouseEnter={() => soundFx.playHover()}
-              >
-                {isEquipped ? <Check size={14} color="#10b981" /> : 'EQUIP'}
-              </button>
+              {slotItems.map((item) => {
+                const isEquipped = gearLoadout[item.slot]?.id === item.id;
+                const rarityColor = item.rarity === 'Mythic' ? '#c084fc' : item.rarity === 'Legendary' ? '#f59e0b' : '#60a5fa';
+                return (
+                  <div
+                    key={item.id}
+                    className="card"
+                    style={{
+                      padding: '0.55rem 0.8rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      cursor: 'pointer',
+                      borderColor: isEquipped ? '#10b981' : 'rgba(255, 255, 255, 0.14)',
+                      background: isEquipped ? 'rgba(16, 185, 129, 0.16)' : 'rgba(12, 16, 24, 0.85)',
+                      transition: 'all 0.15s ease-in-out',
+                    }}
+                    onMouseEnter={() => soundFx.playHover()}
+                    onClick={() => handleSelectGear(item)}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flex: 1, minWidth: 0 }}>
+                      <span style={{ fontSize: '1.5rem', flexShrink: 0 }}>{item.icon}</span>
+                      <div style={{ minWidth: 0 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', flexWrap: 'wrap' }}>
+                          <span style={{ fontSize: '0.84rem', fontWeight: 900, color: '#fff' }}>{item.name}</span>
+                          <span style={{ fontSize: '0.58rem', color: rarityColor, border: `1px solid ${rarityColor}`, padding: '0.05rem 0.35rem', borderRadius: '4px', fontWeight: 800, textTransform: 'uppercase' }}>
+                            {item.rarity}
+                          </span>
+                        </div>
+                        <div style={{ fontSize: '0.72rem', color: '#10b981', fontWeight: 800, marginTop: '0.1rem' }}>{item.statBonus}</div>
+                        <div style={{ fontSize: '0.66rem', color: 'rgba(255,255,255,0.65)', marginTop: '0.1rem', fontStyle: 'italic' }}>{item.description}</div>
+                      </div>
+                    </div>
+
+                    <button
+                      className={`btn ${isEquipped ? 'btn-secondary' : 'btn-primary'}`}
+                      style={{ padding: '0.35rem 0.75rem', fontSize: '0.75rem', marginLeft: '0.5rem', flexShrink: 0 }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleSelectGear(item);
+                      }}
+                      onMouseEnter={() => soundFx.playHover()}
+                    >
+                      {isEquipped ? <Check size={14} color="#10b981" /> : 'EQUIP'}
+                    </button>
+                  </div>
+                );
+              })}
             </div>
           );
         })}
+      </div>
       </div>
 
       {/* Save & Confirm Button */}
