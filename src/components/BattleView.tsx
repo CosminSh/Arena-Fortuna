@@ -670,117 +670,174 @@ export const BattleView: React.FC<BattleViewProps> = ({
       </div>
 
       {/* IN-BATTLE PAYTABLE & EV MODAL DRAWER */}
-      {showPaytableModal && (
-        <div className="modal-overlay" style={{ zIndex: 9999, background: 'rgba(4, 6, 12, 0.85)', backdropFilter: 'blur(8px)' }}>
-          <div className="modal-content" style={{ borderColor: 'var(--color-gold)', textAlign: 'left', maxWidth: '520px', padding: '1.2rem', position: 'relative' }}>
-            <button
-              onClick={() => setShowPaytableModal(false)}
-              style={{
-                position: 'absolute',
-                top: '12px',
-                right: '12px',
-                background: 'none',
-                border: 'none',
-                color: 'var(--color-gold)',
-                cursor: 'pointer',
-              }}
-            >
-              <X size={20} />
-            </button>
+      {showPaytableModal && (() => {
+        const playerGearDmg = (player.equippedGear?.weapon?.damageBonus || 0) + (player.equippedGear?.crest?.damageBonus || 0);
+        const playerGearShield = (player.equippedGear?.armor?.shieldBonus || 0) + (player.equippedGear?.crest?.shieldBonus || 0);
+        const playerGearHp = (player.equippedGear?.armor?.hpBonus || 0) + (player.equippedGear?.crest?.hpBonus || 0);
 
-            <h2 style={{ fontSize: '1.25rem', color: '#facc15', marginBottom: '0.2rem', fontFamily: 'var(--font-serif)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-              <Info size={18} color="#facc15" />
-              <span>SLOT PAYTABLE & EXPECTED VALUE (EV)</span>
-            </h2>
+        const effectiveDmgEV = (24.5 + playerGearDmg).toFixed(1);
+        const effectiveShieldEV = (12.5 + playerGearShield).toFixed(1);
+        const hasActiveGear = playerGearDmg > 0 || playerGearShield > 0 || playerGearHp > 0;
 
-            <p style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', marginBottom: '0.8rem' }}>
-              Reels use 4 symbols (Sword 35%, Shield 30%, Ability 25%, Wild 10%). Match 3 for Jackpots, Match 2 for Common hits.
-            </p>
+        return (
+          <div className="modal-overlay" style={{ zIndex: 9999, background: 'rgba(4, 6, 12, 0.85)', backdropFilter: 'blur(8px)' }}>
+            <div className="modal-content" style={{ borderColor: 'var(--color-gold)', textAlign: 'left', maxWidth: '520px', padding: '1.2rem', position: 'relative' }}>
+              <button
+                onClick={() => setShowPaytableModal(false)}
+                style={{
+                  position: 'absolute',
+                  top: '12px',
+                  right: '12px',
+                  background: 'none',
+                  border: 'none',
+                  color: 'var(--color-gold)',
+                  cursor: 'pointer',
+                }}
+              >
+                <X size={20} />
+              </button>
 
-            {/* EV STATS SUMMARY BOX */}
-            <div style={{ background: 'rgba(245, 158, 11, 0.1)', border: '1px solid var(--color-gold)', borderRadius: '10px', padding: '0.5rem 0.8rem', marginBottom: '0.8rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div>
-                <span style={{ fontSize: '0.68rem', color: 'var(--color-gold)', fontWeight: 800, textTransform: 'uppercase', display: 'block' }}>EXPECTED VALUE (EV)</span>
-                <strong style={{ fontSize: '1.1rem', color: '#fff' }}>24.5 Dmg / Spin</strong>
+              <h2 style={{ fontSize: '1.25rem', color: '#facc15', marginBottom: '0.2rem', fontFamily: 'var(--font-serif)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                <Info size={18} color="#facc15" />
+                <span>SLOT PAYTABLE & EXPECTED VALUE (EV)</span>
+              </h2>
+
+              <p style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', marginBottom: '0.6rem' }}>
+                Reels roll 4 symbol types (Sword 35%, Shield 30%, Ability 25%, Wild 10%). Values update dynamically based on your equipped gear loadout.
+              </p>
+
+              {/* Active Gear Summary Banner */}
+              {hasActiveGear && (
+                <div style={{ background: 'rgba(16, 185, 129, 0.15)', border: '1px solid #10b981', borderRadius: '8px', padding: '0.35rem 0.7rem', marginBottom: '0.7rem', fontSize: '0.74rem', color: '#10b981', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <span>🛡️ ACTIVE GEAR LOADOUT:</span>
+                  <span>+{playerGearDmg} Damage</span>
+                  <span>• +{playerGearShield} Shield Armor</span>
+                  <span>• +{playerGearHp} Max HP</span>
+                </div>
+              )}
+
+              {/* EV STATS SUMMARY BOX */}
+              <div style={{ background: 'rgba(245, 158, 11, 0.1)', border: '1px solid var(--color-gold)', borderRadius: '10px', padding: '0.5rem 0.8rem', marginBottom: '0.8rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                  <span style={{ fontSize: '0.68rem', color: 'var(--color-gold)', fontWeight: 800, textTransform: 'uppercase', display: 'block' }}>EXPECTED DAMAGE / SPIN</span>
+                  <strong style={{ fontSize: '1.1rem', color: '#fff' }}>
+                    {effectiveDmgEV} Dmg
+                    {playerGearDmg > 0 && <span style={{ fontSize: '0.72rem', color: '#10b981', marginLeft: '0.3rem' }}>(+{playerGearDmg} Gear)</span>}
+                  </strong>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <span style={{ fontSize: '0.68rem', color: '#60a5fa', fontWeight: 800, textTransform: 'uppercase', display: 'block' }}>EXPECTED SHIELD / SPIN</span>
+                  <strong style={{ fontSize: '1.1rem', color: '#60a5fa' }}>
+                    {effectiveShieldEV} Shield
+                    {playerGearShield > 0 && <span style={{ fontSize: '0.72rem', color: '#10b981', marginLeft: '0.3rem' }}>(+{playerGearShield} Gear)</span>}
+                  </strong>
+                </div>
               </div>
-              <div style={{ textAlign: 'right' }}>
-                <span style={{ fontSize: '0.68rem', color: '#10b981', fontWeight: 800, textTransform: 'uppercase', display: 'block' }}>PLAYER WIN RTP</span>
-                <strong style={{ fontSize: '1.1rem', color: '#10b981' }}>96.2% Overall</strong>
-              </div>
+
+              {/* PAYOUT TABLE LIST */}
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.76rem', marginBottom: '0.8rem' }}>
+                <thead>
+                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.2)', color: 'var(--color-gold)', textAlign: 'left' }}>
+                    <th style={{ padding: '0.3rem' }}>COMBINATION</th>
+                    <th style={{ padding: '0.3rem' }}>TIER</th>
+                    <th style={{ padding: '0.3rem' }}>EFFECT / PAYOUT</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                    <td style={{ padding: '0.35rem', color: '#ef4444', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                      <img src={SYMBOL_DISPLAY.sword.image} alt="" style={{ width: '20px', height: '20px' }} />
+                      <span>3x Sword</span>
+                    </td>
+                    <td style={{ padding: '0.35rem', color: '#f59e0b' }}>Jackpot</td>
+                    <td style={{ padding: '0.35rem', color: '#fff' }}>
+                      {playerGearDmg > 0 ? (
+                        <span>
+                          40 <span style={{ color: '#10b981', fontWeight: 800 }}>(+{playerGearDmg} Gear)</span> = <strong>{40 + playerGearDmg} Raw Damage</strong>
+                        </span>
+                      ) : (
+                        '40 Raw Damage'
+                      )}
+                    </td>
+                  </tr>
+                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                    <td style={{ padding: '0.35rem', color: '#ef4444', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                      <img src={SYMBOL_DISPLAY.sword.image} alt="" style={{ width: '20px', height: '20px' }} />
+                      <span>2x Sword</span>
+                    </td>
+                    <td style={{ padding: '0.35rem', color: '#9ca3af' }}>Common</td>
+                    <td style={{ padding: '0.35rem', color: '#fff' }}>
+                      {playerGearDmg > 0 ? (
+                        <span>
+                          25 <span style={{ color: '#10b981', fontWeight: 800 }}>(+{playerGearDmg} Gear)</span> = <strong>{25 + playerGearDmg} Raw Damage</strong>
+                        </span>
+                      ) : (
+                        '25 Raw Damage'
+                      )}
+                    </td>
+                  </tr>
+                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                    <td style={{ padding: '0.35rem', color: '#3b82f6', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                      <img src={SYMBOL_DISPLAY.shield.image} alt="" style={{ width: '20px', height: '20px' }} />
+                      <span>3x Shield</span>
+                    </td>
+                    <td style={{ padding: '0.35rem', color: '#f59e0b' }}>Jackpot</td>
+                    <td style={{ padding: '0.35rem', color: '#fff' }}>
+                      {playerGearShield > 0 ? (
+                        <span>
+                          +22 <span style={{ color: '#60a5fa', fontWeight: 800 }}>(+{playerGearShield} Gear)</span> = <strong>+{22 + playerGearShield} Shield Armor</strong>
+                        </span>
+                      ) : (
+                        '+22 Shield Protection'
+                      )}
+                    </td>
+                  </tr>
+                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                    <td style={{ padding: '0.35rem', color: '#3b82f6', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                      <img src={SYMBOL_DISPLAY.shield.image} alt="" style={{ width: '20px', height: '20px' }} />
+                      <span>2x Shield</span>
+                    </td>
+                    <td style={{ padding: '0.35rem', color: '#9ca3af' }}>Common</td>
+                    <td style={{ padding: '0.35rem', color: '#fff' }}>
+                      {playerGearShield > 0 ? (
+                        <span>
+                          +14 <span style={{ color: '#60a5fa', fontWeight: 800 }}>(+{playerGearShield} Gear)</span> = <strong>+{14 + playerGearShield} Shield Armor</strong>
+                        </span>
+                      ) : (
+                        '+14 Shield Protection'
+                      )}
+                    </td>
+                  </tr>
+                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                    <td style={{ padding: '0.35rem', color: '#f59e0b', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                      <img src={SYMBOL_DISPLAY.class.image} alt="" style={{ width: '20px', height: '20px' }} />
+                      <span>3x Ability</span>
+                    </td>
+                    <td style={{ padding: '0.35rem', color: '#f59e0b' }}>Jackpot</td>
+                    <td style={{ padding: '0.35rem', color: '#fff' }}>Archetype Ultimate Perk</td>
+                  </tr>
+                  <tr>
+                    <td style={{ padding: '0.35rem', color: '#a855f7', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                      <img src={SYMBOL_DISPLAY.wild.image} alt="" style={{ width: '20px', height: '20px' }} />
+                      <span>Wild Symbol</span>
+                    </td>
+                    <td style={{ padding: '0.35rem', color: '#a855f7' }}>Wild</td>
+                    <td style={{ padding: '0.35rem', color: '#fff' }}>Choose any symbol match</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <button
+                className="btn btn-primary"
+                style={{ width: '100%', padding: '0.5rem', fontSize: '0.8rem', justifyContent: 'center' }}
+                onClick={() => setShowPaytableModal(false)}
+              >
+                GOT IT, RETURN TO BATTLE
+              </button>
             </div>
-
-            {/* PAYOUT TABLE LIST */}
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.76rem', marginBottom: '0.8rem' }}>
-              <thead>
-                <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.2)', color: 'var(--color-gold)', textAlign: 'left' }}>
-                  <th style={{ padding: '0.3rem' }}>COMBINATION</th>
-                  <th style={{ padding: '0.3rem' }}>TIER</th>
-                  <th style={{ padding: '0.3rem' }}>EFFECT / PAYOUT</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                  <td style={{ padding: '0.35rem', color: '#ef4444', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                    <img src={SYMBOL_DISPLAY.sword.image} alt="" style={{ width: '20px', height: '20px' }} />
-                    <span>3x Sword</span>
-                  </td>
-                  <td style={{ padding: '0.35rem', color: '#f59e0b' }}>Jackpot</td>
-                  <td style={{ padding: '0.35rem', color: '#fff' }}>40 Raw Damage</td>
-                </tr>
-                <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                  <td style={{ padding: '0.35rem', color: '#ef4444', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                    <img src={SYMBOL_DISPLAY.sword.image} alt="" style={{ width: '20px', height: '20px' }} />
-                    <span>2x Sword</span>
-                  </td>
-                  <td style={{ padding: '0.35rem', color: '#9ca3af' }}>Common</td>
-                  <td style={{ padding: '0.35rem', color: '#fff' }}>25 Raw Damage</td>
-                </tr>
-                <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                  <td style={{ padding: '0.35rem', color: '#3b82f6', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                    <img src={SYMBOL_DISPLAY.shield.image} alt="" style={{ width: '20px', height: '20px' }} />
-                    <span>3x Shield</span>
-                  </td>
-                  <td style={{ padding: '0.35rem', color: '#f59e0b' }}>Jackpot</td>
-                  <td style={{ padding: '0.35rem', color: '#fff' }}>+22 Shield Protection</td>
-                </tr>
-                <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                  <td style={{ padding: '0.35rem', color: '#3b82f6', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                    <img src={SYMBOL_DISPLAY.shield.image} alt="" style={{ width: '20px', height: '20px' }} />
-                    <span>2x Shield</span>
-                  </td>
-                  <td style={{ padding: '0.35rem', color: '#9ca3af' }}>Common</td>
-                  <td style={{ padding: '0.35rem', color: '#fff' }}>+14 Shield Protection</td>
-                </tr>
-                <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                  <td style={{ padding: '0.35rem', color: '#f59e0b', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                    <img src={SYMBOL_DISPLAY.class.image} alt="" style={{ width: '20px', height: '20px' }} />
-                    <span>3x Ability</span>
-                  </td>
-                  <td style={{ padding: '0.35rem', color: '#f59e0b' }}>Jackpot</td>
-                  <td style={{ padding: '0.35rem', color: '#fff' }}>Archetype Ultimate Perk</td>
-                </tr>
-                <tr>
-                  <td style={{ padding: '0.35rem', color: '#a855f7', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                    <img src={SYMBOL_DISPLAY.wild.image} alt="" style={{ width: '20px', height: '20px' }} />
-                    <span>Wild Symbol</span>
-                  </td>
-                  <td style={{ padding: '0.35rem', color: '#a855f7' }}>Wild</td>
-                  <td style={{ padding: '0.35rem', color: '#fff' }}>Choose any symbol match</td>
-                </tr>
-              </tbody>
-            </table>
-
-            <button
-              className="btn btn-primary"
-              style={{ width: '100%', padding: '0.5rem', fontSize: '0.8rem', justifyContent: 'center' }}
-              onClick={() => setShowPaytableModal(false)}
-            >
-              GOT IT, RETURN TO BATTLE
-            </button>
           </div>
-        </div>
-      )}
-
+        );
+      })()}
 
       {/* WILD CHOICE RESOLUTION OVERLAY MODAL */}
       {pendingWildReels && (
