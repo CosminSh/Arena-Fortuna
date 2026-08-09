@@ -204,6 +204,7 @@ export const App: React.FC = () => {
           <FortunaTutorialModal
             onClose={() => setShowTutorialModal(false)}
             onStartFirstFight={handleStartWar}
+            currentViewMode={viewMode}
           />
         )}
 

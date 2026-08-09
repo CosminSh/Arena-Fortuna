@@ -74,6 +74,7 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({ onOpenProbabilityModal, on
 
       <div className="header-actions">
         <button
+          id="nav-guide-btn"
           className="header-btn"
           onClick={() => {
             soundFx.playClick();
@@ -92,6 +93,7 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({ onOpenProbabilityModal, on
         </button>
 
         <button
+          id="nav-odds-btn"
           className="header-btn"
           onClick={() => {
             soundFx.playClick();

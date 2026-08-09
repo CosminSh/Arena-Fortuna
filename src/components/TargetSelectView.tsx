@@ -106,7 +106,7 @@ export const TargetSelectView: React.FC<TargetSelectViewProps> = ({
       </div>
 
       {/* 2x2 Target Cards Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.6rem', flex: 1, maxHeight: 'calc(100vh - 110px)' }}>
+      <div id="target-scout-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.6rem', flex: 1, maxHeight: 'calc(100vh - 110px)' }}>
         {activeTargets.map((enemy) => {
           const enemyArch = ARCHETYPES[enemy.archetypeId];
           const isFavored = playerArch.favoredAgainst === enemy.archetypeId;

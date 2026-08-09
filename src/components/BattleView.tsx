@@ -633,6 +633,7 @@ export const BattleView: React.FC<BattleViewProps> = ({
 
         {/* Centerpiece Grand Casino Slot Cabinet */}
         <div
+          id="battle-slot-cabinet"
           className="slot-frame"
           style={{
             borderColor: isEnemyTurn ? '#ef4444' : 'var(--color-gold)',

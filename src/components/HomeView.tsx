@@ -140,6 +140,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onStartWar, onOpenGladiatorH
         {/* 2 MAIN BUTTONS: MY GLADIATOR & ENTER ARENA WAR */}
         <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
           <button
+            id="home-gladiator-btn"
             className="btn btn-secondary"
             style={{ width: '100%', padding: '0.75rem', fontSize: '0.98rem', borderRadius: '22px', borderColor: 'var(--color-gold)', background: 'rgba(245, 158, 11, 0.15)' }}
             onClick={() => {
@@ -154,6 +155,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onStartWar, onOpenGladiatorH
           </button>
 
           <button
+            id="home-start-war-btn"
             className="btn btn-primary pulse"
             style={{ width: '100%', padding: '0.85rem', fontSize: '1.1rem', borderRadius: '22px' }}
             onClick={() => {

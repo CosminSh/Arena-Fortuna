@@ -1,31 +1,123 @@
-import React, { useState } from 'react';
-import { X, ChevronRight, ChevronLeft, Swords, BarChart2, Shield, Sparkles, Crown, HelpCircle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, ChevronRight, ChevronLeft, Swords, BarChart2, Shield, Sparkles, Crown, Check, User } from 'lucide-react';
 import { soundFx } from '../engine/audioEngine';
-import { setTutorialCompleted } from '../engine/storageEngine';
+import { setTutorialCompleted, updatePlayerName, loadPlayerProfile } from '../engine/storageEngine';
 
 interface FortunaTutorialModalProps {
   onClose: () => void;
   onStartFirstFight: () => void;
-  onHighlightOdds?: () => void;
+  currentViewMode?: string;
 }
+
+interface StepConfig {
+  step: number;
+  targetId: string;
+  title: string;
+  badge: string;
+  dialogue: string;
+  buttonLabel?: string;
+  action?: 'navigate_target' | 'complete';
+}
+
+const TUTORIAL_STEPS: Record<number, StepConfig> = {
+  1: {
+    step: 1,
+    targetId: 'nav-odds-btn',
+    badge: 'STEP 1: ODDS & MATH',
+    title: 'KNOW YOUR ODDS',
+    dialogue: 'Knowledge is your sharpest weapon! Tap Odds in the header anytime to inspect symbol probabilities and archetype counter math.',
+  },
+  2: {
+    step: 2,
+    targetId: 'home-gladiator-btn',
+    badge: 'STEP 2: ARMORY & GEAR',
+    title: 'FORGE YOUR CHAMPION',
+    dialogue: 'Tap My Gladiator & Gear to pick your archetype (Murmillo, Retiarius, Thraex) and equip armor to boost your Health!',
+  },
+  3: {
+    step: 3,
+    targetId: 'home-start-war-btn',
+    badge: 'STEP 3: ENTER ARENA WAR',
+    title: 'TO THE SANDS!',
+    dialogue: 'The Colosseum roars for blood and glory! Tap Enter Arena War to scout your first rival opponent.',
+    buttonLabel: 'SCOUT RIVALS NOW',
+    action: 'navigate_target',
+  },
+  4: {
+    step: 4,
+    targetId: 'target-scout-grid',
+    badge: 'STEP 4: SCOUTING RIVALS',
+    title: 'CHOOSE YOUR ADVERSARY',
+    dialogue: 'Scout your rival carefully! Murmillo shield counters Retiarius net, Retiarius counters Thraex, and Thraex cuts Murmillo.',
+  },
+  5: {
+    step: 5,
+    targetId: 'battle-slot-cabinet',
+    badge: 'STEP 5: REELS OF DESTINY',
+    title: 'SPIN FOR VICTORY',
+    dialogue: 'Spin the 3 Reels of Fate! 🗡️ Swords deal damage, 🛡️ Shields block strikes, and 3 matching symbols trigger a Jackpot!',
+    buttonLabel: "LET'S BATTLE!",
+    action: 'complete',
+  },
+};
 
 export const FortunaTutorialModal: React.FC<FortunaTutorialModalProps> = ({
   onClose,
   onStartFirstFight,
+  currentViewMode = 'home',
 }) => {
-  const [currentStep, setCurrentStep] = useState<number>(1);
-  const totalSteps = 5;
+  const profile = loadPlayerProfile();
+  const [currentStep, setCurrentStep] = useState<number>(0); // 0 = Name Prompt Modal
+  const [playerNameInput, setPlayerNameInput] = useState<string>(profile.playerName || 'Imperator');
 
-  const handleNext = () => {
+  // Apply highlight spotlight pulse effect to active target element on DOM
+  useEffect(() => {
+    if (currentStep === 0) return;
+
+    const config = TUTORIAL_STEPS[currentStep];
+    if (!config) return;
+
+    // Remove previous highlights
+    document.querySelectorAll('.tutorial-highlight-pulse').forEach((el) => {
+      el.classList.remove('tutorial-highlight-pulse');
+    });
+
+    const targetEl = document.getElementById(config.targetId);
+    if (targetEl) {
+      targetEl.classList.add('tutorial-highlight-pulse');
+      targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    return () => {
+      if (targetEl) {
+        targetEl.classList.remove('tutorial-highlight-pulse');
+      }
+    };
+  }, [currentStep, currentViewMode]);
+
+  const handleSaveName = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     soundFx.playClick();
-    if (currentStep < totalSteps) {
-      setCurrentStep((prev) => prev + 1);
+    const trimmed = playerNameInput.trim() || 'Imperator';
+    updatePlayerName(trimmed);
+    setCurrentStep(1);
+  };
+
+  const handleNextStep = () => {
+    soundFx.playClick();
+    const config = TUTORIAL_STEPS[currentStep];
+
+    if (config?.action === 'navigate_target') {
+      onStartFirstFight();
+      setCurrentStep(4);
+    } else if (config?.action === 'complete' || currentStep >= 5) {
+      handleComplete();
     } else {
-      handleCompleteAndFight();
+      setCurrentStep((prev) => prev + 1);
     }
   };
 
-  const handlePrev = () => {
+  const handlePrevStep = () => {
     soundFx.playClick();
     if (currentStep > 1) {
       setCurrentStep((prev) => prev - 1);
@@ -34,319 +126,245 @@ export const FortunaTutorialModal: React.FC<FortunaTutorialModalProps> = ({
 
   const handleSkip = () => {
     soundFx.playClick();
+    // Remove highlights
+    document.querySelectorAll('.tutorial-highlight-pulse').forEach((el) => {
+      el.classList.remove('tutorial-highlight-pulse');
+    });
     setTutorialCompleted(true);
     onClose();
   };
 
-  const handleCompleteAndFight = () => {
+  const handleComplete = () => {
     soundFx.playClick();
+    document.querySelectorAll('.tutorial-highlight-pulse').forEach((el) => {
+      el.classList.remove('tutorial-highlight-pulse');
+    });
     setTutorialCompleted(true);
     onClose();
-    onStartFirstFight();
   };
 
-  return (
-    <div className="modal-overlay" style={{ zIndex: 120, backdropFilter: 'blur(16px)' }}>
-      <div
-        className="modal-content fortuna-modal-card"
-        style={{
-          maxWidth: '680px',
-          padding: '0',
-          overflow: 'hidden',
-          border: '2px solid var(--color-gold)',
-          boxShadow: '0 25px 80px rgba(0, 0, 0, 0.95), 0 0 60px rgba(245, 158, 11, 0.35)',
-          background: 'linear-gradient(180deg, rgba(14, 18, 28, 0.98) 0%, rgba(6, 8, 14, 0.98) 100%)',
-          borderRadius: '26px',
-        }}
-      >
-        {/* Top Header Strip */}
+  // STEP 0: Compact Regal Name Input Prompt Modal
+  if (currentStep === 0) {
+    return (
+      <div className="modal-overlay" style={{ zIndex: 150, backdropFilter: 'blur(12px)' }}>
         <div
+          className="modal-content"
           style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '0.85rem 1.4rem',
-            background: 'linear-gradient(90deg, rgba(245, 158, 11, 0.18) 0%, rgba(14, 18, 28, 0.4) 100%)',
-            borderBottom: '1px solid rgba(245, 158, 11, 0.3)',
+            maxWidth: '440px',
+            padding: '1.4rem',
+            textAlign: 'center',
+            border: '2px solid var(--color-gold)',
+            boxShadow: '0 25px 70px rgba(0,0,0,0.98), 0 0 50px rgba(245, 158, 11, 0.4)',
+            background: 'linear-gradient(180deg, rgba(14, 18, 28, 0.98) 0%, rgba(6, 8, 14, 0.98) 100%)',
+            borderRadius: '24px',
+            position: 'relative',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-            <Crown size={22} color="#facc15" style={{ filter: 'drop-shadow(0 0 8px rgba(250, 204, 21, 0.8))' }} />
-            <div>
-              <h3
+          {/* Queen Fortuna Avatar Header */}
+          <div style={{ position: 'relative', display: 'inline-block', marginBottom: '0.6rem' }}>
+            <div className="fortuna-divine-aura" style={{ width: '120px', height: '120px' }} />
+            <img
+              src="./assets/Fortuna-NPC-torso.png"
+              alt="Queen Fortuna"
+              style={{
+                width: '90px',
+                height: '90px',
+                borderRadius: '50%',
+                objectFit: 'cover',
+                border: '2.5px solid #facc15',
+                filter: 'drop-shadow(0 0 15px rgba(245, 158, 11, 0.8))',
+                position: 'relative',
+                zIndex: 2,
+              }}
+            />
+          </div>
+
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', background: 'rgba(245,158,11,0.15)', border: '1px solid var(--color-gold)', padding: '0.2rem 0.65rem', borderRadius: '12px', fontSize: '0.68rem', fontWeight: 900, color: '#facc15', marginBottom: '0.4rem' }}>
+            <Crown size={12} />
+            <span>QUEEN FORTUNA WELCOMES YOU</span>
+          </div>
+
+          <h2 style={{ fontSize: '1.4rem', color: '#fff', margin: '0.2rem 0 0.4rem 0', fontFamily: 'var(--font-serif)' }}>
+            CLAIM YOUR GLADIATOR NAME
+          </h2>
+
+          <p style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)', lineHeight: 1.45, marginBottom: '1.1rem' }}>
+            "Hail, fighter! I am Queen Fortuna—ruler of these sands. Before you step upon the arena floor, tell me: by what name shall Rome know you?"
+          </p>
+
+          <form onSubmit={handleSaveName} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            <div style={{ position: 'relative' }}>
+              <User size={18} color="var(--color-gold)" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
+              <input
+                type="text"
+                value={playerNameInput}
+                onChange={(e) => setPlayerNameInput(e.target.value)}
+                placeholder="Enter Gladiator Name..."
+                maxLength={20}
                 style={{
-                  fontSize: '1.05rem',
-                  fontWeight: 900,
+                  width: '100%',
+                  padding: '0.75rem 0.75rem 0.75rem 2.4rem',
+                  fontSize: '0.95rem',
+                  fontWeight: 800,
                   color: '#fff',
-                  fontFamily: 'var(--font-serif)',
-                  lineHeight: 1.1,
-                  letterSpacing: '0.04em',
+                  background: 'rgba(0, 0, 0, 0.6)',
+                  border: '1.5px solid var(--color-gold)',
+                  borderRadius: '14px',
+                  outline: 'none',
+                  boxShadow: 'inset 0 2px 6px rgba(0,0,0,0.8)',
                 }}
-              >
-                QUEEN FORTUNA'S GUIDANCE
-              </h3>
-              <span style={{ fontSize: '0.72rem', color: 'var(--color-gold)', fontWeight: 700 }}>
-                Step {currentStep} of {totalSteps} — Arena Regent & Goddess of Fate
+                autoFocus
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="btn btn-primary pulse-btn-gold"
+              style={{
+                width: '100%',
+                padding: '0.8rem',
+                fontSize: '1rem',
+                borderRadius: '14px',
+                marginTop: '0.2rem',
+              }}
+              onMouseEnter={() => soundFx.playHover()}
+            >
+              <Swords size={18} />
+              <span>CLAIM MY NAME & ENTER ARENA</span>
+              <ChevronRight size={18} />
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
+  // STEPS 1 to 5: Sleek Floating Speech Popover Box
+  const config = TUTORIAL_STEPS[currentStep] || TUTORIAL_STEPS[1];
+
+  return (
+    <div
+      style={{
+        position: 'fixed',
+        inset: 0,
+        pointerEvents: 'none',
+        zIndex: 140,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: currentStep === 1 ? 'flex-start' : currentStep === 3 ? 'center' : 'flex-end',
+        padding: '1.2rem',
+      }}
+    >
+      {/* Floating Compact Dialogue Popover */}
+      <div
+        className="fortuna-popover-box"
+        style={{
+          pointerEvents: 'auto',
+          width: '100%',
+          maxWidth: '420px',
+          background: 'linear-gradient(180deg, rgba(14, 18, 28, 0.96) 0%, rgba(6, 8, 14, 0.98) 100%)',
+          border: '2px solid var(--color-gold)',
+          borderRadius: '20px',
+          padding: '0.85rem 1rem',
+          boxShadow: '0 20px 60px rgba(0, 0, 0, 0.95), 0 0 35px rgba(245, 158, 11, 0.35)',
+          animation: 'popoverPopIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '0.6rem',
+        }}
+      >
+        {/* Header Row: Fortuna Portrait + Title */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.6rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem' }}>
+            <img
+              src="./assets/Fortuna-NPC-torso.png"
+              alt="Queen Fortuna"
+              style={{
+                width: '42px',
+                height: '42px',
+                borderRadius: '50%',
+                objectFit: 'cover',
+                border: '2px solid #facc15',
+                boxShadow: '0 0 12px rgba(250, 204, 21, 0.7)',
+                flexShrink: 0,
+              }}
+            />
+            <div>
+              <span className="step-tag-pill" style={{ fontSize: '0.58rem', padding: '0.1rem 0.4rem' }}>
+                {config.badge}
               </span>
+              <h4 style={{ fontSize: '0.92rem', fontWeight: 900, color: '#fff', margin: 0, fontFamily: 'var(--font-serif)' }}>
+                {config.title}
+              </h4>
             </div>
           </div>
 
           <button
             className="btn btn-secondary btn-icon"
-            style={{ width: '32px', height: '32px', padding: 0 }}
+            style={{ width: '28px', height: '28px', padding: 0 }}
             onClick={handleSkip}
             onMouseEnter={() => soundFx.playHover()}
-            title="Close Tutorial"
+            title="Skip Guidance"
           >
-            <X size={18} />
+            <X size={15} />
           </button>
         </div>
 
-        {/* Modal Main Content (2-Column Grid: Fortuna Portrait Left + Interactive Card Right) */}
-        <div className="fortuna-dialogue-grid">
-          {/* Left Column: Queen Fortuna NPC Visual Showcase */}
-          <div className="fortuna-portrait-container">
-            <div className="fortuna-divine-aura" />
-            <img
-              src={currentStep === 1 ? './assets/Fortuna-NPC-full-body.png' : './assets/Fortuna-NPC-torso.png'}
-              alt="Queen Fortuna"
-              className="fortuna-npc-img"
-            />
-            <div className="fortuna-badge-tag">
-              <Sparkles size={13} color="#facc15" />
-              <span>QUEEN FORTUNA</span>
-            </div>
-          </div>
-
-          {/* Right Column: Step Dialogue & Visual Demonstrations */}
-          <div className="fortuna-content-pane">
-            {/* Step 1: Welcome */}
-            {currentStep === 1 && (
-              <div className="step-pane-content">
-                <div className="step-tag-pill">GREETINGS WARRIOR</div>
-                <h2 className="step-title">HAIL, FIGHTER OF INVICTA!</h2>
-                <div className="dialogue-speech-box">
-                  <p>
-                    "I am <strong>Queen Fortuna</strong>—organizer of every arena war, ruler of these sands, and goddess of destiny!
-                  </p>
-                  <p style={{ marginTop: '0.6rem' }}>
-                    Though thousands fight for my favor, I personally welcome every new combatant worthy enough to hold steel. Step forward into glory!"
-                  </p>
-                </div>
-                <div className="step-perk-box">
-                  <Crown size={18} color="#facc15" />
-                  <span>"May fortune favor your blade on the sands of Rome!"</span>
-                </div>
-              </div>
-            )}
-
-            {/* Step 2: Odds & Math */}
-            {currentStep === 2 && (
-              <div className="step-pane-content">
-                <div className="step-tag-pill">STRATEGY & ODDS</div>
-                <h2 className="step-title">KNOW YOUR ODDS BEFORE YOU BLEED</h2>
-                <div className="dialogue-speech-box">
-                  <p>
-                    "A true champion fights with mind as well as blade! In the top navigation bar, tap the <strong>'Odds'</strong> button at any time.
-                  </p>
-                  <p style={{ marginTop: '0.5rem' }}>
-                    There you can inspect exact reel probabilities, symbol payouts, and our soft archetype counter triangle."
-                  </p>
-                </div>
-
-                {/* Simulated Header Button Visual */}
-                <div className="odds-demo-callout">
-                  <span className="demo-label">CLICK THIS BUTTON IN THE HEADER ANYTIME:</span>
-                  <div className="odds-button-mock pulse-glow">
-                    <BarChart2 size={16} color="#f59e0b" />
-                    <span>Odds</span>
-                    <Sparkles size={13} color="#facc15" />
-                  </div>
-                  <div className="odds-quick-stats">
-                    <span>🗡️ 35% Sword</span>
-                    <span>🛡️ 30% Shield</span>
-                    <span>⭐ 25% Class</span>
-                    <span>🃏 10% Wild</span>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Step 3: Armory & Archetypes */}
-            {currentStep === 3 && (
-              <div className="step-pane-content">
-                <div className="step-tag-pill">ARMORY & GEAR</div>
-                <h2 className="step-title">FORGE YOUR COMBAT IDENTITIY</h2>
-                <div className="dialogue-speech-box">
-                  <p>
-                    "Visit <strong>'MY GLADIATOR & GEAR'</strong> to select your archetype and equip armor.
-                  </p>
-                  <p style={{ marginTop: '0.5rem' }}>
-                    Choose between <strong>Murmillo</strong> (High Defense), <strong>Retiarius</strong> (Disruptor), or <strong>Thraex</strong> (Burst Damage). Equipping helmets and armor adds <strong>+HP</strong> directly to your fighter!"
-                  </p>
-                </div>
-
-                <div className="archetype-triad-preview">
-                  <div className="triad-card">
-                    <span className="triad-icon">🛡️</span>
-                    <span className="triad-name">Murmillo</span>
-                    <span className="triad-desc">Beats Net</span>
-                  </div>
-                  <div className="triad-card">
-                    <span className="triad-icon">🔱</span>
-                    <span className="triad-name">Retiarius</span>
-                    <span className="triad-desc">Beats Burst</span>
-                  </div>
-                  <div className="triad-card">
-                    <span className="triad-icon">🗡️</span>
-                    <span className="triad-name">Thraex</span>
-                    <span className="triad-desc">Beats Shield</span>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Step 4: Reel Mechanics */}
-            {currentStep === 4 && (
-              <div className="step-pane-content">
-                <div className="step-tag-pill">COMBAT RESOLUTION</div>
-                <h2 className="step-title">SPIN THE REELS OF DESTINY</h2>
-                <div className="dialogue-speech-box">
-                  <p>
-                    "Combat is resolved by spinning 3 Reels of Fate!
-                  </p>
-                  <p style={{ marginTop: '0.4rem' }}>
-                    Each turn, spin to strike damage, gain shield charges, or unleash your Class Special ability. Align 3 of a kind for a devastating <strong>Jackpot</strong>!"
-                  </p>
-                </div>
-
-                <div className="reels-symbols-preview">
-                  <div className="sym-preview-item">
-                    <img src="./assets/symbol_sword.png" alt="Sword" className="sym-img" />
-                    <span><strong>Sword</strong><br />Direct HP Damage</span>
-                  </div>
-                  <div className="sym-preview-item">
-                    <img src="./assets/symbol_shield.png" alt="Shield" className="sym-img" />
-                    <span><strong>Shield</strong><br />Block & Mitigate</span>
-                  </div>
-                  <div className="sym-preview-item">
-                    <img src="./assets/symbol_class.png" alt="Class" className="sym-img" />
-                    <span><strong>Class</strong><br />Special Ability</span>
-                  </div>
-                  <div className="sym-preview-item">
-                    <img src="./assets/symbol_wild.png" alt="Wild" className="sym-img" />
-                    <span><strong>Wild</strong><br />Morph Best Match</span>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Step 5: First Battle */}
-            {currentStep === 5 && (
-              <div className="step-pane-content">
-                <div className="step-tag-pill highlight-gold">READY FOR GLORY</div>
-                <h2 className="step-title">CLAIM YOUR FIRST VICTORY!</h2>
-                <div className="dialogue-speech-box">
-                  <p>
-                    "The roar of the Colosseum awaits you! Your first rival is ready in the scouting grounds.
-                  </p>
-                  <p style={{ marginTop: '0.5rem' }}>
-                    Step to the sands, spin the reels of fate, and let your name resound across Rome!"
-                  </p>
-                </div>
-
-                <div className="first-fight-cta-container">
-                  <button
-                    className="btn btn-primary pulse-btn-gold"
-                    style={{
-                      width: '100%',
-                      padding: '0.9rem 1.2rem',
-                      fontSize: '1.1rem',
-                      borderRadius: '16px',
-                    }}
-                    onClick={handleCompleteAndFight}
-                    onMouseEnter={() => soundFx.playHover()}
-                  >
-                    <Swords size={22} />
-                    <span>STEP INTO THE ARENA NOW</span>
-                    <ChevronRight size={20} />
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
+        {/* Dialogue Text */}
+        <div className="dialogue-speech-box" style={{ padding: '0.65rem 0.8rem', fontSize: '0.82rem', lineHeight: 1.38 }}>
+          {config.dialogue}
         </div>
 
-        {/* Modal Footer Controls */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '0.85rem 1.4rem',
-            background: 'rgba(0, 0, 0, 0.4)',
-            borderTop: '1px solid rgba(255, 255, 255, 0.1)',
-          }}
-        >
+        {/* Footer Navigation Bar */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '0.2rem' }}>
           {/* Step Dots */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-            {Array.from({ length: totalSteps }).map((_, idx) => (
+          <div style={{ display: 'flex', gap: '0.35rem' }}>
+            {[1, 2, 3, 4, 5].map((s) => (
               <div
-                key={idx}
+                key={s}
                 onClick={() => {
                   soundFx.playClick();
-                  setCurrentStep(idx + 1);
+                  setCurrentStep(s);
                 }}
-                className={`step-dot ${currentStep === idx + 1 ? 'active' : ''}`}
-                title={`Step ${idx + 1}`}
+                className={`step-dot ${currentStep === s ? 'active' : ''}`}
+                style={{ width: '8px', height: '8px' }}
               />
             ))}
           </div>
 
-          {/* Action Buttons */}
-          <div style={{ display: 'flex', gap: '0.6rem' }}>
+          {/* Buttons */}
+          <div style={{ display: 'flex', gap: '0.45rem' }}>
             {currentStep > 1 && (
               <button
                 className="btn btn-secondary"
-                style={{ padding: '0.45rem 0.9rem', fontSize: '0.82rem' }}
-                onClick={handlePrev}
+                style={{ padding: '0.3rem 0.65rem', fontSize: '0.74rem' }}
+                onClick={handlePrevStep}
                 onMouseEnter={() => soundFx.playHover()}
               >
-                <ChevronLeft size={16} />
+                <ChevronLeft size={14} />
                 <span>Back</span>
               </button>
             )}
 
             <button
               className="btn btn-secondary"
-              style={{ padding: '0.45rem 0.9rem', fontSize: '0.82rem' }}
+              style={{ padding: '0.3rem 0.65rem', fontSize: '0.74rem' }}
               onClick={handleSkip}
               onMouseEnter={() => soundFx.playHover()}
             >
               <span>Skip</span>
             </button>
 
-            {currentStep < totalSteps ? (
-              <button
-                className="btn btn-primary"
-                style={{ padding: '0.45rem 1.1rem', fontSize: '0.88rem' }}
-                onClick={handleNext}
-                onMouseEnter={() => soundFx.playHover()}
-              >
-                <span>Next</span>
-                <ChevronRight size={16} />
-              </button>
-            ) : (
-              <button
-                className="btn btn-primary"
-                style={{ padding: '0.45rem 1.1rem', fontSize: '0.88rem' }}
-                onClick={handleCompleteAndFight}
-                onMouseEnter={() => soundFx.playHover()}
-              >
-                <span>To Battle!</span>
-                <Swords size={16} />
-              </button>
-            )}
+            <button
+              className="btn btn-primary"
+              style={{ padding: '0.35rem 0.85rem', fontSize: '0.78rem' }}
+              onClick={handleNextStep}
+              onMouseEnter={() => soundFx.playHover()}
+            >
+              <span>{config.buttonLabel || 'Next'}</span>
+              <ChevronRight size={14} />
+            </button>
           </div>
         </div>
       </div>
