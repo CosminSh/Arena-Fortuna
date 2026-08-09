@@ -74,6 +74,37 @@ export const TargetSelectView: React.FC<TargetSelectViewProps> = ({
         </button>
       </div>
 
+      {/* Queen Fortuna Tactical Guidance Banner */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.65rem',
+          background: 'linear-gradient(90deg, rgba(245, 158, 11, 0.18) 0%, rgba(14, 18, 28, 0.85) 100%)',
+          border: '1px solid rgba(245, 158, 11, 0.4)',
+          borderRadius: '12px',
+          padding: '0.4rem 0.8rem',
+          flexShrink: 0,
+        }}
+      >
+        <img
+          src="./assets/Fortuna-NPC-torso.png"
+          alt="Queen Fortuna"
+          style={{
+            width: '32px',
+            height: '32px',
+            borderRadius: '50%',
+            objectFit: 'cover',
+            border: '1.5px solid #facc15',
+            boxShadow: '0 0 10px rgba(250, 204, 21, 0.6)',
+            flexShrink: 0,
+          }}
+        />
+        <div style={{ fontSize: '0.74rem', color: '#e5e7eb', lineHeight: 1.3 }}>
+          <strong style={{ color: '#facc15' }}>Queen Fortuna's Advice:</strong> "Choose your adversary wisely! Murmillo counters Retiarius, Retiarius counters Thraex, and Thraex counters Murmillo. Check the Monte Carlo Win Rate before challenging!"
+        </div>
+      </div>
+
       {/* 2x2 Target Cards Grid */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.6rem', flex: 1, maxHeight: 'calc(100vh - 110px)' }}>
         {activeTargets.map((enemy) => {

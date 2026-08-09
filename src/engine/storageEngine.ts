@@ -7,6 +7,7 @@ export interface PlayerProfile {
   level: number;
   highestStreak: number;
   currentStreak: number;
+  hasCompletedTutorial?: boolean;
 }
 
 const STORAGE_KEY = 'arena_reels_player_profile_v1';
@@ -20,6 +21,7 @@ const DEFAULT_PROFILE: PlayerProfile = {
   level: 1,
   highestStreak: 0,
   currentStreak: 0,
+  hasCompletedTutorial: false,
 };
 
 export function loadPlayerProfile(): PlayerProfile {
@@ -32,6 +34,7 @@ export function loadPlayerProfile(): PlayerProfile {
       ...parsed,
       playerName: parsed.playerName && parsed.playerName.trim() !== '' ? parsed.playerName.trim() : 'Imperator',
       level: Math.floor((parsed.exp || 0) / 300) + 1,
+      hasCompletedTutorial: parsed.hasCompletedTutorial ?? false,
     };
   } catch (e) {
     console.error('Failed to load profile from localStorage', e);
@@ -45,6 +48,16 @@ export function savePlayerProfile(profile: PlayerProfile): void {
   } catch (e) {
     console.error('Failed to save profile to localStorage', e);
   }
+}
+
+export function setTutorialCompleted(completed: boolean = true): PlayerProfile {
+  const current = loadPlayerProfile();
+  const updated: PlayerProfile = {
+    ...current,
+    hasCompletedTutorial: completed,
+  };
+  savePlayerProfile(updated);
+  return updated;
 }
 
 export function updatePlayerName(name: string): PlayerProfile {

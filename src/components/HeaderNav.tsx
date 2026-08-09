@@ -5,10 +5,11 @@ import { loadPlayerProfile, PlayerProfile } from '../engine/storageEngine';
 
 interface HeaderNavProps {
   onOpenProbabilityModal: () => void;
+  onOpenTutorial: () => void;
   onResetToHome: () => void;
 }
 
-export const HeaderNav: React.FC<HeaderNavProps> = ({ onOpenProbabilityModal, onResetToHome }) => {
+export const HeaderNav: React.FC<HeaderNavProps> = ({ onOpenProbabilityModal, onOpenTutorial, onResetToHome }) => {
   const [muted, setMuted] = useState(soundFx.getMuted());
   const [musicPlaying, setMusicPlaying] = useState(soundFx.getIsMusicPlaying());
   const [profile, setProfile] = useState<PlayerProfile>(() => loadPlayerProfile());
@@ -72,6 +73,24 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({ onOpenProbabilityModal, on
       </div>
 
       <div className="header-actions">
+        <button
+          className="header-btn"
+          onClick={() => {
+            soundFx.playClick();
+            onOpenTutorial();
+          }}
+          onMouseEnter={() => soundFx.playHover()}
+          title="Queen Fortuna's Gladiator Tutorial"
+          style={{ border: '1px solid rgba(250, 204, 21, 0.4)', background: 'rgba(250, 204, 21, 0.12)' }}
+        >
+          <img
+            src="./assets/Fortuna-NPC-torso.png"
+            alt="Queen Fortuna"
+            style={{ width: '22px', height: '22px', borderRadius: '50%', objectFit: 'cover', border: '1px solid #facc15' }}
+          />
+          <span style={{ color: '#facc15' }}>Guide</span>
+        </button>
+
         <button
           className="header-btn"
           onClick={() => {

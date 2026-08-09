@@ -469,6 +469,39 @@ export const BattleView: React.FC<BattleViewProps> = ({
         </label>
       </div>
 
+      {/* Queen Fortuna Early Combat Blessing Banner */}
+      {turn <= 2 && (
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.55rem',
+            background: 'linear-gradient(90deg, rgba(245, 158, 11, 0.15) 0%, rgba(10, 14, 22, 0.85) 100%)',
+            border: '1px solid rgba(245, 158, 11, 0.35)',
+            borderRadius: '12px',
+            padding: '0.3rem 0.7rem',
+            maxWidth: '560px',
+            flexShrink: 0,
+          }}
+        >
+          <img
+            src="./assets/Fortuna-NPC-torso.png"
+            alt="Queen Fortuna"
+            style={{
+              width: '26px',
+              height: '26px',
+              borderRadius: '50%',
+              objectFit: 'cover',
+              border: '1px solid #facc15',
+              flexShrink: 0,
+            }}
+          />
+          <span style={{ fontSize: '0.72rem', color: '#e5e7eb' }}>
+            <strong style={{ color: '#facc15' }}>Fortuna's Blessing:</strong> "Spin the Reels of Fate! Align 3 matching symbols for a Jackpot, or collect Shields to absorb incoming strikes!"
+          </span>
+        </div>
+      )}
+
       {/* MOBILE COMPACT VERSUS HEADER STRIP (< 820px) */}
       <div className="mobile-versus-strip">
         <div className="mobile-fighter-col player">

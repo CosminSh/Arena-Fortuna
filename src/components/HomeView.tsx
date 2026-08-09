@@ -9,9 +9,10 @@ interface HomeViewProps {
   onOpenGladiatorHub: () => void;
   onOpenMath: () => void;
   onOpenLeaderboard: () => void;
+  onOpenTutorial: () => void;
 }
 
-export const HomeView: React.FC<HomeViewProps> = ({ onStartWar, onOpenGladiatorHub, onOpenMath, onOpenLeaderboard }) => {
+export const HomeView: React.FC<HomeViewProps> = ({ onStartWar, onOpenGladiatorHub, onOpenMath, onOpenLeaderboard, onOpenTutorial }) => {
   const profile = loadPlayerProfile();
 
   const teammates = [
@@ -170,6 +171,19 @@ export const HomeView: React.FC<HomeViewProps> = ({ onStartWar, onOpenGladiatorH
 
       {/* Bottom Quick Action Buttons */}
       <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+        <button
+          className="btn btn-secondary"
+          style={{ fontSize: '0.75rem', padding: '0.35rem 0.85rem', borderColor: 'var(--color-gold)', background: 'rgba(250, 204, 21, 0.1)' }}
+          onClick={() => {
+            soundFx.playClick();
+            onOpenTutorial();
+          }}
+          onMouseEnter={() => soundFx.playHover()}
+        >
+          <img src="./assets/Fortuna-NPC-torso.png" alt="Queen Fortuna" style={{ width: '16px', height: '16px', borderRadius: '50%', objectFit: 'cover' }} />
+          <span style={{ color: '#facc15' }}>Queen Fortuna's Guidance</span>
+        </button>
+
         <button
           className="btn btn-secondary"
           style={{ fontSize: '0.75rem', padding: '0.35rem 0.85rem' }}

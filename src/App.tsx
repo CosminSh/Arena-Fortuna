@@ -8,6 +8,7 @@ import { BattleView } from './components/BattleView';
 import { ResultModal } from './components/ResultModal';
 import { ProbabilityModal } from './components/ProbabilityModal';
 import { HouseLeaderboardModal } from './components/HouseLeaderboardModal';
+import { FortunaTutorialModal } from './components/FortunaTutorialModal';
 import { BackgroundParticles } from './components/BackgroundParticles';
 import { ArchetypeId, Gladiator, BattleState, GearItem } from './types/game';
 import { ARCHETYPES } from './engine/mathEngine';
@@ -24,6 +25,10 @@ export const App: React.FC = () => {
   const [battleState, setBattleState] = useState<BattleState | null>(null);
   const [showProbabilityModal, setShowProbabilityModal] = useState<boolean>(false);
   const [showLeaderboardModal, setShowLeaderboardModal] = useState<boolean>(false);
+  const [showTutorialModal, setShowTutorialModal] = useState<boolean>(() => {
+    const profile = loadPlayerProfile();
+    return !profile.hasCompletedTutorial;
+  });
 
   useEffect(() => {
     const handleFirstInteraction = () => {
@@ -45,7 +50,9 @@ export const App: React.FC = () => {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        if (showProbabilityModal) {
+        if (showTutorialModal) {
+          setShowTutorialModal(false);
+        } else if (showProbabilityModal) {
           setShowProbabilityModal(false);
         } else if (showLeaderboardModal) {
           setShowLeaderboardModal(false);
@@ -54,7 +61,7 @@ export const App: React.FC = () => {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [showProbabilityModal, showLeaderboardModal]);
+  }, [showTutorialModal, showProbabilityModal, showLeaderboardModal]);
 
   const handleStartWar = () => {
     soundFx.playClick();
@@ -143,6 +150,7 @@ export const App: React.FC = () => {
       <div className="app-container">
         <HeaderNav
           onOpenProbabilityModal={() => setShowProbabilityModal(true)}
+          onOpenTutorial={() => setShowTutorialModal(true)}
           onResetToHome={handleReturnHome}
         />
 
@@ -153,6 +161,7 @@ export const App: React.FC = () => {
               onOpenGladiatorHub={() => setViewMode('gladiator')}
               onOpenMath={() => setShowProbabilityModal(true)}
               onOpenLeaderboard={() => setShowLeaderboardModal(true)}
+              onOpenTutorial={() => setShowTutorialModal(true)}
             />
           )}
 
@@ -188,6 +197,14 @@ export const App: React.FC = () => {
             />
           )}
         </main>
+
+        {/* Queen Fortuna Tutorial Modal Overlay */}
+        {showTutorialModal && (
+          <FortunaTutorialModal
+            onClose={() => setShowTutorialModal(false)}
+            onStartFirstFight={handleStartWar}
+          />
+        )}
 
         {/* Result Modal Overlay */}
         {battleState && (
