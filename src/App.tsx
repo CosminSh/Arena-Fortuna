@@ -194,6 +194,7 @@ export const App: React.FC = () => {
               playerGladiator={createPlayerGladiator()}
               enemyGladiator={selectedEnemy}
               onFinishBattle={handleFinishBattle}
+              onUpdateEquippedGear={setEquippedGear}
             />
           )}
         </main>

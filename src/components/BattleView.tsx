@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
-import { Gladiator, SymbolType, BattleState, TurnOutcome } from '../types/game';
-import { ARCHETYPES, spinReels, resolveTurn } from '../engine/mathEngine';
+import { Gladiator, SymbolType, BattleState, TurnOutcome, GearItem } from '../types/game';
+import { ARCHETYPES, spinReels, resolveTurn, AVAILABLE_GEAR } from '../engine/mathEngine';
 import { soundFx } from '../engine/audioEngine';
 import { triggerGladiatorArenaSparks } from '../engine/arenaParticles';
-import { Swords, Shield, RefreshCw, Zap, ChevronDown, ChevronUp, AlertTriangle, Bot, Info, Flame, HelpCircle, X } from 'lucide-react';
+import { Swords, Shield, RefreshCw, Zap, ChevronDown, ChevronUp, AlertTriangle, Bot, Info, Flame, HelpCircle, X, Sparkles, Check, Wrench } from 'lucide-react';
 
 interface BattleViewProps {
   playerGladiator: Gladiator;
   enemyGladiator: Gladiator;
   onFinishBattle: (state: BattleState) => void;
+  onUpdateEquippedGear?: (gear: { weapon?: GearItem; armor?: GearItem; crest?: GearItem }) => void;
 }
 
 type TurnPhase = 'player_ready' | 'player_spinning' | 'enemy_spinning';
@@ -24,6 +25,7 @@ export const BattleView: React.FC<BattleViewProps> = ({
   playerGladiator: initialPlayer,
   enemyGladiator: initialEnemy,
   onFinishBattle,
+  onUpdateEquippedGear,
 }) => {
   const [player, setPlayer] = useState<Gladiator>({ ...initialPlayer });
   const [enemy, setEnemy] = useState<Gladiator>({ ...initialEnemy });
@@ -49,9 +51,39 @@ export const BattleView: React.FC<BattleViewProps> = ({
   const [isShaking, setIsShaking] = useState<boolean>(false);
   const [showLogDrawer, setShowLogDrawer] = useState<boolean>(false);
   const [showPaytableModal, setShowPaytableModal] = useState<boolean>(false);
+  const [showQuickGearModal, setShowQuickGearModal] = useState<boolean>(false);
 
   const playerArch = ARCHETYPES[player.archetypeId];
   const enemyArch = ARCHETYPES[enemy.archetypeId];
+
+  const handleEquipItemInBattle = (item: GearItem) => {
+    soundFx.playClick();
+    const slot = item.slot;
+    const currentEquipped = player.equippedGear || {};
+    const isEquipped = currentEquipped[slot]?.id === item.id;
+
+    const newEquipped = {
+      ...currentEquipped,
+      [slot]: isEquipped ? undefined : item,
+    };
+
+    const oldHpBonus = (currentEquipped.armor?.hpBonus || 0) + (currentEquipped.crest?.hpBonus || 0);
+    const newHpBonus = (newEquipped.armor?.hpBonus || 0) + (newEquipped.crest?.hpBonus || 0);
+    const hpDiff = newHpBonus - oldHpBonus;
+    const newMaxHp = Math.max(50, 100 + newHpBonus);
+    const newCurrentHp = Math.max(1, Math.min(newMaxHp, player.currentHp + hpDiff));
+
+    setPlayer((prev) => ({
+      ...prev,
+      maxHp: newMaxHp,
+      currentHp: newCurrentHp,
+      equippedGear: newEquipped,
+    }));
+
+    if (onUpdateEquippedGear) {
+      onUpdateEquippedGear(newEquipped);
+    }
+  };
 
   // Auto Battle spectator mode loop
   React.useEffect(() => {
@@ -421,6 +453,22 @@ export const BattleView: React.FC<BattleViewProps> = ({
           </div>
         )}
 
+        {/* Quick Gear Shortcut Button */}
+        <button
+          className="header-btn"
+          onClick={() => {
+            soundFx.playClick();
+            setShowQuickGearModal(true);
+          }}
+          onMouseEnter={() => soundFx.playHover()}
+          style={{ height: '32px', fontSize: '0.75rem', borderColor: '#10b981', background: 'rgba(16, 185, 129, 0.15)', color: '#10b981' }}
+          title="Change Gladiator Gear Loadout Live"
+        >
+          <Wrench size={14} color="#10b981" />
+          <span>CHANGE GEAR</span>
+          <Sparkles size={12} color="#facc15" />
+        </button>
+
         {/* Paytable & EV Info Button */}
         <button
           className="header-btn"
@@ -567,6 +615,20 @@ export const BattleView: React.FC<BattleViewProps> = ({
               <span>{player.shieldCharges} SHIELD ARMOR</span>
             </div>
           )}
+
+          {/* Quick Gear Shortcut Button on Player Card */}
+          <button
+            className="btn btn-secondary"
+            style={{ padding: '0.22rem 0.6rem', fontSize: '0.68rem', marginTop: '0.45rem', borderColor: '#10b981', background: 'rgba(16, 185, 129, 0.12)', color: '#10b981' }}
+            onClick={() => {
+              soundFx.playClick();
+              setShowQuickGearModal(true);
+            }}
+            onMouseEnter={() => soundFx.playHover()}
+          >
+            <Wrench size={12} color="#10b981" />
+            <span>SWAP GEAR</span>
+          </button>
         </div>
 
         {/* Centerpiece Grand Casino Slot Cabinet */}
@@ -957,6 +1019,193 @@ export const BattleView: React.FC<BattleViewProps> = ({
           </div>
         </div>
       )}
+      {/* QUICK GEAR LOADOUT DRAWER MODAL OVERLAY */}
+      {showQuickGearModal && (() => {
+        const equipped = player.equippedGear || {};
+        const totalDmgBonus = (equipped.weapon?.damageBonus || 0) + (equipped.crest?.damageBonus || 0);
+        const totalShieldBonus = (equipped.armor?.shieldBonus || 0) + (equipped.crest?.shieldBonus || 0);
+        const totalHpBonus = (equipped.armor?.hpBonus || 0) + (equipped.crest?.hpBonus || 0);
+
+        return (
+          <div className="modal-overlay" style={{ zIndex: 9999, background: 'rgba(4, 6, 12, 0.88)', backdropFilter: 'blur(10px)' }}>
+            <div
+              className="modal-content"
+              style={{
+                borderColor: '#10b981',
+                textAlign: 'left',
+                maxWidth: '620px',
+                padding: '1.4rem',
+                position: 'relative',
+                boxShadow: '0 25px 70px rgba(0, 0, 0, 0.98), 0 0 45px rgba(16, 185, 129, 0.3)',
+              }}
+            >
+              <button
+                onClick={() => {
+                  soundFx.playClick();
+                  setShowQuickGearModal(false);
+                }}
+                style={{
+                  position: 'absolute',
+                  top: '14px',
+                  right: '14px',
+                  background: 'rgba(255,255,255,0.08)',
+                  border: '1px solid rgba(255,255,255,0.2)',
+                  borderRadius: '50%',
+                  width: '32px',
+                  height: '32px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#fff',
+                  cursor: 'pointer',
+                }}
+                onMouseEnter={() => soundFx.playHover()}
+              >
+                <X size={18} />
+              </button>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.2rem' }}>
+                <Wrench size={22} color="#10b981" />
+                <h2 style={{ fontSize: '1.3rem', color: '#10b981', margin: 0, fontFamily: 'var(--font-serif)' }}>
+                  QUICK GEAR LOADOUT
+                </h2>
+              </div>
+              <p style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', marginBottom: '0.8rem' }}>
+                Equip weapons, armor, and crests live in combat to dynamically alter your Health and attack power.
+              </p>
+
+              {/* Dynamic Stats Banner */}
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(3, 1fr)',
+                  gap: '0.5rem',
+                  background: 'rgba(16, 185, 129, 0.1)',
+                  border: '1px solid #10b981',
+                  borderRadius: '12px',
+                  padding: '0.6rem 0.8rem',
+                  marginBottom: '1rem',
+                  textAlign: 'center',
+                }}
+              >
+                <div>
+                  <span style={{ fontSize: '0.64rem', color: 'var(--color-text-muted)', fontWeight: 800, textTransform: 'uppercase' }}>MAX HEALTH</span>
+                  <div style={{ fontSize: '1.1rem', fontWeight: 900, color: '#10b981' }}>{player.maxHp} HP</div>
+                  <span style={{ fontSize: '0.62rem', color: '#10b981' }}>(+{totalHpBonus} Gear Bonus)</span>
+                </div>
+                <div>
+                  <span style={{ fontSize: '0.64rem', color: 'var(--color-text-muted)', fontWeight: 800, textTransform: 'uppercase' }}>BONUS DAMAGE</span>
+                  <div style={{ fontSize: '1.1rem', fontWeight: 900, color: '#f59e0b' }}>+{totalDmgBonus} Dmg</div>
+                  <span style={{ fontSize: '0.62rem', color: '#f59e0b' }}>(Strikes & Sword Rolls)</span>
+                </div>
+                <div>
+                  <span style={{ fontSize: '0.64rem', color: 'var(--color-text-muted)', fontWeight: 800, textTransform: 'uppercase' }}>SHIELD ARMOR</span>
+                  <div style={{ fontSize: '1.1rem', fontWeight: 900, color: '#60a5fa' }}>+{totalShieldBonus} Armor</div>
+                  <span style={{ fontSize: '0.62rem', color: '#60a5fa' }}>(Shield Roll Boost)</span>
+                </div>
+              </div>
+
+              {/* Gear Selection Slots */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxHeight: '50vh', overflowY: 'auto', paddingRight: '0.4rem' }}>
+                {(['weapon', 'armor', 'crest'] as const).map((slotType) => {
+                  const itemsInSlot = AVAILABLE_GEAR.filter((g) => g.slot === slotType);
+                  const currentlyEquippedItem = equipped[slotType];
+                  const slotTitle = slotType === 'weapon' ? '🗡️ WEAPON SLOT' : slotType === 'armor' ? '🛡️ ARMOR SLOT' : '👑 CREST SLOT';
+
+                  return (
+                    <div key={slotType} style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '14px', padding: '0.75rem' }}>
+                      <div style={{ fontSize: '0.75rem', fontWeight: 900, color: 'var(--color-gold)', letterSpacing: '0.08em', marginBottom: '0.55rem' }}>
+                        {slotTitle}
+                      </div>
+
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: '0.5rem' }}>
+                        {itemsInSlot.map((item) => {
+                          const isSelected = currentlyEquippedItem?.id === item.id;
+                          return (
+                            <div
+                              key={item.id}
+                              onClick={() => handleEquipItemInBattle(item)}
+                              onMouseEnter={() => soundFx.playHover()}
+                              style={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                justifyContent: 'space-between',
+                                background: isSelected ? 'rgba(16, 185, 129, 0.18)' : 'rgba(0, 0, 0, 0.4)',
+                                border: `1.5px solid ${isSelected ? '#10b981' : 'rgba(255, 255, 255, 0.15)'}`,
+                                borderRadius: '10px',
+                                padding: '0.55rem',
+                                cursor: 'pointer',
+                                transition: 'all 0.15s ease-in-out',
+                                boxShadow: isSelected ? '0 0 14px rgba(16, 185, 129, 0.4)' : 'none',
+                              }}
+                            >
+                              <div>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.2rem' }}>
+                                  <span style={{ fontSize: '1.2rem' }}>{item.icon}</span>
+                                  <span style={{ fontSize: '0.58rem', fontWeight: 900, color: isSelected ? '#10b981' : 'var(--color-gold)', background: 'rgba(0,0,0,0.5)', padding: '0.1rem 0.35rem', borderRadius: '4px' }}>
+                                    {item.rarity}
+                                  </span>
+                                </div>
+                                <div style={{ fontSize: '0.78rem', fontWeight: 900, color: isSelected ? '#10b981' : '#fff', lineHeight: 1.2 }}>
+                                  {item.name}
+                                </div>
+                                <div style={{ fontSize: '0.68rem', fontWeight: 800, color: '#facc15', margin: '0.2rem 0' }}>
+                                  {item.statBonus}
+                                </div>
+                                <div style={{ fontSize: '0.64rem', color: 'var(--color-text-muted)', lineHeight: 1.2 }}>
+                                  {item.description}
+                                </div>
+                              </div>
+
+                              <button
+                                className={`btn ${isSelected ? 'btn-primary' : 'btn-secondary'}`}
+                                style={{
+                                  width: '100%',
+                                  padding: '0.25rem',
+                                  fontSize: '0.68rem',
+                                  marginTop: '0.4rem',
+                                  borderRadius: '6px',
+                                  background: isSelected ? '#10b981' : 'rgba(255,255,255,0.08)',
+                                  borderColor: isSelected ? '#34d399' : 'rgba(255,255,255,0.2)',
+                                  color: isSelected ? '#000' : '#fff',
+                                }}
+                              >
+                                {isSelected ? (
+                                  <>
+                                    <Check size={12} />
+                                    <span>EQUIPPED</span>
+                                  </>
+                                ) : (
+                                  <span>EQUIP</span>
+                                )}
+                              </button>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div style={{ marginTop: '0.9rem', textAlign: 'center' }}>
+                <button
+                  className="btn btn-primary"
+                  style={{ width: '100%', padding: '0.7rem', fontSize: '0.95rem', borderRadius: '12px', background: '#10b981', borderColor: '#34d399', color: '#000' }}
+                  onClick={() => {
+                    soundFx.playClick();
+                    setShowQuickGearModal(false);
+                  }}
+                  onMouseEnter={() => soundFx.playHover()}
+                >
+                  <Check size={18} />
+                  <span>APPLY LOADOUT & RETURN TO BATTLE</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 };

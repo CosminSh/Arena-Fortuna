@@ -151,29 +151,33 @@ export const TargetSelectView: React.FC<TargetSelectViewProps> = ({
                 onSelectTarget(enemy);
               }}
             >
-              {/* Gear Badge Indicator */}
-              {hasEquippedGear && (
-                <div
-                  style={{
-                    position: 'absolute',
-                    top: '6px',
-                    right: '6px',
-                    background: 'rgba(245, 158, 11, 0.2)',
-                    border: '1px solid var(--color-gold)',
-                    borderRadius: '6px',
-                    padding: '0.15rem 0.35rem',
-                    fontSize: '0.6rem',
-                    fontWeight: 800,
-                    color: 'var(--color-gold)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.2rem',
-                  }}
-                >
-                  <Sparkles size={10} />
-                  <span>ARMORED</span>
-                </div>
-              )}
+              {/* Class & Gear Badges */}
+              <div style={{ position: 'absolute', top: '6px', right: '6px', display: 'flex', gap: '0.25rem', flexWrap: 'wrap', justifyContent: 'flex-end', maxWidth: '80%' }}>
+                {/* Unique Class Archetype Tag */}
+                {enemy.archetypeId === 'murmillo' && (
+                  <span style={{ fontSize: '0.58rem', fontWeight: 900, color: '#60a5fa', background: 'rgba(59, 130, 246, 0.25)', border: '1px solid #3b82f6', borderRadius: '6px', padding: '0.15rem 0.35rem', whiteSpace: 'nowrap' }}>
+                    🛡️ SHIELD TANK
+                  </span>
+                )}
+                {enemy.archetypeId === 'retiarius' && (
+                  <span style={{ fontSize: '0.58rem', fontWeight: 900, color: '#c084fc', background: 'rgba(168, 85, 247, 0.25)', border: '1px solid #a855f7', borderRadius: '6px', padding: '0.15rem 0.35rem', whiteSpace: 'nowrap' }}>
+                    🕸️ NET DISRUPTOR
+                  </span>
+                )}
+                {enemy.archetypeId === 'thraex' && (
+                  <span style={{ fontSize: '0.58rem', fontWeight: 900, color: '#f87171', background: 'rgba(239, 68, 68, 0.25)', border: '1px solid #ef4444', borderRadius: '6px', padding: '0.15rem 0.35rem', whiteSpace: 'nowrap' }}>
+                    🗡️ SICA BURSTER
+                  </span>
+                )}
+
+                {/* Separate Gear Indicator */}
+                {hasEquippedGear && (
+                  <span style={{ fontSize: '0.58rem', fontWeight: 900, color: '#facc15', background: 'rgba(245, 158, 11, 0.2)', border: '1px solid var(--color-gold)', borderRadius: '6px', padding: '0.15rem 0.35rem', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: '0.15rem' }}>
+                    <Sparkles size={9} />
+                    <span>ARMORED</span>
+                  </span>
+                )}
+              </div>
 
               {/* Avatar & Info */}
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
