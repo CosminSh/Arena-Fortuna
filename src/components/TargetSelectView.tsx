@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Gladiator, GearItem } from '../types/game';
 import { ARCHETYPES, getRandomScoutingTargets, simulateMatchup, AVAILABLE_GEAR, getGearStats } from '../engine/mathEngine';
 import { soundFx } from '../engine/audioEngine';
@@ -45,14 +45,34 @@ export const TargetSelectView: React.FC<TargetSelectViewProps> = ({
     }
   };
 
-  // Run Monte Carlo combat simulations for active targets (re-evaluates live when gear is changed!)
-  const simResults = useMemo(() => {
-    const results: Record<string, { winRate: number; avgTurns: number }> = {};
-    activeTargets.forEach((enemy) => {
-      const { playerWinRate, averageTurns } = simulateMatchup(playerGladiator, enemy, 500);
-      results[enemy.id] = { winRate: playerWinRate, avgTurns: averageTurns };
-    });
-    return results;
+  const [simResults, setSimResults] = useState<Record<string, { winRate: number; avgTurns: number }>>({});
+  const [isSimulating, setIsSimulating] = useState<boolean>(true);
+
+  // Run Monte Carlo combat simulations off the main thread via Web Worker
+  useEffect(() => {
+    setIsSimulating(true);
+    let worker: Worker | null = null;
+    try {
+      worker = new Worker(new URL('../workers/simulationWorker.ts', import.meta.url), { type: 'module' });
+      worker.onmessage = (e) => {
+        setSimResults(e.data);
+        setIsSimulating(false);
+      };
+      worker.postMessage({ player: playerGladiator, targets: activeTargets, simulations: 500 });
+    } catch {
+      // Fallback if Web Worker is restricted or unsupported
+      const results: Record<string, { winRate: number; avgTurns: number }> = {};
+      activeTargets.forEach((enemy) => {
+        const { playerWinRate, averageTurns } = simulateMatchup(playerGladiator, enemy, 500);
+        results[enemy.id] = { winRate: playerWinRate, avgTurns: averageTurns };
+      });
+      setSimResults(results);
+      setIsSimulating(false);
+    }
+
+    return () => {
+      if (worker) worker.terminate();
+    };
   }, [playerGladiator, activeTargets]);
 
   return (

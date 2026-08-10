@@ -1,8 +1,10 @@
 # Arena Fortuna — Tactical Gladiator Slot Combat
 
 [![Live Demo](https://img.shields.io/badge/🎮%20Play%20Live%20Demo-Arena%20Fortuna-gold?style=for-the-badge&logo=github)](https://cosminsh.github.io/Arena-Fortuna/)
+[![License: All Rights Reserved](https://img.shields.io/badge/License-All_Rights_Reserved-red.svg?style=for-the-badge)](LICENSE)
 
 > 🎮 **Live Demo:** [Play Arena Fortuna Vertical Slice Online](https://cosminsh.github.io/Arena-Fortuna/)  
+> 🎬 **Evaluator Demo Script:** [60–90 Second Interactive Demo Guide](./PRESENTATION.md)  
 > 📜 **Game Design Document:** [Arena Fortuna GDD (Vertical Slice & Full Game Vision)](./Arena_Fortuna_GDD.md)
 
 ---

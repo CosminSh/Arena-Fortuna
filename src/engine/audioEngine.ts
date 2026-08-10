@@ -15,7 +15,7 @@ class AudioEngine {
       `${cleanBase}music/${filename}`,
       `./music/${filename}`,
       `music/${filename}`,
-      `/Arena-Reels/music/${filename}`,
+      `/Arena-Fortuna/music/${filename}`,
     ];
   }
 
