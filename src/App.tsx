@@ -151,6 +151,7 @@ export const App: React.FC = () => {
         <HeaderNav
           onOpenProbabilityModal={() => setShowProbabilityModal(true)}
           onOpenTutorial={() => setShowTutorialModal(true)}
+          onOpenLeaderboard={() => setShowLeaderboardModal(true)}
           onResetToHome={handleReturnHome}
           currentViewMode={viewMode}
         />

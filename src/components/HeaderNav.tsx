@@ -1,24 +1,44 @@
 import React, { useState, useEffect } from 'react';
-import { Volume2, VolumeX, Music, BarChart2, Shield } from 'lucide-react';
+import { Volume2, VolumeX, Music, BarChart2, Trophy, Maximize2, Minimize2 } from 'lucide-react';
 import { soundFx } from '../engine/audioEngine';
 import { loadPlayerProfile, PlayerProfile } from '../engine/storageEngine';
 
 interface HeaderNavProps {
   onOpenProbabilityModal: () => void;
   onOpenTutorial: () => void;
+  onOpenLeaderboard: () => void;
   onResetToHome: () => void;
   currentViewMode?: string;
 }
 
-export const HeaderNav: React.FC<HeaderNavProps> = ({ onOpenProbabilityModal, onOpenTutorial, onResetToHome, currentViewMode = 'home' }) => {
+export const HeaderNav: React.FC<HeaderNavProps> = ({
+  onOpenProbabilityModal,
+  onOpenTutorial,
+  onOpenLeaderboard,
+  onResetToHome,
+  currentViewMode = 'home',
+}) => {
   const [muted, setMuted] = useState(soundFx.getMuted());
   const [musicPlaying, setMusicPlaying] = useState(soundFx.getIsMusicPlaying());
+  const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
   const [profile, setProfile] = useState<PlayerProfile>(() => loadPlayerProfile());
 
   useEffect(() => {
     const handleStorageChange = () => setProfile(loadPlayerProfile());
     window.addEventListener('storage', handleStorageChange);
     return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement || !!(document as any).webkitFullscreenElement);
+    };
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
+    };
   }, []);
 
   const handleToggleSound = () => {
@@ -32,6 +52,26 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({ onOpenProbabilityModal, on
     soundFx.playClick();
     const isNowActive = soundFx.toggleMusic();
     setMusicPlaying(isNowActive);
+  };
+
+  const handleToggleFullscreen = () => {
+    soundFx.playClick();
+    const doc = document as any;
+    const docEl = document.documentElement as any;
+
+    if (!doc.fullscreenElement && !doc.webkitFullscreenElement) {
+      if (docEl.requestFullscreen) {
+        docEl.requestFullscreen().catch(() => {});
+      } else if (docEl.webkitRequestFullscreen) {
+        docEl.webkitRequestFullscreen();
+      }
+    } else {
+      if (doc.exitFullscreen) {
+        doc.exitFullscreen().catch(() => {});
+      } else if (doc.webkitExitFullscreen) {
+        doc.webkitExitFullscreen();
+      }
+    }
   };
 
   return (
@@ -74,6 +114,23 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({ onOpenProbabilityModal, on
       </div>
 
       <div className="header-actions">
+        {/* House Leaderboard & Squad Button */}
+        <button
+          id="nav-leaderboard-btn"
+          className="header-btn"
+          onClick={() => {
+            soundFx.playClick();
+            onOpenLeaderboard();
+          }}
+          onMouseEnter={() => soundFx.playHover()}
+          title="House Leaderboard & Squad Standings"
+          style={{ border: '1px solid rgba(245, 158, 11, 0.4)', background: 'rgba(245, 158, 11, 0.1)' }}
+        >
+          <Trophy size={15} color="#f59e0b" />
+          <span className="hide-mobile-sm" style={{ color: '#f59e0b' }}>Rankings</span>
+        </button>
+
+        {/* Dynamic Contextual Help / Guide Button */}
         {(() => {
           let guideLabel = 'Guide';
           let guideTitle = "Queen Fortuna's Gladiator Tutorial & Guide";
@@ -105,11 +162,12 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({ onOpenProbabilityModal, on
                 alt="Queen Fortuna"
                 style={{ width: '22px', height: '22px', borderRadius: '50%', objectFit: 'cover', border: '1px solid #facc15' }}
               />
-              <span style={{ color: '#facc15' }}>{guideLabel}</span>
+              <span className="hide-mobile-xs" style={{ color: '#facc15' }}>{guideLabel}</span>
             </button>
           );
         })()}
 
+        {/* Combat Odds / Math Button */}
         <button
           id="nav-odds-btn"
           className="header-btn"
@@ -121,29 +179,40 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({ onOpenProbabilityModal, on
           title="Inspect Math & Symbol Probabilities"
         >
           <BarChart2 size={15} color="#f59e0b" />
-          <span>Odds</span>
+          <span className="hide-mobile-sm">Odds</span>
         </button>
 
+        {/* Background Music Toggle */}
         <button
           className="header-btn header-btn-icon"
           onClick={handleToggleMusic}
           onMouseEnter={() => soundFx.playHover()}
           title={musicPlaying ? 'Pause Background Music' : 'Play Background Music'}
         >
-          <Music size={16} color={musicPlaying ? '#facc15' : '#6b7280'} />
+          <Music size={15} color={musicPlaying ? '#facc15' : '#6b7280'} />
         </button>
 
+        {/* Master Sound FX Toggle */}
         <button
           className="header-btn header-btn-icon"
           onClick={handleToggleSound}
           onMouseEnter={() => soundFx.playHover()}
           title={muted ? 'Unmute Master Sound' : 'Mute Master Sound'}
         >
-          {muted ? <VolumeX size={16} color="#ef4444" /> : <Volume2 size={16} color="#10b981" />}
+          {muted ? <VolumeX size={15} color="#ef4444" /> : <Volume2 size={15} color="#10b981" />}
+        </button>
+
+        {/* Fullscreen Toggle Button */}
+        <button
+          id="nav-fullscreen-btn"
+          className="header-btn header-btn-icon"
+          onClick={handleToggleFullscreen}
+          onMouseEnter={() => soundFx.playHover()}
+          title={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
+        >
+          {isFullscreen ? <Minimize2 size={15} color="#facc15" /> : <Maximize2 size={15} color="#d1d5db" />}
         </button>
       </div>
     </header>
   );
 };
-
-
