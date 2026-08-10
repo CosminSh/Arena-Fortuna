@@ -152,6 +152,7 @@ export const App: React.FC = () => {
           onOpenProbabilityModal={() => setShowProbabilityModal(true)}
           onOpenTutorial={() => setShowTutorialModal(true)}
           onResetToHome={handleReturnHome}
+          currentViewMode={viewMode}
         />
 
         <main className="main-content">

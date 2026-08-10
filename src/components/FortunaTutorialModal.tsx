@@ -67,7 +67,17 @@ export const FortunaTutorialModal: React.FC<FortunaTutorialModalProps> = ({
   currentViewMode = 'home',
 }) => {
   const profile = loadPlayerProfile();
-  const [currentStep, setCurrentStep] = useState<number>(0); // 0 = Name Prompt Modal
+
+  // Initialize initial step contextually based on active scene
+  const getInitialStep = (): number => {
+    if (currentViewMode === 'battle') return 5;   // Jump straight to combat help
+    if (currentViewMode === 'target') return 4;   // Jump straight to scouting help
+    if (currentViewMode === 'gladiator') return 2;// Jump straight to armory help
+    if (!profile.playerName || profile.playerName === 'Imperator') return 0; // First-time name prompt
+    return 1;
+  };
+
+  const [currentStep, setCurrentStep] = useState<number>(() => getInitialStep());
   const [playerNameInput, setPlayerNameInput] = useState<string>(profile.playerName || 'Imperator');
 
   // Apply highlight spotlight pulse effect to active target element on DOM
@@ -107,6 +117,11 @@ export const FortunaTutorialModal: React.FC<FortunaTutorialModalProps> = ({
     soundFx.playClick();
     const config = TUTORIAL_STEPS[currentStep];
 
+    if (currentViewMode === 'battle' && currentStep === 5) {
+      handleComplete();
+      return;
+    }
+
     if (config?.action === 'navigate_target') {
       onStartFirstFight();
       setCurrentStep(4);
@@ -126,7 +141,6 @@ export const FortunaTutorialModal: React.FC<FortunaTutorialModalProps> = ({
 
   const handleSkip = () => {
     soundFx.playClick();
-    // Remove highlights
     document.querySelectorAll('.tutorial-highlight-pulse').forEach((el) => {
       el.classList.remove('tutorial-highlight-pulse');
     });
@@ -239,8 +253,36 @@ export const FortunaTutorialModal: React.FC<FortunaTutorialModalProps> = ({
     );
   }
 
-  // STEPS 1 to 5: Sleek Floating Speech Popover Box
-  const config = TUTORIAL_STEPS[currentStep] || TUTORIAL_STEPS[1];
+  // STEPS 1 to 5: Contextual Speech Popover Box
+  let stepConfig = TUTORIAL_STEPS[currentStep] || TUTORIAL_STEPS[1];
+
+  // Apply scene-specific contextual help overrides when opened in specialized view modes
+  if (currentViewMode === 'battle' && currentStep === 5) {
+    stepConfig = {
+      ...stepConfig,
+      badge: 'COMBAT HELP: REELS & TACTICS',
+      title: 'SLOT REELS & BATTLE RULES',
+      dialogue: 'Spin the 3 Reels of Fate! 🗡️ Swords deal damage, 🛡️ Shields absorb strikes, and 3 matching symbols trigger a Jackpot! Consecutive hits build a 🔥 STREAK multiplier (+5% per tier). Click PAYTABLE & EV on the slot cabinet for dynamic odds.',
+      buttonLabel: 'GOT IT! RETURN TO COMBAT',
+      action: 'complete',
+    };
+  } else if (currentViewMode === 'target' && currentStep === 4) {
+    stepConfig = {
+      ...stepConfig,
+      badge: 'SCOUTING HELP: MATCHUPS',
+      title: 'CHOOSE YOUR ADVERSARY',
+      dialogue: 'Scout your 4 rival targets! Check % Sim Win Rate badges (calculated via 500+ Monte Carlo simulations). Murmillo shield counters Retiarius net, Retiarius counters Thraex, and Thraex cuts Murmillo. Swap gear anytime to recalculate live odds!',
+      buttonLabel: 'GOT IT! RETURN TO SCOUTING',
+    };
+  } else if (currentViewMode === 'gladiator' && currentStep === 2) {
+    stepConfig = {
+      ...stepConfig,
+      badge: 'ARMORY HELP: GEAR & STATS',
+      title: 'GLADIATOR LOADOUTS',
+      dialogue: 'Equip your Weapons, Armor, and Crests before entering the arena! Gear bonuses (+Damage, +Shield, +Max HP) apply across all equipped items to boost combat output and scouting win rates.',
+      buttonLabel: 'GOT IT! RETURN TO ARMORY',
+    };
+  }
 
   return (
     <div
@@ -262,7 +304,7 @@ export const FortunaTutorialModal: React.FC<FortunaTutorialModalProps> = ({
         style={{
           pointerEvents: 'auto',
           width: '100%',
-          maxWidth: '420px',
+          maxWidth: '440px',
           background: 'linear-gradient(180deg, rgba(14, 18, 28, 0.96) 0%, rgba(6, 8, 14, 0.98) 100%)',
           border: '2px solid var(--color-gold)',
           borderRadius: '20px',
@@ -292,10 +334,10 @@ export const FortunaTutorialModal: React.FC<FortunaTutorialModalProps> = ({
             />
             <div>
               <span className="step-tag-pill" style={{ fontSize: '0.58rem', padding: '0.1rem 0.4rem' }}>
-                {config.badge}
+                {stepConfig.badge}
               </span>
               <h4 style={{ fontSize: '0.92rem', fontWeight: 900, color: '#fff', margin: 0, fontFamily: 'var(--font-serif)' }}>
-                {config.title}
+                {stepConfig.title}
               </h4>
             </div>
           </div>
@@ -305,7 +347,7 @@ export const FortunaTutorialModal: React.FC<FortunaTutorialModalProps> = ({
             style={{ width: '28px', height: '28px', padding: 0 }}
             onClick={handleSkip}
             onMouseEnter={() => soundFx.playHover()}
-            title="Skip Guidance"
+            title="Close Help"
           >
             <X size={15} />
           </button>
@@ -313,7 +355,7 @@ export const FortunaTutorialModal: React.FC<FortunaTutorialModalProps> = ({
 
         {/* Dialogue Text */}
         <div className="dialogue-speech-box" style={{ padding: '0.65rem 0.8rem', fontSize: '0.82rem', lineHeight: 1.38 }}>
-          {config.dialogue}
+          {stepConfig.dialogue}
         </div>
 
         {/* Footer Navigation Bar */}
@@ -353,7 +395,7 @@ export const FortunaTutorialModal: React.FC<FortunaTutorialModalProps> = ({
               onClick={handleSkip}
               onMouseEnter={() => soundFx.playHover()}
             >
-              <span>Skip</span>
+              <span>Close</span>
             </button>
 
             <button
@@ -362,7 +404,7 @@ export const FortunaTutorialModal: React.FC<FortunaTutorialModalProps> = ({
               onClick={handleNextStep}
               onMouseEnter={() => soundFx.playHover()}
             >
-              <span>{config.buttonLabel || 'Next'}</span>
+              <span>{stepConfig.buttonLabel || 'Next'}</span>
               <ChevronRight size={14} />
             </button>
           </div>
