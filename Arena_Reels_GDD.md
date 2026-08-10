@@ -1,4 +1,4 @@
-# Arena Reels — Game Design Document
+# Arena Fortuna — Game Design Document
 
 ## Document Overview
 This document covers two scopes:
@@ -120,7 +120,7 @@ The player wins the battle by reducing the enemy's health to zero before their o
 - Static daily war score or rank display.
 
 ## A11. Presentation Notes
-Label the build clearly as **“Arena Reels — PvP Guild War Concept Demo.”** Explain that the enemy is a premade or recorded opponent representing what would be another real player's async gladiator in the full game.
+Label the build clearly as **“Arena Fortuna — PvP Guild War Concept Demo.”** Explain that the enemy is a premade or recorded opponent representing what would be another real player's async gladiator in the full game.
 
 The prototype should demonstrate this experience:
 
@@ -138,7 +138,7 @@ The prototype should demonstrate this experience:
 # PART B: Full Game Vision
 
 ## B1. Concept
-**Arena Reels** is a PvP-only, asynchronous, guild-vs-guild RPG. Players join a **Gladiator House**, build a single gladiator, and fight in daily House Wars. Battles are resolved by a slot-machine combat system layered with archetype identity and light build customization. There is no PvE; the community itself is the difficulty curve.
+**Arena Fortuna** is a PvP-only, asynchronous, guild-vs-guild RPG. Players join a **Gladiator House**, build a single gladiator, and fight in daily House Wars. Battles are resolved by a slot-machine combat system layered with archetype identity and light build customization. There is no PvE; the community itself is the difficulty curve.
 
 ## B2. Design Pillars
 - **Agency within randomness:** builds and choices shape the odds; the slot decides the moment.

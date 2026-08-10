@@ -1,7 +1,7 @@
 import { spinReels, evaluateCombination } from '../src/engine/mathEngine';
 
 console.log('====================================================');
-console.log('  ARENA REELS — COMBAT SYMBOL PROBABILITY SIMULATOR');
+console.log('  ARENA FORTUNA — COMBAT SYMBOL PROBABILITY SIMULATOR');
 console.log('====================================================\n');
 
 const TOTAL_SPINS = 100_000;

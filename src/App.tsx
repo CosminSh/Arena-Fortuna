@@ -186,6 +186,7 @@ export const App: React.FC = () => {
               playerGladiator={createPlayerGladiator()}
               onSelectTarget={handleSelectTarget}
               onBack={() => setViewMode('home')}
+              onUpdateEquippedGear={setEquippedGear}
             />
           )}
 
@@ -194,7 +195,6 @@ export const App: React.FC = () => {
               playerGladiator={createPlayerGladiator()}
               enemyGladiator={selectedEnemy}
               onFinishBattle={handleFinishBattle}
-              onUpdateEquippedGear={setEquippedGear}
             />
           )}
         </main>
