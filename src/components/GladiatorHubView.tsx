@@ -25,7 +25,7 @@ export const GladiatorHubView: React.FC<GladiatorHubViewProps> = ({
   const arch = ARCHETYPES[selectedArchId];
 
   const handleSelectGear = (gear: GearItem) => {
-    soundFx.playClick();
+    soundFx.playEquip();
     setGearLoadout((prev) => ({
       ...prev,
       [gear.slot]: gear,

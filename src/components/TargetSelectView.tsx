@@ -33,7 +33,7 @@ export const TargetSelectView: React.FC<TargetSelectViewProps> = ({
   };
 
   const handleEquipItem = (item: GearItem) => {
-    soundFx.playClick();
+    soundFx.playEquip();
     const currentEquipped = playerGladiator.equippedGear || {};
     const isEquipped = currentEquipped[item.slot]?.id === item.id;
     const newEquipped = {
@@ -252,7 +252,7 @@ export const TargetSelectView: React.FC<TargetSelectViewProps> = ({
               }}
               onMouseEnter={() => soundFx.playHover()}
               onClick={() => {
-                soundFx.playClick();
+                soundFx.playTargetSelect();
                 onSelectTarget(enemy);
               }}
             >

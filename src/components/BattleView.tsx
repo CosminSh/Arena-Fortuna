@@ -85,7 +85,7 @@ export const BattleView: React.FC<BattleViewProps> = ({
   const handlePlayerSpin = () => {
     if (turnPhase !== 'player_ready' || player.currentHp <= 0 || enemy.currentHp <= 0 || turn > 8) return;
 
-    soundFx.playClick();
+    soundFx.playSpinStart();
     if (canReroll) {
       setCanReroll(false);
     }
