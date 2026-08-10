@@ -187,23 +187,25 @@ export function getGearStats(equippedGear?: { weapon?: GearItem; armor?: GearIte
 }
 
 export const ENEMY_GLADIATORS: Gladiator[] = [
-  // Tier 1 / House of the Golden Falcon
+  // --- TIER 1 / HOUSE OF THE GOLDEN FALCON ---
   {
     id: 'enemy_decimus',
     name: 'Decimus Iron-Wall',
     title: 'Champion of the 3rd Cohort',
     archetypeId: 'murmillo',
-    maxHp: 100,
-    currentHp: 100,
-    shieldCharges: 12,
+    maxHp: 125,
+    currentHp: 125,
+    shieldCharges: 16,
     houseName: 'House of the Golden Falcon',
     isPlayer: false,
     avatarUrl: './assets/murmillo.png',
-    buildDescription: 'Heavy defensive specialist. High shield mitigation.',
+    buildDescription: 'Heavy defensive specialist with gladius, scutum guard & mars crest.',
     wins: 14,
     losses: 2,
     equippedGear: {
-      armor: AVAILABLE_GEAR[3], // Imperial Scutum Guard
+      weapon: AVAILABLE_GEAR[0], // Gladius (+8 Dmg, +4 Shield)
+      armor: AVAILABLE_GEAR[3],  // Scutum Guard (+16 Shield, +10 HP)
+      crest: AVAILABLE_GEAR[7],  // Mars Crest (+10 Dmg, +5 HP)
     },
   },
   {
@@ -211,17 +213,18 @@ export const ENEMY_GLADIATORS: Gladiator[] = [
     name: 'Varia the Viper',
     title: 'The Unbroken Blade',
     archetypeId: 'thraex',
-    maxHp: 95,
-    currentHp: 95,
-    shieldCharges: 0,
+    maxHp: 110,
+    currentHp: 110,
+    shieldCharges: 4,
     houseName: 'House of the Golden Falcon',
     isPlayer: false,
     avatarUrl: './assets/thraex.png',
-    buildDescription: 'Aggressive armor-piercer focused on high direct damage.',
+    buildDescription: 'Aggressive armor-piercer with hooked sica & war crest.',
     wins: 18,
     losses: 5,
     equippedGear: {
-      weapon: AVAILABLE_GEAR[1], // Hooked Sica of Viper
+      weapon: AVAILABLE_GEAR[1], // Hooked Sica (+15 Dmg)
+      crest: AVAILABLE_GEAR[7],  // Warhorn Crest of Mars (+10 Dmg, +5 HP)
     },
   },
   {
@@ -229,17 +232,19 @@ export const ENEMY_GLADIATORS: Gladiator[] = [
     name: 'Batiatus Net-Master',
     title: 'The Pit Disruptor',
     archetypeId: 'retiarius',
-    maxHp: 90,
-    currentHp: 90,
-    shieldCharges: 5,
+    maxHp: 115,
+    currentHp: 115,
+    shieldCharges: 8,
     houseName: 'House of the Golden Falcon',
     isPlayer: false,
     avatarUrl: './assets/retiarius.png',
-    buildDescription: 'Disruptive crowd-pleaser using web control.',
+    buildDescription: 'Disruptive crowd-pleaser using weighted trident, galerus & mars crest.',
     wins: 11,
     losses: 4,
     equippedGear: {
-      weapon: AVAILABLE_GEAR[2], // Weighted Trident
+      weapon: AVAILABLE_GEAR[2], // Weighted Trident (+6 Dmg, +8 Shield, +10 HP)
+      armor: AVAILABLE_GEAR[5],  // Galerus (+8 Dmg, +10 Shield)
+      crest: AVAILABLE_GEAR[7],  // Mars Crest (+10 Dmg, +5 HP)
     },
   },
   {
@@ -247,39 +252,40 @@ export const ENEMY_GLADIATORS: Gladiator[] = [
     name: 'Flamma the Immortal',
     title: 'Arena Grandmaster',
     archetypeId: 'thraex',
-    maxHp: 110,
-    currentHp: 110,
-    shieldCharges: 15,
+    maxHp: 135,
+    currentHp: 135,
+    shieldCharges: 10,
     houseName: 'House of the Golden Falcon',
     isPlayer: false,
     avatarUrl: './assets/thraex.png',
-    buildDescription: 'Veteran arena champion with extra durability and deadly strikes.',
+    buildDescription: 'Veteran arena champion with sica & lorica hamata.',
     wins: 34,
     losses: 1,
     equippedGear: {
-      weapon: AVAILABLE_GEAR[0], // Gladius of Invicta
-      crest: AVAILABLE_GEAR[6], // Champion's Golden Laurel
+      weapon: AVAILABLE_GEAR[1], // Sica (+15 Dmg)
+      armor: AVAILABLE_GEAR[4],  // Lorica Hamata (+6 Shield, +25 HP)
     },
   },
 
-  // Tier 2 / Blood Sands Syndicate
+  // --- TIER 2 / BLOOD SANDS SYNDICATE ---
   {
     id: 'enemy_crixus',
     name: 'Crixus the Undefeated',
     title: 'Gaulic Heavy Wall',
     archetypeId: 'murmillo',
-    maxHp: 105,
-    currentHp: 105,
-    shieldCharges: 14,
+    maxHp: 135,
+    currentHp: 135,
+    shieldCharges: 18,
     houseName: 'Blood Sands Syndicate',
     isPlayer: false,
     avatarUrl: './assets/murmillo.png',
-    buildDescription: 'Fierce Gaulic warlord with reinforced Scutum shielding.',
+    buildDescription: 'Fierce Gaulic warlord with gladius, lorica hamata & mars crest.',
     wins: 22,
     losses: 3,
     equippedGear: {
-      weapon: AVAILABLE_GEAR[0],
-      armor: AVAILABLE_GEAR[4],
+      weapon: AVAILABLE_GEAR[0], // Gladius (+8 Dmg, +4 Shield)
+      armor: AVAILABLE_GEAR[4],  // Lorica Hamata (+6 Shield, +25 HP)
+      crest: AVAILABLE_GEAR[7],  // Mars Crest (+10 Dmg, +5 HP)
     },
   },
   {
@@ -287,18 +293,19 @@ export const ENEMY_GLADIATORS: Gladiator[] = [
     name: 'Spartacus the Breaker',
     title: 'Liberator of Capua',
     archetypeId: 'thraex',
-    maxHp: 105,
-    currentHp: 105,
-    shieldCharges: 4,
+    maxHp: 130,
+    currentHp: 130,
+    shieldCharges: 10,
     houseName: 'Blood Sands Syndicate',
     isPlayer: false,
     avatarUrl: './assets/thraex.png',
-    buildDescription: 'Master dual-blade fighter with rapid shield-stripping.',
+    buildDescription: 'Master dual-blade boss champion with full sica, galerus & mars crest (+33 Dmg).',
     wins: 40,
     losses: 0,
     equippedGear: {
-      weapon: AVAILABLE_GEAR[1], // Hooked Sica of Viper
-      crest: AVAILABLE_GEAR[7], // Warhorn Crest of Mars
+      weapon: AVAILABLE_GEAR[1], // Hooked Sica (+15 Dmg)
+      armor: AVAILABLE_GEAR[5],  // Galerus (+8 Dmg, +10 Shield)
+      crest: AVAILABLE_GEAR[7],  // Crest of Mars (+10 Dmg, +5 HP)
     },
   },
   {
@@ -306,18 +313,19 @@ export const ENEMY_GLADIATORS: Gladiator[] = [
     name: 'Gannicus the Shadow',
     title: 'Flamboyant Champion',
     archetypeId: 'retiarius',
-    maxHp: 95,
-    currentHp: 95,
-    shieldCharges: 8,
+    maxHp: 115,
+    currentHp: 115,
+    shieldCharges: 12,
     houseName: 'Blood Sands Syndicate',
     isPlayer: false,
     avatarUrl: './assets/retiarius.png',
-    buildDescription: 'High risk, high evasion net master.',
+    buildDescription: 'High risk evasion net master with weighted trident, galerus & mars crest.',
     wins: 28,
     losses: 6,
     equippedGear: {
-      weapon: AVAILABLE_GEAR[2],
-      armor: AVAILABLE_GEAR[5],
+      weapon: AVAILABLE_GEAR[2], // Trident (+6 Dmg, +8 Shield, +10 HP)
+      armor: AVAILABLE_GEAR[5],  // Galerus (+8 Dmg, +10 Shield)
+      crest: AVAILABLE_GEAR[7],  // Mars Crest (+10 Dmg, +5 HP)
     },
   },
   {
@@ -325,38 +333,40 @@ export const ENEMY_GLADIATORS: Gladiator[] = [
     name: 'Oenomaus the Doctore',
     title: 'Trainer of Gladiators',
     archetypeId: 'murmillo',
-    maxHp: 110,
-    currentHp: 110,
-    shieldCharges: 16,
+    maxHp: 150,
+    currentHp: 150,
+    shieldCharges: 22,
     houseName: 'Blood Sands Syndicate',
     isPlayer: false,
     avatarUrl: './assets/murmillo.png',
-    buildDescription: 'Impenetrable defense with mastery of counter-strike attrition.',
+    buildDescription: 'Impenetrable defense boss with scutum guard, aegis banner & gladius.',
     wins: 30,
     losses: 4,
     equippedGear: {
-      armor: AVAILABLE_GEAR[3], // Imperial Scutum Guard
-      crest: AVAILABLE_GEAR[8], // Aegis Banner
+      weapon: AVAILABLE_GEAR[0], // Gladius (+8 Dmg, +4 Shield)
+      armor: AVAILABLE_GEAR[3],  // Scutum Guard (+16 Shield, +10 HP)
+      crest: AVAILABLE_GEAR[6],  // Golden Laurel (+6 Dmg, +8 Shield, +12 HP)
     },
   },
 
-  // Tier 3 / Crimson Colosseum
+  // --- TIER 3 / CRIMSON COLOSSEUM ---
   {
     id: 'enemy_priscus',
     name: 'Priscus Net-Binder',
     title: 'Trident Specialist',
     archetypeId: 'retiarius',
-    maxHp: 88,
-    currentHp: 88,
-    shieldCharges: 6,
+    maxHp: 115,
+    currentHp: 115,
+    shieldCharges: 10,
     houseName: 'Crimson Colosseum',
     isPlayer: false,
     avatarUrl: './assets/retiarius.png',
-    buildDescription: 'Specializes in entangling nets and turn disruption.',
+    buildDescription: 'Specializes in entangling nets with trident & aegis banner.',
     wins: 15,
     losses: 7,
     equippedGear: {
-      weapon: AVAILABLE_GEAR[2],
+      weapon: AVAILABLE_GEAR[2], // Trident (+6 Dmg, +8 Shield, +10 HP)
+      crest: AVAILABLE_GEAR[8],  // Aegis Banner (+12 Shield, +15 HP)
     },
   },
   {
@@ -364,17 +374,18 @@ export const ENEMY_GLADIATORS: Gladiator[] = [
     name: 'Verus the Crimson',
     title: 'Colosseum Favorite',
     archetypeId: 'thraex',
-    maxHp: 98,
-    currentHp: 98,
-    shieldCharges: 2,
+    maxHp: 115,
+    currentHp: 115,
+    shieldCharges: 6,
     houseName: 'Crimson Colosseum',
     isPlayer: false,
     avatarUrl: './assets/thraex.png',
-    buildDescription: 'Crowd-favorite curved sica striker.',
+    buildDescription: 'Crowd-favorite striker with hooked sica & galerus.',
     wins: 19,
     losses: 8,
     equippedGear: {
-      weapon: AVAILABLE_GEAR[1],
+      weapon: AVAILABLE_GEAR[1], // Hooked Sica (+15 Dmg)
+      armor: AVAILABLE_GEAR[5],  // Galerus (+8 Dmg, +10 Shield)
     },
   },
   {
@@ -382,19 +393,19 @@ export const ENEMY_GLADIATORS: Gladiator[] = [
     name: 'Emperor Commodus',
     title: 'Self-Proclaimed Hercules',
     archetypeId: 'murmillo',
-    maxHp: 120,
-    currentHp: 120,
-    shieldCharges: 20,
+    maxHp: 152,
+    currentHp: 152,
+    shieldCharges: 25,
     houseName: 'Crimson Colosseum',
     isPlayer: false,
     avatarUrl: './assets/murmillo.png',
-    buildDescription: 'Equipped with royal gilded armor and massive durability.',
+    buildDescription: 'Supreme Imperial boss with gilded sica, scutum guard & golden laurel.',
     wins: 50,
     losses: 0,
     equippedGear: {
-      weapon: AVAILABLE_GEAR[0],
-      armor: AVAILABLE_GEAR[3],
-      crest: AVAILABLE_GEAR[6],
+      weapon: AVAILABLE_GEAR[1], // Sica (+15 Dmg)
+      armor: AVAILABLE_GEAR[3],  // Imperial Scutum Guard (+16 Shield, +10 HP)
+      crest: AVAILABLE_GEAR[6],  // Golden Laurel (+6 Dmg, +8 Shield, +12 HP)
     },
   },
   {
@@ -408,12 +419,13 @@ export const ENEMY_GLADIATORS: Gladiator[] = [
     houseName: 'Crimson Colosseum',
     isPlayer: false,
     avatarUrl: './assets/thraex.png',
-    buildDescription: 'Vicious offense honed hunting arena lions.',
+    buildDescription: 'Raw un-armored offense honed hunting arena lions.',
     wins: 25,
     losses: 3,
+    // Un-geared
   },
 
-  // Tier 4 / Imperial Vanguard
+  // --- TIER 4 / IMPERIAL VANGUARD ---
   {
     id: 'enemy_hermeros',
     name: 'Hermeros the Swift',
@@ -425,24 +437,30 @@ export const ENEMY_GLADIATORS: Gladiator[] = [
     houseName: 'Imperial Vanguard',
     isPlayer: false,
     avatarUrl: './assets/retiarius.png',
-    buildDescription: 'Fast, agile skirmisher with net traps.',
+    buildDescription: 'Fast rookie skirmisher with basic net traps.',
     wins: 12,
     losses: 9,
+    // Un-geared
   },
   {
     id: 'enemy_spiculus',
     name: 'Spiculus the Favored',
     title: 'Nero’s Paladin',
     archetypeId: 'murmillo',
-    maxHp: 100,
-    currentHp: 100,
-    shieldCharges: 10,
+    maxHp: 135,
+    currentHp: 135,
+    shieldCharges: 18,
     houseName: 'Imperial Vanguard',
     isPlayer: false,
     avatarUrl: './assets/murmillo.png',
-    buildDescription: 'Disciplined shield formation tactics.',
+    buildDescription: 'Disciplined shield paladin with gladius, scutum guard & aegis banner.',
     wins: 21,
     losses: 5,
+    equippedGear: {
+      weapon: AVAILABLE_GEAR[0], // Gladius (+8 Dmg, +4 Shield)
+      armor: AVAILABLE_GEAR[3],  // Scutum Guard (+16 Shield, +10 HP)
+      crest: AVAILABLE_GEAR[8],  // Aegis Banner (+12 Shield, +15 HP)
+    },
   },
   {
     id: 'enemy_attilius',
@@ -455,27 +473,33 @@ export const ENEMY_GLADIATORS: Gladiator[] = [
     houseName: 'Imperial Vanguard',
     isPlayer: false,
     avatarUrl: './assets/thraex.png',
-    buildDescription: 'Unpredictable young duel hero.',
+    buildDescription: 'Unpredictable un-armored rookie duel hero.',
     wins: 9,
     losses: 1,
+    // Un-geared
   },
   {
     id: 'enemy_titurius',
     name: 'Centurion Titurius',
     title: 'Legion Commandant',
     archetypeId: 'murmillo',
-    maxHp: 108,
-    currentHp: 108,
-    shieldCharges: 15,
+    maxHp: 155,
+    currentHp: 155,
+    shieldCharges: 20,
     houseName: 'Imperial Vanguard',
     isPlayer: false,
     avatarUrl: './assets/murmillo.png',
-    buildDescription: 'Iron-clad military veteran with thick shield walls.',
+    buildDescription: 'Iron-clad commandant boss with sica, lorica hamata & golden laurel.',
     wins: 27,
     losses: 4,
+    equippedGear: {
+      weapon: AVAILABLE_GEAR[1], // Sica (+15 Dmg)
+      armor: AVAILABLE_GEAR[4],  // Lorica Hamata (+6 Shield, +25 HP)
+      crest: AVAILABLE_GEAR[6],  // Golden Laurel (+6 Dmg, +8 Shield, +12 HP)
+    },
   },
 
-  // Tier 5 / Iron Serpent Ludus
+  // --- TIER 5 / IRON SERPENT LUDUS ---
   {
     id: 'enemy_aurelius',
     name: 'Aurelius Net-Binder',
@@ -487,146 +511,190 @@ export const ENEMY_GLADIATORS: Gladiator[] = [
     houseName: 'Iron Serpent Ludus',
     isPlayer: false,
     avatarUrl: './assets/retiarius.png',
-    buildDescription: 'Uses venomous net tactics to slow attackers.',
+    buildDescription: 'Un-armored trapper using venomous net tactics.',
     wins: 16,
     losses: 7,
+    // Un-geared
   },
   {
     id: 'enemy_servilius',
     name: 'Servilius Iron-Fang',
     title: 'Serpent Executioner',
     archetypeId: 'thraex',
-    maxHp: 96,
-    currentHp: 96,
-    shieldCharges: 0,
+    maxHp: 110,
+    currentHp: 110,
+    shieldCharges: 6,
     houseName: 'Iron Serpent Ludus',
     isPlayer: false,
     avatarUrl: './assets/thraex.png',
-    buildDescription: 'High critical strike chance blade master.',
+    buildDescription: 'High critical striker with hooked sica & mars crest.',
     wins: 18,
     losses: 6,
+    equippedGear: {
+      weapon: AVAILABLE_GEAR[1], // Hooked Sica (+15 Dmg)
+      crest: AVAILABLE_GEAR[7],  // Mars Crest (+10 Dmg, +5 HP)
+    },
   },
   {
     id: 'enemy_domitius',
     name: 'Domitius Apex',
     title: 'Pinnacle Shield',
     archetypeId: 'murmillo',
-    maxHp: 104,
-    currentHp: 104,
-    shieldCharges: 12,
+    maxHp: 136,
+    currentHp: 136,
+    shieldCharges: 18,
     houseName: 'Iron Serpent Ludus',
     isPlayer: false,
     avatarUrl: './assets/murmillo.png',
-    buildDescription: 'Heavy defensive wall with counter-attack capability.',
+    buildDescription: 'Heavy defensive wall with gladius, scutum guard & golden laurel.',
     wins: 20,
     losses: 5,
+    equippedGear: {
+      weapon: AVAILABLE_GEAR[0], // Gladius (+8 Dmg, +4 Shield)
+      armor: AVAILABLE_GEAR[3],  // Scutum Guard (+16 Shield, +10 HP)
+      crest: AVAILABLE_GEAR[6],  // Golden Laurel (+6 Dmg, +8 Shield, +12 HP)
+    },
   },
   {
     id: 'enemy_lucius',
     name: 'Lucius Scythe',
     title: 'Reaper of Capua',
     archetypeId: 'thraex',
-    maxHp: 100,
-    currentHp: 100,
-    shieldCharges: 0,
+    maxHp: 125,
+    currentHp: 125,
+    shieldCharges: 10,
     houseName: 'Iron Serpent Ludus',
     isPlayer: false,
     avatarUrl: './assets/thraex.png',
-    buildDescription: 'Armor-piercing specialist.',
+    buildDescription: 'Fully-geared armor-piercing reaper boss with sica, galerus & mars crest.',
     wins: 23,
     losses: 4,
+    equippedGear: {
+      weapon: AVAILABLE_GEAR[1], // Hooked Sica (+15 Dmg)
+      armor: AVAILABLE_GEAR[5],  // Galerus (+8 Dmg, +10 Shield)
+      crest: AVAILABLE_GEAR[7],  // Crest of Mars (+10 Dmg, +5 HP)
+    },
   },
 
-  // Tier 6 / Legio Invicta Rivals
+  // --- TIER 6 / LEGIO INVICTA RIVALS ---
   {
     id: 'enemy_cassius',
     name: 'Cassius Trident-Grip',
     title: 'Sea Demon',
     archetypeId: 'retiarius',
-    maxHp: 94,
-    currentHp: 94,
-    shieldCharges: 7,
+    maxHp: 125,
+    currentHp: 125,
+    shieldCharges: 12,
     houseName: 'Legio Invicta Rivals',
     isPlayer: false,
     avatarUrl: './assets/retiarius.png',
-    buildDescription: 'Master of crowd manipulation and net locks.',
+    buildDescription: 'Trident master equipped with weighted trident, galerus & aegis banner.',
     wins: 17,
     losses: 5,
+    equippedGear: {
+      weapon: AVAILABLE_GEAR[2], // Trident (+6 Dmg, +8 Shield, +10 HP)
+      armor: AVAILABLE_GEAR[5],  // Galerus (+8 Dmg, +10 Shield)
+      crest: AVAILABLE_GEAR[8],  // Aegis Banner (+12 Shield, +15 HP)
+    },
   },
   {
     id: 'enemy_tiberius',
     name: 'Tiberius Titan',
     title: 'The Unshakable',
     archetypeId: 'murmillo',
-    maxHp: 112,
-    currentHp: 112,
-    shieldCharges: 18,
+    maxHp: 150,
+    currentHp: 150,
+    shieldCharges: 22,
     houseName: 'Legio Invicta Rivals',
     isPlayer: false,
     avatarUrl: './assets/murmillo.png',
-    buildDescription: 'Enormous health pool and massive Scutum shield.',
+    buildDescription: 'Fully-geared Titan boss equipped with gladius, scutum & mars crest.',
     wins: 31,
     losses: 2,
+    equippedGear: {
+      weapon: AVAILABLE_GEAR[0], // Gladius (+8 Dmg, +4 Shield)
+      armor: AVAILABLE_GEAR[3],  // Scutum Guard (+16 Shield, +10 HP)
+      crest: AVAILABLE_GEAR[7],  // Mars Crest (+10 Dmg, +5 HP)
+    },
   },
   {
     id: 'enemy_valerius',
     name: 'Valerius Blood-Shed',
     title: 'Carnage Champion',
     archetypeId: 'thraex',
-    maxHp: 98,
-    currentHp: 98,
-    shieldCharges: 0,
+    maxHp: 110,
+    currentHp: 110,
+    shieldCharges: 4,
     houseName: 'Legio Invicta Rivals',
     isPlayer: false,
     avatarUrl: './assets/thraex.png',
-    buildDescription: 'Fast-paced, aggressive curved blade attacks.',
+    buildDescription: 'Fast-paced striker with hooked sica & mars crest.',
     wins: 24,
     losses: 7,
+    equippedGear: {
+      weapon: AVAILABLE_GEAR[1], // Hooked Sica (+15 Dmg)
+      crest: AVAILABLE_GEAR[7],  // Crest of Mars (+10 Dmg, +5 HP)
+    },
   },
   {
     id: 'enemy_septimius',
     name: 'Septimius Tempest',
     title: 'Storm Caster',
     archetypeId: 'retiarius',
-    maxHp: 89,
-    currentHp: 89,
-    shieldCharges: 5,
+    maxHp: 125,
+    currentHp: 125,
+    shieldCharges: 10,
     houseName: 'Legio Invicta Rivals',
     isPlayer: false,
     avatarUrl: './assets/retiarius.png',
-    buildDescription: 'Relentless control strategy with free rerolls.',
+    buildDescription: 'Fully-geared net tempest boss with sica, galerus & mars crest.',
     wins: 14,
     losses: 6,
+    equippedGear: {
+      weapon: AVAILABLE_GEAR[1], // Sica (+15 Dmg)
+      armor: AVAILABLE_GEAR[5],  // Galerus (+8 Dmg, +10 Shield)
+      crest: AVAILABLE_GEAR[7],  // Mars Crest (+10 Dmg, +5 HP)
+    },
   },
   {
     id: 'enemy_antoninus',
     name: 'Antoninus Executioner',
     title: 'The Pit Cleaver',
     archetypeId: 'thraex',
-    maxHp: 104,
-    currentHp: 104,
-    shieldCharges: 0,
+    maxHp: 125,
+    currentHp: 125,
+    shieldCharges: 8,
     houseName: 'Legio Invicta Rivals',
     isPlayer: false,
     avatarUrl: './assets/thraex.png',
-    buildDescription: 'Strips shield defense with razor precision.',
+    buildDescription: 'Fully-geared executioner boss with hooked sica, galerus & mars crest.',
     wins: 26,
     losses: 4,
+    equippedGear: {
+      weapon: AVAILABLE_GEAR[1], // Hooked Sica (+15 Dmg)
+      armor: AVAILABLE_GEAR[5],  // Galerus (+8 Dmg, +10 Shield)
+      crest: AVAILABLE_GEAR[7],  // Crest of Mars (+10 Dmg, +5 HP)
+    },
   },
   {
     id: 'enemy_claudius',
     name: 'Claudius Bastion',
     title: 'Fortress Guardian',
     archetypeId: 'murmillo',
-    maxHp: 106,
-    currentHp: 106,
-    shieldCharges: 14,
+    maxHp: 145,
+    currentHp: 145,
+    shieldCharges: 18,
     houseName: 'Legio Invicta Rivals',
     isPlayer: false,
     avatarUrl: './assets/murmillo.png',
-    buildDescription: 'High shield absorption and attrition.',
+    buildDescription: 'High shield defender with gladius, lorica hamata & aegis banner.',
     wins: 22,
     losses: 5,
+    equippedGear: {
+      weapon: AVAILABLE_GEAR[0], // Gladius (+8 Dmg, +4 Shield)
+      armor: AVAILABLE_GEAR[4],  // Lorica Hamata (+6 Shield, +25 HP)
+      crest: AVAILABLE_GEAR[8],  // Aegis Banner (+12 Shield, +15 HP)
+    },
   },
   {
     id: 'enemy_rufus',
@@ -639,57 +707,69 @@ export const ENEMY_GLADIATORS: Gladiator[] = [
     houseName: 'Legio Invicta Rivals',
     isPlayer: false,
     avatarUrl: './assets/retiarius.png',
-    buildDescription: 'Disrupts enemy attacks with entangling nets.',
+    buildDescription: 'Un-armored net caster disrupting rival stabs.',
     wins: 13,
     losses: 8,
+    // Un-geared
   },
   {
     id: 'enemy_drusus',
     name: 'Drusus Gladius',
     title: 'Iron Sword Master',
     archetypeId: 'thraex',
-    maxHp: 97,
-    currentHp: 97,
-    shieldCharges: 0,
+    maxHp: 130,
+    currentHp: 130,
+    shieldCharges: 8,
     houseName: 'Legio Invicta Rivals',
     isPlayer: false,
     avatarUrl: './assets/thraex.png',
-    buildDescription: 'Consistent direct damage output.',
+    buildDescription: 'Disciplined sword master with gladius, lorica hamata & mars crest.',
     wins: 19,
     losses: 6,
+    equippedGear: {
+      weapon: AVAILABLE_GEAR[0], // Gladius (+8 Dmg, +4 Shield)
+      armor: AVAILABLE_GEAR[4],  // Lorica Hamata (+6 Shield, +25 HP)
+      crest: AVAILABLE_GEAR[7],  // Mars Crest (+10 Dmg, +5 HP)
+    },
   },
   {
     id: 'enemy_felix',
     name: 'Felix Fortunatus',
     title: 'The Lucky Blade',
     archetypeId: 'murmillo',
-    maxHp: 100,
-    currentHp: 100,
-    shieldCharges: 10,
+    maxHp: 145,
+    currentHp: 145,
+    shieldCharges: 20,
     houseName: 'Legio Invicta Rivals',
     isPlayer: false,
     avatarUrl: './assets/murmillo.png',
-    buildDescription: 'Balanced defense and steady attack pattern.',
+    buildDescription: 'Fully-geared champion boss with sica, scutum guard & golden laurel.',
     wins: 16,
     losses: 6,
+    equippedGear: {
+      weapon: AVAILABLE_GEAR[1], // Sica (+15 Dmg)
+      armor: AVAILABLE_GEAR[3],  // Scutum Guard (+16 Shield, +10 HP)
+      crest: AVAILABLE_GEAR[6],  // Golden Laurel (+6 Dmg, +8 Shield, +12 HP)
+    },
   },
   {
     id: 'enemy_maximus',
     name: 'Maximus Decimus Meridius',
     title: 'Commander of the Northern Armies',
     archetypeId: 'thraex',
-    maxHp: 125,
-    currentHp: 125,
-    shieldCharges: 15,
+    maxHp: 145,
+    currentHp: 145,
+    shieldCharges: 14,
     houseName: 'Legio Invicta Rivals',
     isPlayer: false,
     avatarUrl: './assets/thraex.png',
-    buildDescription: 'Grand Arena Legend equipped with Mythic Laurel and Viper Sica.',
+    buildDescription: 'Fully-geared Grand Arena Legend boss with sica, galerus & mars crest.',
     wins: 60,
     losses: 0,
     equippedGear: {
-      weapon: AVAILABLE_GEAR[2],
-      crest: AVAILABLE_GEAR[6],
+      weapon: AVAILABLE_GEAR[1], // Hooked Sica (+15 Dmg)
+      armor: AVAILABLE_GEAR[5],  // Galerus (+8 Dmg, +10 Shield)
+      crest: AVAILABLE_GEAR[7],  // Crest of Mars (+10 Dmg, +5 HP)
     },
   },
 ];
