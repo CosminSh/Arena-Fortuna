@@ -390,23 +390,23 @@ export const BattleView: React.FC<BattleViewProps> = ({
       )}
 
       {/* Top Turn Header Pill, Paytable Button & Auto Battle Toggle */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap', justifyContent: 'center' }}>
         <div
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '0.45rem',
+            gap: '0.35rem',
             background: isEnemyTurn ? 'rgba(239, 68, 68, 0.3)' : 'rgba(14, 18, 28, 0.95)',
-            padding: '0.35rem 0.9rem',
+            padding: '0.3rem 0.75rem',
             borderRadius: '16px',
             border: `1.5px solid ${isEnemyTurn ? '#ef4444' : 'var(--color-border-gold)'}`,
-            fontSize: '0.8rem',
+            fontSize: '0.78rem',
             fontWeight: 900,
             color: isEnemyTurn ? '#f87171' : '#fff',
             boxShadow: '0 4px 20px rgba(0,0,0,0.8)',
           }}
         >
-          {isEnemyTurn ? <AlertTriangle size={15} color="#ef4444" /> : <Swords size={15} color="#f59e0b" />}
+          {isEnemyTurn ? <AlertTriangle size={14} color="#ef4444" /> : <Swords size={14} color="#f59e0b" />}
           <span>{isEnemyTurn ? `RIVAL TURN ${turn}` : `YOUR TURN (${turn}/8)`}</span>
         </div>
 
@@ -416,24 +416,22 @@ export const BattleView: React.FC<BattleViewProps> = ({
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '0.3rem',
+              gap: '0.25rem',
               background: 'linear-gradient(135deg, #f59e0b 0%, #b45309 100%)',
               border: '1px solid #fef08a',
               borderRadius: '16px',
-              padding: '0.35rem 0.75rem',
-              fontSize: '0.78rem',
+              padding: '0.3rem 0.65rem',
+              fontSize: '0.75rem',
               fontWeight: 900,
               color: '#000',
               boxShadow: '0 0 15px rgba(245, 158, 11, 0.6)',
               animation: 'symbolPulse 1.2s infinite alternate',
             }}
           >
-            <Flame size={15} color="#000" />
+            <Flame size={14} color="#000" />
             <span>STREAK x{streakCount}</span>
           </div>
         )}
-
-
 
         {/* Paytable & EV Info Button */}
         <button
@@ -443,9 +441,9 @@ export const BattleView: React.FC<BattleViewProps> = ({
             setShowPaytableModal(true);
           }}
           onMouseEnter={() => soundFx.playHover()}
-          style={{ height: '32px', fontSize: '0.75rem', borderColor: 'var(--color-gold)' }}
+          style={{ height: '30px', fontSize: '0.72rem', borderColor: 'var(--color-gold)', padding: '0 0.6rem' }}
         >
-          <Info size={14} color="var(--color-gold)" />
+          <Info size={13} color="var(--color-gold)" />
           <span>PAYTABLE & EV</span>
         </button>
 
@@ -454,12 +452,12 @@ export const BattleView: React.FC<BattleViewProps> = ({
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '0.4rem',
+            gap: '0.35rem',
             background: isAutoBattle ? 'linear-gradient(135deg, rgba(245, 158, 11, 0.35) 0%, rgba(217, 119, 6, 0.35) 100%)' : 'rgba(14, 18, 28, 0.95)',
             border: `1.5px solid ${isAutoBattle ? '#facc15' : 'rgba(255, 255, 255, 0.25)'}`,
             borderRadius: '16px',
-            padding: '0.35rem 0.75rem',
-            fontSize: '0.78rem',
+            padding: '0.3rem 0.65rem',
+            fontSize: '0.75rem',
             fontWeight: 900,
             color: isAutoBattle ? '#facc15' : '#9ca3af',
             cursor: 'pointer',
@@ -476,9 +474,9 @@ export const BattleView: React.FC<BattleViewProps> = ({
               soundFx.playClick();
               setIsAutoBattle(e.target.checked);
             }}
-            style={{ width: '14px', height: '14px', accentColor: '#f59e0b', cursor: 'pointer' }}
+            style={{ width: '13px', height: '13px', accentColor: '#f59e0b', cursor: 'pointer' }}
           />
-          <Bot size={15} color={isAutoBattle ? '#facc15' : '#9ca3af'} />
+          <Bot size={14} color={isAutoBattle ? '#facc15' : '#9ca3af'} />
           <span>AUTO</span>
         </label>
       </div>
@@ -486,14 +484,15 @@ export const BattleView: React.FC<BattleViewProps> = ({
       {/* Queen Fortuna Early Combat Blessing Banner */}
       {turn <= 2 && (
         <div
+          className="fortuna-blessing-banner"
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '0.55rem',
+            gap: '0.5rem',
             background: 'linear-gradient(90deg, rgba(245, 158, 11, 0.15) 0%, rgba(10, 14, 22, 0.85) 100%)',
             border: '1px solid rgba(245, 158, 11, 0.35)',
             borderRadius: '12px',
-            padding: '0.3rem 0.7rem',
+            padding: '0.25rem 0.6rem',
             maxWidth: '560px',
             flexShrink: 0,
           }}
@@ -502,16 +501,16 @@ export const BattleView: React.FC<BattleViewProps> = ({
             src="./assets/Fortuna-NPC-torso.png"
             alt="Queen Fortuna"
             style={{
-              width: '26px',
-              height: '26px',
+              width: '24px',
+              height: '24px',
               borderRadius: '50%',
               objectFit: 'cover',
               border: '1px solid #facc15',
               flexShrink: 0,
             }}
           />
-          <span style={{ fontSize: '0.72rem', color: '#e5e7eb' }}>
-            <strong style={{ color: '#facc15' }}>Fortuna's Blessing:</strong> "Spin the Reels of Fate! Align 3 matching symbols for a Jackpot, or collect Shields to absorb incoming strikes!"
+          <span style={{ fontSize: '0.7rem', color: '#e5e7eb', lineHeight: 1.25 }}>
+            <strong style={{ color: '#facc15' }}>Fortuna's Blessing:</strong> "Spin the Reels of Fate! Align 3 matching symbols for a Jackpot, or collect Shields to absorb strikes!"
           </span>
         </div>
       )}
@@ -521,19 +520,21 @@ export const BattleView: React.FC<BattleViewProps> = ({
         <div className="mobile-fighter-col player">
           <img src={playerArch.portrait} alt={player.name} className="mobile-avatar" />
           <div className="mobile-fighter-info">
-            <div className="mobile-fighter-name">{player.name}</div>
-            <div className="stage-hp-track" style={{ height: '18px', marginTop: '0.2rem' }}>
+            <div className="mobile-fighter-name-row">
+              <span className="mobile-fighter-name">{player.name}</span>
+              {player.shieldCharges > 0 && (
+                <span className="mobile-shield-badge">
+                  <img src={SYMBOL_DISPLAY.shield.image} alt="" style={{ width: '12px', height: '12px' }} />
+                  <span>{player.shieldCharges}</span>
+                </span>
+              )}
+            </div>
+            <div className="stage-hp-track mobile-hp-track">
               <div className="stage-hp-fill" style={{ width: `${(player.currentHp / player.maxHp) * 100}%` }} />
-              <span className="stage-hp-val" style={{ fontSize: '0.64rem', fontWeight: 900, lineHeight: '18px', textShadow: '0 1px 2px #000' }}>
+              <span className="stage-hp-val">
                 {player.currentHp}/{player.maxHp} HP
               </span>
             </div>
-            {player.shieldCharges > 0 && (
-              <span className="mobile-shield-badge" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}>
-                <img src={SYMBOL_DISPLAY.shield.image} alt="" style={{ width: '12px', height: '12px' }} />
-                <span>{player.shieldCharges}</span>
-              </span>
-            )}
           </div>
         </div>
 
@@ -541,19 +542,21 @@ export const BattleView: React.FC<BattleViewProps> = ({
 
         <div className="mobile-fighter-col enemy">
           <div className="mobile-fighter-info" style={{ textAlign: 'right' }}>
-            <div className="mobile-fighter-name">{enemy.name}</div>
-            <div className="stage-hp-track" style={{ height: '18px', marginTop: '0.2rem' }}>
+            <div className="mobile-fighter-name-row enemy-name-row">
+              {enemy.shieldCharges > 0 && (
+                <span className="mobile-shield-badge">
+                  <img src={SYMBOL_DISPLAY.shield.image} alt="" style={{ width: '12px', height: '12px' }} />
+                  <span>{enemy.shieldCharges}</span>
+                </span>
+              )}
+              <span className="mobile-fighter-name">{enemy.name}</span>
+            </div>
+            <div className="stage-hp-track mobile-hp-track">
               <div className="stage-hp-fill enemy" style={{ width: `${(enemy.currentHp / enemy.maxHp) * 100}%` }} />
-              <span className="stage-hp-val" style={{ fontSize: '0.64rem', fontWeight: 900, lineHeight: '18px', textShadow: '0 1px 2px #000' }}>
+              <span className="stage-hp-val">
                 {enemy.currentHp}/{enemy.maxHp} HP
               </span>
             </div>
-            {enemy.shieldCharges > 0 && (
-              <span className="mobile-shield-badge" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}>
-                <img src={SYMBOL_DISPLAY.shield.image} alt="" style={{ width: '12px', height: '12px' }} />
-                <span>{enemy.shieldCharges}</span>
-              </span>
-            )}
           </div>
           <img src={enemy.avatarUrl} alt={enemy.name} className="mobile-avatar" style={{ borderColor: '#ef4444' }} />
         </div>
