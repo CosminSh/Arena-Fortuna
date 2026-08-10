@@ -11,7 +11,7 @@ import { HouseLeaderboardModal } from './components/HouseLeaderboardModal';
 import { FortunaTutorialModal } from './components/FortunaTutorialModal';
 import { BackgroundParticles } from './components/BackgroundParticles';
 import { ArchetypeId, Gladiator, BattleState, GearItem } from './types/game';
-import { ARCHETYPES } from './engine/mathEngine';
+import { ARCHETYPES, getGearStats } from './engine/mathEngine';
 import { soundFx } from './engine/audioEngine';
 import { loadPlayerProfile } from './engine/storageEngine';
 
@@ -109,8 +109,8 @@ export const App: React.FC = () => {
   const createPlayerGladiator = (): Gladiator => {
     const profile = loadPlayerProfile();
     const arch = ARCHETYPES[selectedArchetypeId];
-    const hpBonus = (equippedGear.armor?.hpBonus || 0) + (equippedGear.crest?.hpBonus || 0);
-    const maxHp = 100 + hpBonus;
+    const gearStats = getGearStats(equippedGear);
+    const maxHp = 100 + gearStats.hpBonus;
     return {
       id: 'player_hero',
       name: profile.playerName || 'Imperator',

@@ -13,22 +13,31 @@ This document covers two scopes:
 Demonstrate a working slot-machine combat mechanic inside a believable PvP gladiator-war context, without building real multiplayer, guild systems, or persistence. This is a **presentation demo**, not a functional backend.
 
 ## A2. Scope Boundaries
-**In scope:**
+
+### Core Assignment Scope:
 - One playable slot-machine combat encounter.
-- Simple gladiator archetype selection before battle.
-- A premade player House and premade enemy House.
-- Target selection among 3–5 premade enemy gladiators.
+- Gladiator archetype selection before battle.
+- Premade player House and premade enemy House.
+- Target selection among premade enemy gladiators.
 - Clear win/loss feedback and win-condition explanation.
 
-**Out of scope:**
-- Real multiplayer or networking.
-- Guild creation and management.
-- Real ELO or matchmaking.
-- Gear inventory, shops, or currencies.
+### Extended Vertical Slice Implementation (Delivered Prototype):
+To demonstrate maximum fidelity, the delivered vertical slice extends beyond the minimum scope:
+- **30+ Gladiator Database**: 30 unique opponents across 6 distinct Ludus Houses.
+- **Pre-Battle Armory & Loadouts**: Equip Weapons, Armor, and Crests before combat (gear locks upon battle entry).
+- **Real-Time Monte Carlo Simulator**: Live 500+ iteration combat simulation for target scouting; win rates update live as gear is swapped.
+- **LocalStorage Session Persistence**: Profile EXP, Leveling, War Points, and Win/Loss records persist across browser reloads.
+- **Queen Fortuna Guidance & Tutorial**: Interactive tutorial modal and tactical counter advice.
+- **House Leaderboards & Roster Presentation**: Full House War rankings and roster UI.
+
+> **Note on Simulated Presentation Data**: In this client-side vertical slice, House War scores, leaderboards, daily reset timers, and rival house rosters are simulated presentation data. This accurately demonstrates how async guild-war state will be rendered once connected to a live backend API.
+
+### Out of Scope for Vertical Slice:
+- Real multiplayer or backend networking.
+- Live server guild creation and management.
+- Real ELO backend matchmaking.
+- Real-money purchases or microtransactions.
 - Energy systems.
-- Daily reset logic.
-- Persistence/save systems.
-- Multiple game modes.
 
 ## A3. Core Loop
 1. Home screen shows the player's premade House and today's enemy House.

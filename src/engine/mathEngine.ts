@@ -161,6 +161,31 @@ export const AVAILABLE_GEAR: GearItem[] = [
   },
 ];
 
+export interface GearStats {
+  damageBonus: number;
+  shieldBonus: number;
+  hpBonus: number;
+}
+
+export function getGearStats(equippedGear?: { weapon?: GearItem; armor?: GearItem; crest?: GearItem }): GearStats {
+  let damageBonus = 0;
+  let shieldBonus = 0;
+  let hpBonus = 0;
+
+  if (equippedGear) {
+    (['weapon', 'armor', 'crest'] as const).forEach((slot) => {
+      const item = equippedGear[slot];
+      if (item) {
+        if (item.damageBonus) damageBonus += item.damageBonus;
+        if (item.shieldBonus) shieldBonus += item.shieldBonus;
+        if (item.hpBonus) hpBonus += item.hpBonus;
+      }
+    });
+  }
+
+  return { damageBonus, shieldBonus, hpBonus };
+}
+
 export const ENEMY_GLADIATORS: Gladiator[] = [
   // Tier 1 / House of the Golden Falcon
   {
@@ -763,7 +788,8 @@ export function resolveTurn(
   reels: SymbolType[],
   activeEntangled: boolean,
   firstNetUsed: boolean,
-  chosenWildSymbol?: SymbolType
+  chosenWildSymbol?: SymbolType,
+  streakCount: number = 0
 ): {
   outcome: TurnOutcome;
   updatedFirstNetUsed: boolean;
@@ -773,19 +799,15 @@ export function resolveTurn(
   const combination = evaluateCombination(reels, chosenWildSymbol);
   const attackerArchetype = ARCHETYPES[attacker.archetypeId];
 
-  let gearDamageBonus = 0;
-  let gearShieldBonus = 0;
-  if (attacker.equippedGear) {
-    if (attacker.equippedGear.weapon) gearDamageBonus += attacker.equippedGear.weapon.damageBonus;
-    if (attacker.equippedGear.armor) gearShieldBonus += attacker.equippedGear.armor.shieldBonus;
-    if (attacker.equippedGear.crest) {
-      gearDamageBonus += attacker.equippedGear.crest.damageBonus;
-      gearShieldBonus += attacker.equippedGear.crest.shieldBonus;
-    }
-  }
+  const gearStats = getGearStats(attacker.equippedGear);
+  const gearDamageBonus = gearStats.damageBonus;
+  const gearShieldBonus = gearStats.shieldBonus;
 
   const hasTriangleAdvantage = attackerArchetype.favoredAgainst === defender.archetypeId;
   const triangleMultiplier = hasTriangleAdvantage ? 1.15 : 1.0;
+
+  const streakBonusPct = streakCount > 1 ? Math.min(0.25, (streakCount - 1) * 0.05) : 0;
+  const streakMultiplier = 1 + streakBonusPct;
 
   let rawDamage = 0;
   let shieldGranted = 0;
@@ -862,6 +884,11 @@ export function resolveTurn(
     rawDamage = Math.round(rawDamage * (1 - reduction));
   }
 
+  if (streakBonusPct > 0 && rawDamage > 0) {
+    rawDamage = Math.round(rawDamage * streakMultiplier);
+    abilityTriggered = (abilityTriggered ? abilityTriggered + ' | ' : '') + `🔥 Streak x${streakCount} (+${Math.round(streakBonusPct * 100)}% Dmg)`;
+  }
+
   // Calculate Shield Absorption on Defender
   let shieldBlocked = 0;
   let remainingDamage = rawDamage;
@@ -933,8 +960,8 @@ export function simulateMatchup(
     let turn = 1;
     let activeEntangledPlayer = false;
     let activeEntangledEnemy = false;
-    let firstNetUsedPlayer = false;
-    let firstNetUsedEnemy = false;
+    let playerFirstNetResisted = false;
+    let enemyFirstNetResisted = false;
 
     while (turn <= 8 && simPlayer.currentHp > 0 && simEnemy.currentHp > 0) {
       // 1. Player Turn
@@ -944,10 +971,10 @@ export function simulateMatchup(
         simEnemy,
         spinReels(),
         activeEntangledPlayer,
-        firstNetUsedEnemy
+        playerFirstNetResisted
       );
 
-      firstNetUsedEnemy = playerTurn.updatedFirstNetUsed;
+      playerFirstNetResisted = playerTurn.updatedFirstNetUsed;
       simEnemy.currentHp = Math.max(0, simEnemy.currentHp - playerTurn.outcome.netDamage);
       simEnemy.shieldCharges = playerTurn.updatedDefenderShields;
       simPlayer.shieldCharges = playerTurn.updatedAttackerShields;
@@ -965,15 +992,17 @@ export function simulateMatchup(
         simPlayer,
         spinReels(),
         activeEntangledEnemy,
-        firstNetUsedPlayer
+        enemyFirstNetResisted
       );
 
-      firstNetUsedPlayer = enemyTurn.updatedFirstNetUsed;
+      enemyFirstNetResisted = enemyTurn.updatedFirstNetUsed;
       simPlayer.currentHp = Math.max(0, simPlayer.currentHp - enemyTurn.outcome.netDamage);
       simPlayer.shieldCharges = enemyTurn.updatedDefenderShields;
       simEnemy.shieldCharges = enemyTurn.updatedAttackerShields;
 
       if (enemyTurn.outcome.debuffApplied) activeEntangledPlayer = true;
+      else activeEntangledPlayer = false;
+      activeEntangledEnemy = false;
 
       if (simPlayer.currentHp <= 0) break;
 

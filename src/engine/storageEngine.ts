@@ -10,7 +10,8 @@ export interface PlayerProfile {
   hasCompletedTutorial?: boolean;
 }
 
-const STORAGE_KEY = 'arena_reels_player_profile_v1';
+const PRIMARY_STORAGE_KEY = 'arena_fortuna_player_profile_v1';
+const LEGACY_STORAGE_KEY = 'arena_reels_player_profile_v1';
 
 const DEFAULT_PROFILE: PlayerProfile = {
   playerName: 'Imperator',
@@ -26,7 +27,7 @@ const DEFAULT_PROFILE: PlayerProfile = {
 
 export function loadPlayerProfile(): PlayerProfile {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(PRIMARY_STORAGE_KEY) || localStorage.getItem(LEGACY_STORAGE_KEY);
     if (!raw) return { ...DEFAULT_PROFILE };
     const parsed = JSON.parse(raw);
     return {
@@ -44,7 +45,7 @@ export function loadPlayerProfile(): PlayerProfile {
 
 export function savePlayerProfile(profile: PlayerProfile): void {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
+    localStorage.setItem(PRIMARY_STORAGE_KEY, JSON.stringify(profile));
   } catch (e) {
     console.error('Failed to save profile to localStorage', e);
   }

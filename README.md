@@ -3,7 +3,7 @@
 [![Live Demo](https://img.shields.io/badge/🎮%20Play%20Live%20Demo-Arena%20Fortuna-gold?style=for-the-badge&logo=github)](https://cosminsh.github.io/Arena-Fortuna/)
 
 > 🎮 **Live Demo:** [Play Arena Fortuna Vertical Slice Online](https://cosminsh.github.io/Arena-Fortuna/)  
-> 📜 **Game Design Document:** [Arena Fortuna GDD (Vertical Slice & Full Game Vision)](./Arena_Reels_GDD.md)
+> 📜 **Game Design Document:** [Arena Fortuna GDD (Vertical Slice & Full Game Vision)](./Arena_Fortuna_GDD.md)
 
 ---
 
@@ -11,7 +11,7 @@
 
 **Arena Fortuna** is an innovative hybrid vertical slice combining **Casino Slot Machine Mechanics** with a **Tactical RPG Gladiator Combat Engine**. Players customize gladiator archetypes, optimize pre-battle armory gear loadouts, scout rival Ludus house targets using real-time Monte Carlo win-rate simulations, and spin combat reels to execute battle strikes and shield tactics.
 
-For detailed game design specifications, mathematical models, and long-term feature roadmaps, check out the comprehensive [Arena Fortuna Game Design Document (GDD)](./Arena_Reels_GDD.md). The GDD includes both the **Vertical Slice Prototype** specification and **Part B: Full Game Vision**, which outlines how the prototype expands into a full-scale asynchronous PvP Guild-vs-Guild RPG featuring House Wars, ELO matchmaking, build progression, and fair monetization safeguards.
+For detailed game design specifications, mathematical models, and long-term feature roadmaps, check out the comprehensive [Arena Fortuna Game Design Document (GDD)](./Arena_Fortuna_GDD.md). The GDD includes both the **Vertical Slice Prototype** specification and **Part B: Full Game Vision**, which outlines how the prototype expands into a full-scale asynchronous PvP Guild-vs-Guild RPG featuring House Wars, ELO matchmaking, build progression, and fair monetization safeguards.
 
 ---
 
@@ -23,8 +23,8 @@ For detailed game design specifications, mathematical models, and long-term feat
 - **🏟️ 30+ Rival Gladiator Roster**: Scout gladiators across 6 Ludus houses (*Blood Sands Syndicate*, *Imperial Vanguard*, *Crimson Colosseum*, etc.).
 - **🎰 Casino Slot Combat Engine**: 3 independent reels with 4 symbol types (Sword, Shield, Class Ability, Wild) and instant combination evaluation.
 - **⚡ Archetype Soft-Triangle**: Dynamic counter-system between *Murmillo (Shield)*, *Thraex (Sica)*, and *Retiarius (Net)* yielding +15% damage multipliers.
-- **📈 In-Battle Paytable & EV Drawer**: On-demand expected value breakdown (`24.5 HP/spin`, `96.2% baseline RTP`) available directly on the slot frame.
-- **🔥 Momentum Streak Combo**: Consecutive winning spins generate `STREAK x2` combo multipliers.
+- **📈 In-Battle Paytable & EV Drawer**: On-demand expected value breakdown (`24.5 HP/spin` base damage output + gear scaling factor) available directly on the slot frame.
+- **🔥 Momentum Streak Combo**: Consecutive winning spins build a `STREAK x2+` combo multiplier granting up to +25% bonus damage on consecutive strikes.
 - **💾 Session Persistence**: LocalStorage tracks Player Level, EXP, War Points, and Win/Loss records across reloads.
 - **📱 Fully Responsive Design**: Seamless layout scaling optimized for mobile devices (iPhone 13 mini viewport) up to 4K displays.
 
@@ -43,9 +43,9 @@ Each spin rolls 3 independent reels containing 4 distinct symbol types:
 | 🃏 **Wild** | Special | **10%** | Player chooses target symbol match |
 
 ### 2. Combination Payout Tier Structure
-- **3-of-a-Kind (Jackpot)**: ~5.8% probability per spin. High raw output (40 Damage / +22 Shield Armor / Ultimate Perk).
-- **2-of-a-Kind (Common Hit)**: ~42.3% probability per spin. Solid baseline output (25 Damage / +14 Shield Armor).
-- **0-Match (Fumble)**: ~51.9% probability per spin. Low output baseline.
+- **3-of-a-Kind (Jackpot)**: **19.60%** probability per spin. High raw output (40 Damage / +22 Shield Armor / Ultimate Perk).
+- **2-of-a-Kind (Common Hit)**: **64.65%** probability per spin. Solid baseline output (25 Damage / +14 Shield Armor).
+- **0-Match (Fumble)**: **15.75%** probability per spin. Low output baseline.
 
 ### 3. Archetype Soft-Triangle Counter System
 - 🛡️ **Murmillo (The Shield)** ➔ Counters **Retiarius** (Resists net entangle & mitigates attrition)
@@ -56,11 +56,11 @@ Each spin rolls 3 independent reels containing 4 distinct symbol types:
 
 ## 📖 Game Design Document & Future Evolution
 
-Read the full [Arena Fortuna Game Design Document](./Arena_Reels_GDD.md) to explore:
+Read the full [Arena Fortuna Game Design Document](./Arena_Fortuna_GDD.md) to explore:
 
-- **Part A: Vertical Slice Specification**: The immediate presentation prototype, ruleset, reel weights, and scope boundaries.
+- **Part A: Vertical Slice Specification**: The presentation prototype ruleset, scope boundaries, reel weights, and extended features.
 - **Part B: Full Game Vision & Roadmap**: Details how Arena Fortuna expands into a live-service RPG:
-  - **Asynchronous Guild-vs-Guild (House Wars)**: Daily House matchings, player attack limits, and shared guild scoring.
+  - **Asynchronous Guild-vs-Guild (House Wars)**: Daily House matchings, player attack limits, and shared guild scoring *(Note: House War leaderboards and scores in this prototype are simulated presentation data)*.
   - **ELO Matchmaking & Rating System**: Fair House rating algorithms preventing high-level farming.
   - **Gladiator Build Progression**: Gear slots, talent trees, reel lock modifiers, and cosmetic banners.
   - **Competitive Monetization Safeguards**: Strict anti-pay-to-win guidelines prohibiting purchased extra rolls or competitive advantages.
@@ -90,7 +90,7 @@ src/
 ├── engine/
 │   ├── arenaParticles.ts        # Arena spark particle triggers
 │   ├── audioEngine.ts           # Web Audio API sound FX engine
-│   ├── mathEngine.ts            # Reel logic, combat resolution, 30+ enemy roster
+│   ├── mathEngine.ts            # Reel logic, combat resolution, 30+ enemy roster, getGearStats helper
 │   └── storageEngine.ts         # LocalStorage profile persistence
 └── types/
     └── game.ts                  # TypeScript game state interfaces

@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Gladiator, GearItem } from '../types/game';
-import { ARCHETYPES, getRandomScoutingTargets, simulateMatchup, AVAILABLE_GEAR } from '../engine/mathEngine';
+import { ARCHETYPES, getRandomScoutingTargets, simulateMatchup, AVAILABLE_GEAR, getGearStats } from '../engine/mathEngine';
 import { soundFx } from '../engine/audioEngine';
 import { ArrowLeft, Swords, Activity, RefreshCw, Shield, Sparkles, Wrench, Check, X } from 'lucide-react';
 
@@ -22,9 +22,10 @@ export const TargetSelectView: React.FC<TargetSelectViewProps> = ({
 
   const playerArch = ARCHETYPES[playerGladiator.archetypeId];
   const equipped = playerGladiator.equippedGear || {};
-  const totalDmgBonus = (equipped.weapon?.damageBonus || 0) + (equipped.crest?.damageBonus || 0);
-  const totalShieldBonus = (equipped.armor?.shieldBonus || 0) + (equipped.crest?.shieldBonus || 0);
-  const totalHpBonus = (equipped.armor?.hpBonus || 0) + (equipped.crest?.hpBonus || 0);
+  const gearStats = getGearStats(playerGladiator.equippedGear);
+  const totalDmgBonus = gearStats.damageBonus;
+  const totalShieldBonus = gearStats.shieldBonus;
+  const totalHpBonus = gearStats.hpBonus;
 
   const handleRefresh = () => {
     soundFx.playClick();

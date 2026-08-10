@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Gladiator, SymbolType, BattleState, TurnOutcome } from '../types/game';
-import { ARCHETYPES, spinReels, resolveTurn } from '../engine/mathEngine';
+import { ARCHETYPES, spinReels, resolveTurn, getGearStats } from '../engine/mathEngine';
 import { soundFx } from '../engine/audioEngine';
 import { triggerGladiatorArenaSparks } from '../engine/arenaParticles';
 import { Swords, Shield, RefreshCw, Zap, ChevronDown, ChevronUp, AlertTriangle, Bot, Info, Flame, HelpCircle, X, Sparkles, Check, Lock } from 'lucide-react';
@@ -39,8 +39,8 @@ export const BattleView: React.FC<BattleViewProps> = ({
   const [canReroll, setCanReroll] = useState<boolean>(false);
   const [activeEntangledDefender, setActiveEntangledDefender] = useState<boolean>(false);
   const [activeEntangledPlayer, setActiveEntangledPlayer] = useState<boolean>(false);
-  const [firstNetUsedPlayer, setFirstNetUsedPlayer] = useState<boolean>(false);
-  const [firstNetUsedEnemy, setFirstNetUsedEnemy] = useState<boolean>(false);
+  const [playerFirstNetResisted, setPlayerFirstNetResisted] = useState<boolean>(false);
+  const [enemyFirstNetResisted, setEnemyFirstNetResisted] = useState<boolean>(false);
 
   // FX & UI States
   const [floatingDamage, setFloatingDamage] = useState<{ text: string; iconImg?: string; isEnemy: boolean } | null>(null);
@@ -86,6 +86,9 @@ export const BattleView: React.FC<BattleViewProps> = ({
     if (turnPhase !== 'player_ready' || player.currentHp <= 0 || enemy.currentHp <= 0 || turn > 8) return;
 
     soundFx.playClick();
+    if (canReroll) {
+      setCanReroll(false);
+    }
     setTurnPhase('player_spinning');
     setSpinningReelIndex([true, true, true]);
     setFloatingDamage(null);
@@ -136,12 +139,13 @@ export const BattleView: React.FC<BattleViewProps> = ({
       enemy,
       finalReels,
       activeEntangledPlayer,
-      firstNetUsedEnemy,
-      chosenWildSymbol
+      playerFirstNetResisted,
+      chosenWildSymbol,
+      streakCount
     );
 
     const { outcome: pOutcome, updatedAttackerShields, updatedDefenderShields } = playerTurnResult;
-    setFirstNetUsedEnemy(playerTurnResult.updatedFirstNetUsed);
+    setPlayerFirstNetResisted(playerTurnResult.updatedFirstNetUsed);
 
     // Update streak counter
     if (pOutcome.combination.tier === 'jackpot' || pOutcome.combination.tier === 'common') {
@@ -182,7 +186,11 @@ export const BattleView: React.FC<BattleViewProps> = ({
       triggerGladiatorArenaSparks();
     }
 
-    if (pOutcome.rerollGranted) setCanReroll(true);
+    if (pOutcome.rerollGranted) {
+      setCanReroll(true);
+      setTurnPhase('player_ready');
+      setAbilityBanner('⚡ RETIARIUS NET JACKPOT: Free Reroll Granted! Spin again for an extra turn!');
+    }
     if (pOutcome.debuffApplied) setActiveEntangledDefender(true);
     else setActiveEntangledDefender(false);
     setActiveEntangledPlayer(false);
@@ -194,6 +202,10 @@ export const BattleView: React.FC<BattleViewProps> = ({
       triggerGladiatorArenaSparks();
       setTimeout(() => finishMatch(player, { ...enemy, currentHp: 0 }, turn, pOutcome), 1400);
       return;
+    }
+
+    if (pOutcome.rerollGranted) {
+      return; // Do not schedule enemy turn on free reroll!
     }
 
     setTimeout(() => {
@@ -248,11 +260,11 @@ export const BattleView: React.FC<BattleViewProps> = ({
       { ...player, shieldCharges: playerShields },
       finalEnemyReels,
       activeEntangledDefender,
-      firstNetUsedPlayer
+      enemyFirstNetResisted
     );
 
     const { outcome: eOutcome, updatedAttackerShields, updatedDefenderShields } = enemyTurnResult;
-    setFirstNetUsedPlayer(enemyTurnResult.updatedFirstNetUsed);
+    setEnemyFirstNetResisted(enemyTurnResult.updatedFirstNetUsed);
 
     const nextPlayerHp = Math.max(0, player.currentHp - eOutcome.netDamage);
     setPlayer((prev) => ({ ...prev, currentHp: nextPlayerHp, shieldCharges: updatedDefenderShields }));
@@ -713,12 +725,13 @@ export const BattleView: React.FC<BattleViewProps> = ({
 
       {/* IN-BATTLE PAYTABLE & EV MODAL DRAWER */}
       {showPaytableModal && (() => {
-        const playerGearDmg = (player.equippedGear?.weapon?.damageBonus || 0) + (player.equippedGear?.crest?.damageBonus || 0);
-        const playerGearShield = (player.equippedGear?.armor?.shieldBonus || 0) + (player.equippedGear?.crest?.shieldBonus || 0);
-        const playerGearHp = (player.equippedGear?.armor?.hpBonus || 0) + (player.equippedGear?.crest?.hpBonus || 0);
+        const gearStats = getGearStats(player.equippedGear);
+        const playerGearDmg = gearStats.damageBonus;
+        const playerGearShield = gearStats.shieldBonus;
+        const playerGearHp = gearStats.hpBonus;
 
-        const effectiveDmgEV = (24.5 + playerGearDmg).toFixed(1);
-        const effectiveShieldEV = (12.5 + playerGearShield).toFixed(1);
+        const effectiveDmgEV = (24.5 + playerGearDmg * 0.425).toFixed(1);
+        const effectiveShieldEV = (12.5 + playerGearShield * 0.385).toFixed(1);
         const hasActiveGear = playerGearDmg > 0 || playerGearShield > 0 || playerGearHp > 0;
 
         return (

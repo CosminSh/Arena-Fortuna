@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ArchetypeId, GearItem } from '../types/game';
-import { ARCHETYPES, AVAILABLE_GEAR } from '../engine/mathEngine';
+import { ARCHETYPES, AVAILABLE_GEAR, getGearStats } from '../engine/mathEngine';
 import { soundFx } from '../engine/audioEngine';
 import { loadPlayerProfile, updatePlayerName } from '../engine/storageEngine';
 import { ArrowLeft, Shield, Swords, Sparkles, Crown, Check, Zap, Edit3 } from 'lucide-react';
@@ -39,9 +39,10 @@ export const GladiatorHubView: React.FC<GladiatorHubViewProps> = ({
     onBack();
   };
 
-  const totalDmgBonus = (gearLoadout.weapon?.damageBonus || 0) + (gearLoadout.crest?.damageBonus || 0);
-  const totalShieldBonus = (gearLoadout.armor?.shieldBonus || 0) + (gearLoadout.crest?.shieldBonus || 0);
-  const totalHpBonus = (gearLoadout.armor?.hpBonus || 0) + (gearLoadout.crest?.hpBonus || 0);
+  const gearStats = getGearStats(gearLoadout);
+  const totalDmgBonus = gearStats.damageBonus;
+  const totalShieldBonus = gearStats.shieldBonus;
+  const totalHpBonus = gearStats.hpBonus;
 
   return (
     <div
