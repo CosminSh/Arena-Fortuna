@@ -1,16 +1,19 @@
 # Arena Fortuna — Game Design Document
 
+> **Status**: Draft / exploratory design document.  
+> **Part A** documents the delivered vertical slice. **Part B** captures the broader game direction and is intentionally not a production-complete GDD.
+
 ## Document Overview
 This document covers two scopes:
-1. **Part A — Vertical Slice / Assignment Prototype**: the small, self-contained demo to build now for the job assignment.
-2. **Part B — Full Game Vision**: the complete PvP guild-war game this prototype could become.
+1. **Part A — Vertical Slice / Assignment Prototype**: the self-contained prototype built for the job assignment.
+2. **Part B — Draft Full Game Direction**: the broader PvP guild-war game direction this prototype could evolve into.
 
 ---
 
 # PART A: Vertical Slice
 
 ## A1. Purpose
-Demonstrate a working slot-machine combat mechanic inside a believable PvP gladiator-war context, without building real multiplayer, guild systems, or persistence. This is a **presentation demo**, not a functional backend.
+Demonstrate a working slot-machine combat mechanic inside a believable PvP gladiator-war context, without building real multiplayer, backend guild systems, or server-side persistence. This is a **presentation demo**, not a functional backend.
 
 ## A2. Scope Boundaries
 
@@ -25,7 +28,7 @@ Demonstrate a working slot-machine combat mechanic inside a believable PvP gladi
 To demonstrate maximum fidelity, the delivered vertical slice extends beyond the minimum scope:
 - **30+ Gladiator Database**: 30 unique opponents across 6 distinct Ludus Houses.
 - **Pre-Battle Armory & Loadouts**: Equip Weapons, Armor, and Crests before combat (gear locks upon battle entry).
-- **Real-Time Monte Carlo Simulator**: Live 500+ iteration combat simulation for target scouting; win rates update live as gear is swapped.
+- **Real-Time Monte Carlo Simulator**: Live 500-iteration combat simulation per target for scouting; win rates update live as gear is swapped.
 - **LocalStorage Session Persistence**: Profile EXP, Leveling, War Points, and Win/Loss records persist across browser reloads.
 - **Queen Fortuna Guidance & Tutorial**: Interactive tutorial modal and tactical counter advice.
 - **House Leaderboards & Roster Presentation**: Full House War rankings and roster UI.
@@ -40,11 +43,11 @@ To demonstrate maximum fidelity, the delivered vertical slice extends beyond the
 - Energy systems.
 
 ## A3. Core Loop
-1. Home screen shows the player's premade House and today's enemy House.
-2. Player chooses one gladiator archetype.
-3. Player views 3–5 enemy gladiators and chooses one to fight.
-4. Battle plays out over several turns using the slot machine.
-5. Result screen explains the outcome, important rolls, and archetype interactions.
+1. Home / Gladiator setup → configure archetype and gear loadout.
+2. Scout four rival targets sampled from the active rival roster.
+3. Compare matchup advantage and live simulated Monte Carlo win probability.
+4. Select target gladiator and enter the slot-machine combat arena.
+5. Result screen provides damage breakdown, battle analytics, and profile progression.
 
 ## A4. Gladiator Archetypes
 
@@ -58,7 +61,7 @@ The defensive gladiator equipped with a gladius and large scutum shield.
 ### Thraex — The Hooked Blade
 The technical duelist equipped with a curved sica and smaller shield.
 
-**Ability — Hooked Blade:** 25% of Sword damage ignores Shields. Two Sword symbols remove one enemy Shield charge.
+**Ability — Hooked Blade:** 25% of Sword damage ignores Shields.
 
 **Gameplay identity:** Precision offense and shield-piercing attacks.
 
@@ -72,61 +75,59 @@ The mobile disruptor equipped with a net and trident.
 ## A5. Archetype Triangle
 The prototype uses a soft matchup triangle:
 
-- **Murmillo beats Retiarius**: the large shield reduces trident damage and resists net disruption.
+- **Murmillo beats Retiarius**: its defensive identity and partial resistance to the first Net effect give it an advantage against Retiarius disruption.
 - **Retiarius beats Thraex**: disruption prevents the Thraex from building offensive momentum.
 - **Thraex beats Murmillo**: Hooked Blade attacks partially bypass the Murmillo's shield.
 
 The matchup advantage should be noticeable but not decisive. It should influence the odds rather than guarantee victory.
 
 ## A6. Slot Machine
-Use three reels and four symbol types:
+Use three reels and four symbol types with weighted probability distributions:
 
-| Symbol | Meaning |
-|---|---|
-| Sword | Deal direct damage |
-| Shield | Reduce incoming damage or gain protection |
-| Class symbol | Trigger the selected gladiator's ability |
-| Wild | Counts as any symbol |
+| Symbol | Weight | Single Reel % | Combat Function |
+|---|---|---|---|
+| Sword | 35 | 35.0% | Deal direct damage |
+| Shield | 30 | 30.0% | Gain Shield Armor protection |
+| Class symbol | 25 | 25.0% | Trigger selected gladiator's ability |
+| Wild | 10 | 10.0% | Flexible symbol |
 
-For the prototype, the class symbols can be represented by simple icons:
-- Scutum for Murmillo.
-- Sica for Thraex.
-- Net for Retiarius.
+- **Wild Symbol Mechanism**: During manual play, a Wild pauses resolution and lets the player choose whether it resolves as a Sword, Shield, or Class Ability. In autoplay, it resolves automatically into the best matching combination.
+
+The Class Ability symbol resolves according to the selected archetype: Scutum Wall for Murmillo, Hooked Blade for Thraex, and Entangling Net for Retiarius.
 
 ## A7. Win Conditions
-- **Three matching symbols (19.60%)**: powerful outcome such as high damage, a strong block, or a major class ability. This is the exciting jackpot moment.
-- **Two matching symbols (64.65%)**: standard successful outcome such as normal damage, partial defense, or a weaker ability. This is the expected common success state.
-- **No pair (15.75%)**: weak outcome, such as minimal damage or no useful effect. A bad roll should weaken the turn rather than automatically lose the battle.
-- **Wild symbol**: substitutes into the highest available matching combination to mitigate unlucky rolls.
+- **Three matching symbols (19.60%)**: powerful outcome such as high damage, a strong block, or a major class ability payload. This is the exciting jackpot moment.
+- **Two matching symbols (64.65%)**: standard successful outcome such as normal damage, partial defense, or a standard ability action. This is the expected common success state.
+- **No pair (15.75%)**: baseline/weak effect based on the resolved symbol. A bad roll weakens the turn rather than producing a complete whiff.
+- **Wild symbol**: during manual play, pauses resolution and lets the player choose whether it resolves as a Sword, Shield, or Class Ability (resolves automatically in autoplay).
 
-The player wins the battle by reducing the enemy's health to zero before their own health reaches zero. The slot result determines the immediate action, while archetype abilities and matchup bonuses influence the effectiveness of that action.
+The player wins the battle by reducing the enemy's health to zero before their own health reaches zero, or by having higher HP after 8 turns.
 
 ## A8. Suggested Combat Rules
-- Each character starts with 100 HP.
+- Player base HP is 100 before gear bonuses; rival HP varies by build.
 - Each turn, the active player spins three reels.
 - The player and enemy alternate turns.
 - Sword results deal damage.
-- Shield results reduce damage on the following turn.
+- Shield results grant Shield Armor that absorbs future damage until depleted.
 - Class-symbol results activate the selected archetype ability.
-- A Wild substitutes into the best available match.
+- A Wild during manual play lets the player choose its resolved symbol (Sword, Shield, or Class); in autoplay, it resolves automatically.
 - Battle ends when one gladiator reaches 0 HP or after a maximum of 8 turns.
 - If the turn limit is reached, the gladiator with more HP wins.
-- **Armory Preview**: Players can experiment with free, fully unlocked gear loadouts (Weapons, Armor, Crests) to test stat variations without introducing pay-to-win mechanics.
+- **Armory Loadouts**: Players can experiment with free gear loadouts (Weapons, Armor, Crests) to test stat variations without pay-to-win mechanics.
 
 ## A9. Screens
-1. **Home** — player House, enemy House, and “Enter War” button.
-2. **Gladiator Select** — choose Murmillo, Thraex, or Retiarius.
-3. **Target Select** — choose one of 3–5 enemy gladiators showing name, archetype, and short build description.
-4. **Battle** — reel display, class icons, HP bars, ability text, and combat log.
-5. **Result** — victory/defeat, winning rolls, damage breakdown, and return button.
+1. **Home** — House War standing, daily rival house overview, and navigation.
+2. **Gladiator Hub** — archetype selection, armory gear loadout configuration, and profile progression.
+3. **Target Scouting** — sampling 4 targets from 30+ rival roster with live 500-iteration Monte Carlo win probabilities.
+4. **Battle Stage** — slot cabinet, symbol reels, HP/Shield bars, streak multipliers, floating damage popups, and paytable EV drawer.
+5. **Match Result** — victory/defeat feedback, battle stats comparison, and XP/War Point progression summary.
 
-## A10. Static Data
-- One player House name.
-- One enemy House name.
-- Three to five premade enemy gladiators.
-- Archetype, HP, and ability for each enemy.
-- Symbol table and win-condition rules.
-- Static daily war score or rank display.
+## A10. Delivered Roster & Static Data
+- **Player House**: Premade *Legio Invicta* house.
+- **30+ Rival Gladiators**: 30 unique opponents spanning 6 rival Ludus Houses (*Blood Sands Syndicate*, *Imperial Vanguard*, *Crimson Colosseum*, etc.).
+- **Gear Database**: 9 collectible loadout items across Weapon, Armor, and Crest slots.
+- **Simulation Engine**: Live 500-iteration Monte Carlo combat simulation per target.
+- **Local Persistence**: Browser LocalStorage maintains profile level, EXP, War Points, and win/loss records.
 
 ## A11. Presentation Notes
 Label the build clearly as **“Arena Fortuna — PvP Guild War Concept Demo.”** Explain that the enemy is a premade or recorded opponent representing what would be another real player's async gladiator in the full game.
@@ -135,16 +136,9 @@ The prototype should demonstrate this experience:
 
 > Choose a gladiator, inspect enemy builds, pick the matchup you believe you can win, spin the reels through a short battle, and see whether your build and luck were enough.
 
-## A12. Timebox
-- 30 minutes: symbols, combat rules, abilities, and enemy data.
-- 60–90 minutes: reel logic and outcome resolution.
-- 30–60 minutes: battle UI and damage feedback.
-- 30–60 minutes: archetype and target-selection screens.
-- 30–60 minutes: polish, testing, and assignment explanation.
-
 ---
 
-# PART B: Full Game Vision
+# PART B: Draft Full Game Direction
 
 ## B1. Concept
 **Arena Fortuna** is a PvP-only, asynchronous, guild-vs-guild RPG. Players join a **Gladiator House**, build a single gladiator, and fight in daily House Wars. Battles are resolved by a slot-machine combat system layered with archetype identity and light build customization. There is no PvE; the community itself is the difficulty curve.
@@ -186,7 +180,7 @@ The prototype should demonstrate this experience:
 | Net | Disruption and control for Retiarius |
 | Sica | Shield-piercing effects for Thraex |
 | Scutum | Strong defensive effects for Murmillo |
-| Wild | Flexible symbol |
+| Wild | Flexible symbol allowing player choice (Sword, Shield, or Class) |
 
 For clarity, the full game may use a shared Sword/Shield/Wild set plus archetype-specific symbols, rather than putting every symbol on every reel.
 
@@ -195,7 +189,7 @@ For clarity, the full game may use a shared Sword/Shield/Wild set plus archetype
 | Archetype | Strength | Weakness | Ability |
 |---|---|---|---|
 | Murmillo — The Shield | Defense, consistency, attrition | Shield-piercing attacks | **Scutum Wall:** Shield symbols block 25% more damage; first Net effect is reduced by half |
-| Thraex — The Hooked Blade | Precision offense, shield bypass | Disruption and control | **Hooked Blade:** 25% of Sword damage ignores Shields; two Sword symbols remove one Shield charge |
+| Thraex — The Hooked Blade | Precision offense, shield bypass | Disruption and control | **Hooked Blade:** 25% of Sword damage ignores Shields |
 | Retiarius — The Net | Disruption, reach, tempo control | Direct pressure against heavy defense | **Entangling Net:** two Net symbols apply Entangled, reducing next enemy damage by 30%; three Net symbols grant a free reroll |
 
 The intended matchup cycle is:
@@ -265,6 +259,31 @@ Players improve through:
 - Seasonal cosmetic rewards.
 
 The design should avoid requiring a PvE campaign or artificial enemy ladder. The player community supplies the changing challenge.
+
+## B9.1 Forge Reels — Equipment Generation
+
+Instead of distributing equipment through traditional, disconnected loot boxes, Arena Fortuna extends its core slot-machine mechanic into item progression.
+
+A separate **Forge Reel** system generates equipment through a short multi-reel sequence where each reel determines one property of the resulting item:
+
+$$\text{Equipment Slot} \longrightarrow \text{Archetype Affinity} \longrightarrow \text{Rarity} \longrightarrow \text{Primary Stat} \longrightarrow \text{Special Affix}$$
+
+A sample Forge roll might resolve as:
+> **Weapon** $\rightarrow$ **Thraex** $\rightarrow$ **Legendary** $\rightarrow$ **+Damage** $\rightarrow$ **Shield Pierce**
+
+This keeps randomized rewards intrinsically connected to the game's central visual and mechanical design language rather than moving progression into a generic chest-opening interface.
+
+### Player Agency & Forge Mechanics
+Higher-tier progression introduces tactical controls to shape the odds:
+- **Reel Locking**: Lock one property reel (e.g., Slot or Rarity) before rerolling remaining properties.
+- **Single Property Rerolls**: Reroll a single item property using earned materials.
+- **Catalysts**: Apply crafting catalysts to elevate minimum rarity thresholds.
+- **Pity Protection**: Accumulate Forge resonance toward guaranteed Legendary/Mythic items.
+- **Recycling**: Dismantle unwanted equipment into specialized Forge resources.
+
+The design goal mirrors combat: **randomness creates the outcome space, while player decisions shape the odds.**
+
+For competitive integrity, direct real-money purchases should not provide unrestricted randomized power in ranked House Wars. The Forge primarily functions as an earned progression system, with monetization focused on cosmetics, convenience, and non-decisive advantages.
 
 ## B10. Monetization
 The recommended model protects ranked competition.
